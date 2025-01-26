@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { Command } from "commander";
 import { cloneRepository } from "./cloneRepository";
 import { getExampleDirectories } from "./getExampleDirectories";

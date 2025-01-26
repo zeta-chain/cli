@@ -1,8 +1,11 @@
 {
   "name": "create-universal-contract",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "description": "CLI tool for creating universal smart contracts on ZetaChain",
   "main": "index.js",
+  "bin": {
+    "create-universal-contract": "./dist/index.js"
+  },
   "scripts": {
     "build": "yarn tsc"
   },
@@ -10,6 +13,9 @@
     "type": "git",
     "url": "git+https://github.com/zeta-chain/create-universal-contract.git"
   },
+  "files": [
+    "dist"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
