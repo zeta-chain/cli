@@ -1,8 +1,8 @@
-import fs from "fs-extra";
-import path from "path";
 import { select } from "@inquirer/prompts";
+import fs from "fs-extra";
 import { marked } from "marked";
 import { markedTerminal } from "marked-terminal";
+import path from "path";
 
 marked.use(markedTerminal() as any);
 
@@ -10,7 +10,7 @@ export const copyExample = async (
   chosenExample: string,
   examplesDir: string,
   outputDir: string,
-  isVerbose: boolean
+  isVerbose: boolean,
 ) => {
   const sourceDir = path.join(examplesDir, chosenExample);
 
@@ -20,8 +20,8 @@ export const copyExample = async (
   const targetDir = isOutputDirJustName
     ? path.resolve(process.cwd(), outputDir)
     : path.isAbsolute(outputDir)
-    ? outputDir
-    : path.resolve(process.cwd(), outputDir);
+      ? outputDir
+      : path.resolve(process.cwd(), outputDir);
 
   const finalTargetDir = isOutputDirJustName
     ? path.join(targetDir)
@@ -29,11 +29,11 @@ export const copyExample = async (
 
   if (fs.existsSync(finalTargetDir)) {
     const overwrite = await select({
-      message: `The directory "${finalTargetDir}" already exists. Do you want to overwrite it?`,
       choices: [
         { name: "Yes, overwrite it", value: true },
         { name: "No, cancel the operation", value: false },
       ],
+      message: `The directory "${finalTargetDir}" already exists. Do you want to overwrite it?`,
     });
 
     if (!overwrite) {

@@ -19,8 +19,8 @@ export const getExampleDirectories = async (examplesDir: string) => {
         description = packageJson.description || description;
       }
 
-      return { name: dir.name, description };
-    })
+      return { description, name: dir.name };
+    }),
   );
 
   return examples;

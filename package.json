@@ -7,7 +7,11 @@
     "create-universal-contract": "./dist/index.js"
   },
   "scripts": {
-    "build": "yarn tsc"
+    "build": "yarn tsc",
+    "lint:fix": "npm run lint:js:fix",
+    "lint:js:fix": "eslint --ext .js,.ts . --fix",
+    "lint:js": "eslint --ext .js,.ts .",
+    "lint": "npm run lint:js"
   },
   "repository": {
     "type": "git",
@@ -36,6 +40,18 @@
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/marked-terminal": "^6.1.1",
+    "@typescript-eslint/eslint-plugin": "^5.59.0",
+    "@typescript-eslint/parser": "^8.21.0",
+    "eslint": "^8.42.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-import-resolver-typescript": "^3.7.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "eslint-plugin-prettier": "^5.2.3",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-sort-keys-fix": "^1.1.2",
+    "eslint-plugin-typescript-sort-keys": "^3.3.0",
+    "prettier": "^3.4.2",
     "typescript": "^5.7.3"
   }
 }

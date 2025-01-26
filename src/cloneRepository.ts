@@ -6,7 +6,7 @@ export const cloneRepository = async (
   tempDir: string,
   branchName: string,
   options: any,
-  isVerbose: boolean
+  isVerbose: boolean,
 ) => {
   if (!options.cache || !fs.existsSync(tempDir)) {
     if (fs.existsSync(tempDir)) {

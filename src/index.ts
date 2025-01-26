@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 import { Command } from "commander";
+import os from "os";
+import path from "path";
+
 import { cloneRepository } from "./cloneRepository";
+import { copyExample } from "./copyExample";
 import { getExampleDirectories } from "./getExampleDirectories";
 import { promptForExample } from "./promptForExample";
-import { copyExample } from "./copyExample";
-import path from "path";
-import os from "os";
 
 const program = new Command();
 const REPO_URL = "https://github.com/zeta-chain/example-contracts.git";
@@ -17,14 +18,14 @@ program
   .name("create-universal-contracts")
   .description(
     "CLI tool for creating universal contracts on ZetaChain.\n" +
-      "For more information, visit: https://zetachain.com/docs"
+      "For more information, visit: https://zetachain.com/docs",
   )
   .option("--no-cache", "Bypass cached repository and re-clone")
   .option("--verbose", "Enable verbose logging")
   .option(
     "--output <directory>",
     "Specify custom output directory or name",
-    process.cwd()
+    process.cwd(),
   );
 
 program.parse(process.argv);
