@@ -13,14 +13,20 @@ const EXAMPLES_DIR = path.join(TEMP_DIR, "examples");
 const BRANCH_NAME = "descriptions";
 
 program
+  .name("create-universal-contracts")
+  .description(
+    "CLI tool for creating universal contracts on ZetaChain.\n" +
+      "For more information, visit: https://zetachain.com/docs"
+  )
   .option("--no-cache", "Bypass cached repository and re-clone")
   .option("--verbose", "Enable verbose logging")
   .option(
     "--output <directory>",
     "Specify custom output directory or name",
     process.cwd()
-  )
-  .parse(process.argv);
+  );
+
+program.parse(process.argv);
 
 const options = program.opts();
 const isVerbose = options.verbose;
