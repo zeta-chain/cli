@@ -14,7 +14,6 @@ export const copyExample = async (
 ) => {
   const sourceDir = path.join(examplesDir, chosenExample);
 
-  // Determine if the outputDir is just a name or a full path
   const isOutputDirJustName =
     !path.isAbsolute(outputDir) && !outputDir.includes(path.sep);
 
