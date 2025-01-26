@@ -1,6 +1,6 @@
 {
   "name": "create-universal-contract",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "CLI tool for creating universal smart contracts on ZetaChain",
   "main": "index.js",
   "bin": {
@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/zeta-chain/create-universal-contract#readme",
   "dependencies": {
+    "clear": "^0.1.0",
     "commander": "^13.1.0",
     "fs-extra": "^11.3.0",
     "inquirer": "^12.3.2",
@@ -38,6 +39,7 @@
     "simple-git": "^3.27.0"
   },
   "devDependencies": {
+    "@types/clear": "^0.1.4",
     "@types/fs-extra": "^11.0.4",
     "@types/marked-terminal": "^6.1.1",
     "@typescript-eslint/eslint-plugin": "^5.59.0",
