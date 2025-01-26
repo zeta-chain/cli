@@ -16,10 +16,16 @@ const BRANCH_NAME = "descriptions";
 program
   .option("--no-cache", "Bypass cached repository and re-clone")
   .option("--verbose", "Enable verbose logging")
+  .option(
+    "--output <directory>",
+    "Specify custom output directory or name",
+    process.cwd()
+  )
   .parse(process.argv);
 
 const options = program.opts();
 const isVerbose = options.verbose;
+const outputDir = options.output;
 
 async function cloneRepository() {
   if (!options.cache || !fs.existsSync(TEMP_DIR)) {
@@ -38,9 +44,7 @@ async function cloneRepository() {
   }
 }
 
-async function getExampleDirectories(): Promise<
-  { name: string; description: string }[]
-> {
+async function getExampleDirectories() {
   const entries = fs.readdirSync(EXAMPLES_DIR, { withFileTypes: true });
   const directories = entries.filter((entry) => entry.isDirectory());
 
@@ -86,13 +90,22 @@ marked.use(markedTerminal() as any);
 
 async function copyExample(chosenExample: string) {
   const sourceDir = path.join(EXAMPLES_DIR, chosenExample);
-  const targetDir = path.join(process.cwd(), chosenExample);
+  const targetDir = path.isAbsolute(outputDir)
+    ? outputDir
+    : path.resolve(process.cwd(), outputDir);
 
-  console.log(`\nCreated ${targetDir}\n`);
-  await fs.copy(sourceDir, targetDir);
+  const finalTargetDir =
+    fs.existsSync(targetDir) && fs.lstatSync(targetDir).isDirectory()
+      ? path.join(targetDir, chosenExample)
+      : targetDir;
+
+  if (isVerbose) console.log(`Copying example to ${finalTargetDir}...`);
+
+  console.log(`\nCreated ${finalTargetDir}\n`);
+  await fs.copy(sourceDir, finalTargetDir);
   if (isVerbose) console.log(`Successfully created "${chosenExample}".`);
 
-  const readmePath = path.join(targetDir, "README.md");
+  const readmePath = path.join(finalTargetDir, "README.md");
   if (fs.existsSync(readmePath)) {
     const readmeContent = await fs.readFile(readmePath, "utf-8");
     console.log(marked(readmeContent));
