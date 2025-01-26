@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/zeta-chain/create-universal-contract#readme",
   "dependencies": {
+    "commander": "^13.1.0",
     "fs-extra": "^11.3.0",
     "inquirer": "^12.3.2",
     "node-fetch": "^3.3.2",
