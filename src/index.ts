@@ -27,6 +27,10 @@ program
     "--output <directory>",
     "Specify custom output directory or name",
     process.cwd()
+  )
+  .option(
+    "--example <exampleName>",
+    "Specify the example to use and skip the prompt"
   );
 
 program.parse(process.argv);
@@ -34,13 +38,34 @@ program.parse(process.argv);
 const options = program.opts();
 const isVerbose = options.verbose;
 const outputDir = options.output;
+const exampleName = options.example;
 
 const main = async () => {
   try {
     clear();
     await cloneRepository(REPO_URL, TEMP_DIR, BRANCH_NAME, options, isVerbose);
     const directories = await getExampleDirectories(EXAMPLES_DIR);
-    const chosenExample = await promptForExample(directories);
+
+    let chosenExample;
+    if (exampleName) {
+      const matchingExample = directories.find(
+        (dir) => dir.name === exampleName
+      );
+      if (!matchingExample) {
+        console.error(`Error: Example "${exampleName}" not found.`);
+        console.error(
+          "Available examples:",
+          directories
+            .map((dir) => `${dir.name} - ${dir.description}`)
+            .join("\n")
+        );
+        process.exit(1);
+      }
+      chosenExample = matchingExample.name;
+    } else {
+      chosenExample = await promptForExample(directories);
+    }
+
     await copyExample(chosenExample, EXAMPLES_DIR, outputDir, isVerbose);
   } catch (error: any) {
     if (isVerbose) {
