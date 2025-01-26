@@ -17,5 +17,15 @@
   "bugs": {
     "url": "https://github.com/zeta-chain/create-universal-contract/issues"
   },
-  "homepage": "https://github.com/zeta-chain/create-universal-contract#readme"
+  "homepage": "https://github.com/zeta-chain/create-universal-contract#readme",
+  "dependencies": {
+    "fs-extra": "^11.3.0",
+    "inquirer": "^12.3.2",
+    "node-fetch": "^3.3.2",
+    "simple-git": "^3.27.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "typescript": "^5.7.3"
+  }
 }
