@@ -91,6 +91,14 @@ async function copyExample(chosenExample: string) {
     console.log(`\nCopying "${chosenExample}" to "${targetDir}"...`);
   await fs.copy(sourceDir, targetDir);
   if (isVerbose) console.log(`Successfully created "${chosenExample}".`);
+
+  const readmePath = path.join(targetDir, "README.md");
+  if (fs.existsSync(readmePath)) {
+    const readmeContent = await fs.readFile(readmePath, "utf-8");
+    console.log(`\nContents of README.md:\n\n${readmeContent}`);
+  } else {
+    console.log("\nNo README.md file found in the chosen example.");
+  }
 }
 
 async function main() {
