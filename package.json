@@ -22,11 +22,14 @@
     "commander": "^13.1.0",
     "fs-extra": "^11.3.0",
     "inquirer": "^12.3.2",
+    "marked": "^15.0.6",
+    "marked-terminal": "^7.2.1",
     "node-fetch": "^3.3.2",
     "simple-git": "^3.27.0"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
+    "@types/marked-terminal": "^6.1.1",
     "typescript": "^5.7.3"
   }
 }

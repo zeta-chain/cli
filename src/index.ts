@@ -1,9 +1,11 @@
-import inquirer from "inquirer";
+import { select } from "@inquirer/prompts";
 import simpleGit from "simple-git";
 import fs from "fs-extra";
 import path from "path";
 import os from "os";
 import { Command } from "commander";
+import { marked } from "marked";
+import { markedTerminal } from "marked-terminal";
 
 const program = new Command();
 const REPO_URL = "https://github.com/zeta-chain/example-contracts.git";
@@ -67,37 +69,33 @@ async function promptForExample(
   directories: { name: string; description: string }[]
 ): Promise<string> {
   const choices = directories.map((dir) => ({
-    name: `${dir.name}: ${dir.description}`,
+    name: `${dir.name}\t${dir.description}`,
     value: dir.name,
+    short: dir.name,
   }));
 
-  const { chosenExample } = await inquirer.prompt([
-    {
-      type: "list",
-      name: "chosenExample",
-      message: "Which example do you want to create?",
-      choices,
-    },
-  ]);
+  const chosenExample = await select({
+    message: "Which example do you want to create?",
+    choices,
+  });
 
   return chosenExample;
 }
+
+marked.use(markedTerminal() as any);
 
 async function copyExample(chosenExample: string) {
   const sourceDir = path.join(EXAMPLES_DIR, chosenExample);
   const targetDir = path.join(process.cwd(), chosenExample);
 
-  if (isVerbose)
-    console.log(`\nCopying "${chosenExample}" to "${targetDir}"...`);
+  console.log(`\nCreated ${targetDir}\n`);
   await fs.copy(sourceDir, targetDir);
   if (isVerbose) console.log(`Successfully created "${chosenExample}".`);
 
   const readmePath = path.join(targetDir, "README.md");
   if (fs.existsSync(readmePath)) {
     const readmeContent = await fs.readFile(readmePath, "utf-8");
-    console.log(`\nContents of README.md:\n\n${readmeContent}`);
-  } else {
-    console.log("\nNo README.md file found in the chosen example.");
+    console.log(marked(readmeContent));
   }
 }
 
