@@ -13,23 +13,26 @@ const BRANCH_NAME = "descriptions";
 
 program
   .option("--no-cache", "Bypass cached repository and re-clone")
+  .option("--verbose", "Enable verbose logging")
   .parse(process.argv);
 
 const options = program.opts();
+const isVerbose = options.verbose;
 
 async function cloneRepository() {
   if (!options.cache || !fs.existsSync(TEMP_DIR)) {
     if (fs.existsSync(TEMP_DIR)) {
-      console.log("Removing cached repository...");
+      if (isVerbose) console.log("Removing cached repository...");
       await fs.remove(TEMP_DIR);
     }
 
-    console.log(`Cloning repository (branch: ${BRANCH_NAME})...`);
+    if (isVerbose)
+      console.log(`Cloning repository (branch: ${BRANCH_NAME})...`);
     const git = simpleGit();
     await git.clone(REPO_URL, TEMP_DIR, ["--branch", BRANCH_NAME, "--depth=1"]);
-    console.log("Repository cloned successfully.");
+    if (isVerbose) console.log("Repository cloned successfully.");
   } else {
-    console.log("Using cached repository. Skipping clone.");
+    if (isVerbose) console.log("Using cached repository. Skipping clone.");
   }
 }
 
@@ -84,9 +87,10 @@ async function copyExample(chosenExample: string) {
   const sourceDir = path.join(EXAMPLES_DIR, chosenExample);
   const targetDir = path.join(process.cwd(), chosenExample);
 
-  console.log(`\nCopying "${chosenExample}" to "${targetDir}"...`);
+  if (isVerbose)
+    console.log(`\nCopying "${chosenExample}" to "${targetDir}"...`);
   await fs.copy(sourceDir, targetDir);
-  console.log(`Successfully created "${chosenExample}".`);
+  if (isVerbose) console.log(`Successfully created "${chosenExample}".`);
 }
 
 async function main() {
@@ -96,8 +100,10 @@ async function main() {
     const chosenExample = await promptForExample(directories);
     await copyExample(chosenExample);
   } catch (error: any) {
-    console.error("An error occurred:", error.message);
-    console.error(error.stack);
+    if (isVerbose) {
+      console.error("An error occurred:", error.message);
+      console.error(error.stack);
+    }
     process.exit(1);
   }
 }
