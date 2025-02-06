@@ -1,6 +1,6 @@
 {
   "name": "create-universal-contract",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "CLI tool for creating universal smart contracts on ZetaChain",
   "main": "index.js",
   "bin": {
