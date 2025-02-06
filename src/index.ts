@@ -13,24 +13,24 @@ const program = new Command();
 const REPO_URL = "https://github.com/zeta-chain/example-contracts.git";
 const TEMP_DIR = path.join(os.tmpdir(), "example-contracts");
 const EXAMPLES_DIR = path.join(TEMP_DIR, "examples");
-const BRANCH_NAME = "descriptions";
+const BRANCH_NAME = "main";
 
 program
   .name("create-universal-contracts")
   .description(
     "CLI tool for creating universal contracts on ZetaChain.\n" +
-      "For more information, visit: https://zetachain.com/docs",
+      "For more information, visit: https://zetachain.com/docs"
   )
   .option("--no-cache", "Bypass cached repository and re-clone")
   .option("--verbose", "Enable verbose logging")
   .option(
     "--output <directory>",
     "Specify custom output directory or name",
-    process.cwd(),
+    process.cwd()
   )
   .option(
     "--example <exampleName>",
-    "Specify the example to use and skip the prompt",
+    "Specify the example to use and skip the prompt"
   );
 
 program.parse(process.argv);
@@ -49,7 +49,7 @@ const main = async () => {
     let chosenExample;
     if (exampleName) {
       const matchingExample = directories.find(
-        (dir) => dir.name === exampleName,
+        (dir) => dir.name === exampleName
       );
       if (!matchingExample) {
         console.error(`Error: Example "${exampleName}" not found.`);
@@ -57,7 +57,7 @@ const main = async () => {
           "Available examples:",
           directories
             .map((dir) => `${dir.name} - ${dir.description}`)
-            .join("\n"),
+            .join("\n")
         );
         process.exit(1);
       }
