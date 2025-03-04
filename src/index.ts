@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import clear from "clear";
 import { Command } from "commander";
 import os from "os";
 import path from "path";
@@ -42,7 +41,6 @@ const exampleName = options.example;
 
 const main = async () => {
   try {
-    clear();
     await cloneRepository(REPO_URL, TEMP_DIR, BRANCH_NAME, options, isVerbose);
     const directories = await getExampleDirectories(EXAMPLES_DIR);
 
