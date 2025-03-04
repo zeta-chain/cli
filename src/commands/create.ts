@@ -1,7 +1,7 @@
 #!/usr/bin/env node
+import { Command } from "commander";
 import os from "os";
 import path from "path";
-import { Command } from "commander";
 
 import { cloneRepository } from "@/utils/cloneRepository";
 import { copyExample } from "@/utils/copyExample";
@@ -15,9 +15,9 @@ const BRANCH_NAME = "main";
 
 type CreateOptions = {
   cache?: boolean;
-  verbose?: boolean;
-  output?: string;
   example?: string;
+  output?: string;
+  verbose?: boolean;
 };
 
 const create = async (options: CreateOptions): Promise<void> => {
@@ -32,7 +32,7 @@ const create = async (options: CreateOptions): Promise<void> => {
     let chosenExample: string;
     if (exampleName) {
       const matchingExample = directories.find(
-        (dir: any) => dir.name === exampleName
+        (dir: any) => dir.name === exampleName,
       );
       if (!matchingExample) {
         console.error(`Error: Example "${exampleName}" not found.`);
@@ -40,7 +40,7 @@ const create = async (options: CreateOptions): Promise<void> => {
           "Available examples:",
           directories
             .map((dir: any) => `${dir.name} - ${dir.description}`)
-            .join("\n")
+            .join("\n"),
         );
         process.exit(1);
       }
@@ -68,7 +68,7 @@ export const createCommand = (program: Command): void => {
     .option("--output <directory>", "Specify custom output directory or name")
     .option(
       "--example <exampleName>",
-      "Specify the example to use and skip the prompt"
+      "Specify the example to use and skip the prompt",
     )
     .action(create);
 };
