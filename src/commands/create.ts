@@ -7,18 +7,12 @@ import { cloneRepository } from "@/utils/cloneRepository";
 import { copyExample } from "@/utils/copyExample";
 import { getExampleDirectories } from "@/utils/getExampleDirectories";
 import { promptForExample } from "@/utils/promptForExample";
+import type { CreateOptions } from "@/utils/types";
 
 const REPO_URL = "https://github.com/zeta-chain/example-contracts.git";
 const TEMP_DIR = path.join(os.tmpdir(), "example-contracts");
 const EXAMPLES_DIR = path.join(TEMP_DIR, "examples");
 const BRANCH_NAME = "main";
-
-type CreateOptions = {
-  cache?: boolean;
-  example?: string;
-  output?: string;
-  verbose?: boolean;
-};
 
 const create = async (options: CreateOptions): Promise<void> => {
   const isVerbose: boolean = options.verbose || false;
