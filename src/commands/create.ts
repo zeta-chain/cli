@@ -26,14 +26,14 @@ const create = async (options: CreateOptions): Promise<void> => {
     let chosenExample: string;
     if (exampleName) {
       const matchingExample = directories.find(
-        (dir: any) => dir.name === exampleName,
+        (dir) => dir.name === exampleName,
       );
       if (!matchingExample) {
         console.error(`Error: Example "${exampleName}" not found.`);
         console.error(
           "Available examples:",
           directories
-            .map((dir: any) => `${dir.name} - ${dir.description}`)
+            .map((dir) => `${dir.name} - ${dir.description}`)
             .join("\n"),
         );
         process.exit(1);
@@ -44,10 +44,14 @@ const create = async (options: CreateOptions): Promise<void> => {
     }
 
     await copyExample(chosenExample, EXAMPLES_DIR, outputDir, isVerbose);
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (isVerbose) {
-      console.error("An error occurred:", error.message);
-      console.error(error.stack);
+      if (error instanceof Error) {
+        console.error("An error occurred:", error.message);
+        console.error(error.stack);
+      } else {
+        console.error("An unknown error occurred:", error);
+      }
     }
     process.exit(1);
   }

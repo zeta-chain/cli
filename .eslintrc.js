@@ -24,6 +24,7 @@ module.exports = {
     "prefer-arrow",
   ],
   rules: {
+    "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/sort-type-union-intersection-members": "error",
     camelcase: "off",
     "func-style": ["error", "expression", { allowArrowFunctions: true }],

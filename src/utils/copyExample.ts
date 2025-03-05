@@ -1,10 +1,10 @@
 import { select } from "@inquirer/prompts";
 import fs from "fs-extra";
-import { marked } from "marked";
+import { marked, MarkedExtension } from "marked";
 import { markedTerminal } from "marked-terminal";
 import path from "path";
 
-marked.use(markedTerminal() as any);
+marked.use(markedTerminal() as MarkedExtension);
 
 export const copyExample = async (
   chosenExample: string,
