@@ -1,7 +1,7 @@
 import fs from "fs-extra";
 import simpleGit from "simple-git";
 
-import type { CreateOptions } from "@/utils/types";
+import type { CreateOptions } from "../utils/types";
 
 export const cloneRepository = async (
   repoUrl: string,
