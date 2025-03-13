@@ -1,14 +1,14 @@
 import fs from "fs-extra";
 import simpleGit from "simple-git";
 
-import type { CreateOptions } from "@/utils/types";
+import type { CreateOptions } from "../utils/types";
 
 export const cloneRepository = async (
   repoUrl: string,
   tempDir: string,
   branchName: string,
   options: CreateOptions,
-  isVerbose: boolean,
+  isVerbose: boolean
 ) => {
   const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
 

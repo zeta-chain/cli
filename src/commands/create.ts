@@ -3,11 +3,11 @@ import { Command } from "commander";
 import os from "os";
 import path from "path";
 
-import { cloneRepository } from "@/utils/cloneRepository";
-import { copyExample } from "@/utils/copyExample";
-import { getExampleDirectories } from "@/utils/getExampleDirectories";
-import { promptForExample } from "@/utils/promptForExample";
-import type { CreateOptions } from "@/utils/types";
+import { cloneRepository } from "../utils/cloneRepository";
+import { copyExample } from "../utils/copyExample";
+import { getExampleDirectories } from "../utils/getExampleDirectories";
+import { promptForExample } from "../utils/promptForExample";
+import type { CreateOptions } from "../utils/types";
 
 const REPO_URL = "https://github.com/zeta-chain/example-contracts.git";
 const TEMP_DIR = path.join(os.tmpdir(), "example-contracts");
@@ -26,7 +26,7 @@ const create = async (options: CreateOptions): Promise<void> => {
     let chosenExample: string;
     if (exampleName) {
       const matchingExample = directories.find(
-        (dir) => dir.name === exampleName,
+        (dir) => dir.name === exampleName
       );
       if (!matchingExample) {
         console.error(`Error: Example "${exampleName}" not found.`);
@@ -34,7 +34,7 @@ const create = async (options: CreateOptions): Promise<void> => {
           "Available examples:",
           directories
             .map((dir) => `${dir.name} - ${dir.description}`)
-            .join("\n"),
+            .join("\n")
         );
         process.exit(1);
       }
@@ -66,7 +66,7 @@ export const createCommand = (program: Command): void => {
     .option("--output <directory>", "Specify custom output directory or name")
     .option(
       "--example <exampleName>",
-      "Specify the example to use and skip the prompt",
+      "Specify the example to use and skip the prompt"
     )
     .action(create);
 };
