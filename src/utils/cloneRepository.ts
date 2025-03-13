@@ -8,7 +8,7 @@ export const cloneRepository = async (
   tempDir: string,
   branchName: string,
   options: CreateOptions,
-  isVerbose: boolean
+  isVerbose: boolean,
 ) => {
   const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
 
