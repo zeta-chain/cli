@@ -1,8 +1,8 @@
 #!/usr/bin/env node
+import { localnetCommand } from "@zetachain/localnet/commands";
 import { Command } from "commander";
 
 import { createCommand } from "./commands/create";
-import { localnetCommand } from "@zetachain/localnet/commands";
 
 const program: Command = new Command();
 
