@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { Command } from "commander";
 import os from "os";
 import path from "path";
@@ -26,7 +25,7 @@ const create = async (options: CreateOptions): Promise<void> => {
     let chosenExample: string;
     if (exampleName) {
       const matchingExample = directories.find(
-        (dir) => dir.name === exampleName,
+        (dir) => dir.name === exampleName
       );
       if (!matchingExample) {
         console.error(`Error: Example "${exampleName}" not found.`);
@@ -34,7 +33,7 @@ const create = async (options: CreateOptions): Promise<void> => {
           "Available examples:",
           directories
             .map((dir) => `${dir.name} - ${dir.description}`)
-            .join("\n"),
+            .join("\n")
         );
         process.exit(1);
       }
@@ -57,16 +56,13 @@ const create = async (options: CreateOptions): Promise<void> => {
   }
 };
 
-export const createCommand = (program: Command): void => {
-  program
-    .command("create")
-    .description("Create a new universal contract project.")
-    .option("--no-cache", "Bypass cached repository and re-clone")
-    .option("--verbose", "Enable verbose logging")
-    .option("--output <directory>", "Specify custom output directory or name")
-    .option(
-      "--example <exampleName>",
-      "Specify the example to use and skip the prompt",
-    )
-    .action(create);
-};
+export const createCommand = new Command("create")
+  .description("Create a new universal contract project.")
+  .option("--no-cache", "Bypass cached repository and re-clone")
+  .option("--verbose", "Enable verbose logging")
+  .option("--output <directory>", "Specify custom output directory or name")
+  .option(
+    "--example <exampleName>",
+    "Specify the example to use and skip the prompt"
+  )
+  .action(create);

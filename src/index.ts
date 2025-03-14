@@ -2,6 +2,7 @@
 import { Command } from "commander";
 
 import { createCommand } from "./commands/create";
+import { localnetCommand } from "@zetachain/localnet/commands";
 
 const program: Command = new Command();
 
@@ -10,6 +11,7 @@ program
   .description("CLI tool for ZetaChain development.")
   .version("1.0.0");
 
-createCommand(program);
+program.addCommand(createCommand);
+program.addCommand(localnetCommand);
 
 program.parse(process.argv);
