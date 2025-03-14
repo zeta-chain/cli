@@ -28,8 +28,8 @@ jobs:
         id: determine-npm-tag
         run: |
           VERSION_TAG=${GITHUB_REF#refs/tags/v}
-          if [[ $VERSION_TAG == *"-"* ]]; then
-            echo ::set-output name=NPM_TAG::${VERSION_TAG#*-}
+          if [[ $VERSION_TAG == *"-rc"* ]]; then
+            echo ::set-output name=NPM_TAG::next
           else
             echo ::set-output name=NPM_TAG::latest
           fi
@@ -37,8 +37,7 @@ jobs:
           GITHUB_REF: ${{ github.ref }}
 
       - name: Publish to NPM
-        run:
-          yarn publish --new-version ${GITHUB_REF#refs/tags/v} --tag ${{
+        run: yarn publish --new-version ${GITHUB_REF#refs/tags/v} --tag ${{
           steps.determine-npm-tag.outputs.NPM_TAG }} --no-git-tag-version
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
