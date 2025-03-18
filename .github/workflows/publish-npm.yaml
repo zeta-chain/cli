@@ -21,10 +21,7 @@ jobs:
       - name: Install Dependencies
         run: yarn install
 
-      - name: Build
-        run: yarn build
-
-      - name: Determine NPM Tag
+      - name: Determine NPM Tag and Version
         id: determine-npm-tag
         run: |
           VERSION_TAG=${GITHUB_REF#refs/tags/v}
@@ -33,13 +30,17 @@ jobs:
           else
             echo ::set-output name=NPM_TAG::latest
           fi
+          echo ::set-output name=VERSION::${VERSION_TAG}
         env:
           GITHUB_REF: ${{ github.ref }}
 
+      - name: Build
+        run: yarn build
+        env:
+          ZETACHAIN_CLI_VERSION: ${{ steps.determine-npm-tag.outputs.VERSION }}
+
       - name: Publish to NPM
-        run:
-          yarn publish --new-version ${GITHUB_REF#refs/tags/v} --tag ${{
-          steps.determine-npm-tag.outputs.NPM_TAG }} --no-git-tag-version
+        run: yarn publish --new-version ${{ steps.determine-npm-tag.outputs.VERSION }} --tag ${{ steps.determine-npm-tag.outputs.NPM_TAG }} --no-git-tag-version
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_REF: ${{ github.ref }}
