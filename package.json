@@ -12,7 +12,7 @@
     "lint:js:fix": "eslint --ext .js,.ts . --fix",
     "lint:js": "eslint --ext .js,.ts .",
     "lint": "npm run lint:js",
-    "main": "npx tsx src/index.ts"
+    "zetachain": "npx tsx src/index.ts"
   },
   "repository": {
     "type": "git",
@@ -30,6 +30,7 @@
   },
   "homepage": "https://github.com/zeta-chain/cli#readme",
   "dependencies": {
+    "@zetachain/localnet": "8.0.0-rc1",
     "commander": "^13.1.0",
     "fs-extra": "^11.3.0",
     "inquirer": "^12.3.2",
