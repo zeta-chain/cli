@@ -7,17 +7,17 @@ import { cloneRepository } from "../utils/cloneRepository";
 import { copyExample } from "../utils/copyExample";
 import { getExampleDirectories } from "../utils/getExampleDirectories";
 import { promptForExample } from "../utils/promptForExample";
-import type { CreateOptions } from "../utils/types";
+import type { NewOptions } from "../utils/types";
 
 const REPO_URL = "https://github.com/zeta-chain/example-contracts.git";
 const TEMP_DIR = path.join(os.tmpdir(), "example-contracts");
 const EXAMPLES_DIR = path.join(TEMP_DIR, "examples");
 const BRANCH_NAME = "main";
 
-const create = async (options: CreateOptions): Promise<void> => {
+const main = async (options: NewOptions): Promise<void> => {
   const isVerbose: boolean = options.verbose || false;
   const outputDir: string = options.output || process.cwd();
-  const exampleName: string | undefined = options.example;
+  const exampleName: string | undefined = options.project;
 
   try {
     await cloneRepository(REPO_URL, TEMP_DIR, BRANCH_NAME, options, isVerbose);
@@ -26,7 +26,7 @@ const create = async (options: CreateOptions): Promise<void> => {
     let chosenExample: string;
     if (exampleName) {
       const matchingExample = directories.find(
-        (dir) => dir.name === exampleName,
+        (dir) => dir.name === exampleName
       );
       if (!matchingExample) {
         console.error(`Error: Example "${exampleName}" not found.`);
@@ -34,7 +34,7 @@ const create = async (options: CreateOptions): Promise<void> => {
           "Available examples:",
           directories
             .map((dir) => `${dir.name} - ${dir.description}`)
-            .join("\n"),
+            .join("\n")
         );
         process.exit(1);
       }
@@ -57,16 +57,16 @@ const create = async (options: CreateOptions): Promise<void> => {
   }
 };
 
-export const createCommand = (program: Command): void => {
+export const newCommand = (program: Command): void => {
   program
-    .command("create")
+    .command("new")
     .description("Create a new universal contract project.")
     .option("--no-cache", "Bypass cached repository and re-clone")
     .option("--verbose", "Enable verbose logging")
     .option("--output <directory>", "Specify custom output directory or name")
     .option(
-      "--example <exampleName>",
-      "Specify the example to use and skip the prompt",
+      "--project <projectName>",
+      "Specify the example project to use and skip the prompt"
     )
-    .action(create);
+    .action(main);
 };

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 
-import { createCommand } from "./commands/create";
+import { newCommand } from "./commands/new";
 
 const program: Command = new Command();
 
@@ -10,6 +10,6 @@ program
   .description("CLI tool for ZetaChain development.")
   .version("1.0.0");
 
-createCommand(program);
+newCommand(program);
 
 program.parse(process.argv);

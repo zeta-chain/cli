@@ -1,6 +1,6 @@
-export type CreateOptions = {
+export type NewOptions = {
   cache?: boolean;
-  example?: string;
+  project?: string;
   output?: string;
   verbose?: boolean;
 };
