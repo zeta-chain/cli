@@ -1,6 +1,6 @@
 export type NewOptions = {
   cache?: boolean;
-  project?: string;
   output?: string;
+  project?: string;
   verbose?: boolean;
 };
