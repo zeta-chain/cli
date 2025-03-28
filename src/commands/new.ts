@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { Command } from "commander";
 import os from "os";
 import path from "path";
@@ -57,16 +56,13 @@ const main = async (options: NewOptions): Promise<void> => {
   }
 };
 
-export const newCommand = (program: Command): void => {
-  program
-    .command("new")
-    .description("Create a new universal contract project.")
-    .option("--no-cache", "Bypass cached repository and re-clone")
-    .option("--verbose", "Enable verbose logging")
-    .option("--output <directory>", "Specify custom output directory or name")
-    .option(
-      "--project <projectName>",
-      "Specify the example project to use and skip the prompt",
-    )
-    .action(main);
-};
+export const newCommand = new Command("new")
+  .description("Create a new universal contract project.")
+  .option("--no-cache", "Bypass cached repository and re-clone")
+  .option("--verbose", "Enable verbose logging")
+  .option("--output <directory>", "Specify custom output directory or name")
+  .option(
+    "--project <projectName>",
+    "Specify the example project to use and skip the prompt",
+  )
+  .action(main);

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { localnetCommand } from "@zetachain/localnet/commands";
 import { Command } from "commander";
 
 import { newCommand } from "./commands/new";
@@ -8,8 +9,9 @@ const program: Command = new Command();
 program
   .name("zetachain")
   .description("CLI tool for ZetaChain development.")
-  .version("1.0.0");
+  .version("dev");
 
-newCommand(program);
+program.addCommand(newCommand);
+program.addCommand(localnetCommand);
 
 program.parse(process.argv);
