@@ -17,12 +17,12 @@ npx zetachain@next <command>
 
 ## Commands
 
-### create
+### new
 
 Creates a new ZetaChain universal application:
 
 ```bash
-npx zetachain@next create
+npx zetachain@next new
 ```
 
 ### localnet
