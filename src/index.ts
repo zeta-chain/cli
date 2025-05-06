@@ -10,7 +10,8 @@ const program: Command = new Command();
 program
   .name("zetachain")
   .description("CLI tool for ZetaChain development.")
-  .version("dev");
+  .version("dev")
+  .helpCommand(false);
 
 program.addCommand(newCommand);
 program.addCommand(localnetCommand);
