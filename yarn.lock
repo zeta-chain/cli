@@ -3212,10 +3212,10 @@
     typescript "5.5.4"
     zod "3.22.4"
 
-"@zetachain/localnet@9.0.2-rc1":
-  version "9.0.2-rc1"
-  resolved "https://registry.npmjs.org/@zetachain/localnet/-/localnet-9.0.2-rc1.tgz#bb33555459781b4ac1f639e3c8bc1bea330ddd3d"
-  integrity sha512-X72iBfTsjuk+/83NnFpIrrwTg8Fk21+qP0Im/ofbahGCvNTxAh5PzZd29lST/wZLj62kBCJP6Plt8POnCi3Mlg==
+"@zetachain/localnet@10.0.0-rc1":
+  version "10.0.0-rc1"
+  resolved "https://registry.npmjs.org/@zetachain/localnet/-/localnet-10.0.0-rc1.tgz#e954747582740058fbd465abe5365b9f8067f22e"
+  integrity sha512-7HjK1qml6+DUhXXR2nfTZA1Q6SPDil7U7neTf/9fBTsdISs6153KTOZmoroY4qqNdLlEmIrC6LR1BehxlDyFlA==
   dependencies:
     "@coral-xyz/anchor" "^0.30.1"
     "@inquirer/prompts" "^5.5.0"
@@ -3231,7 +3231,7 @@
     "@uniswap/v3-core" "^1.0.1"
     "@uniswap/v3-periphery" "^1.4.4"
     "@uniswap/v3-sdk" "^3.25.2"
-    "@zetachain/protocol-contracts" "12.0.0"
+    "@zetachain/protocol-contracts" "13.0.0-rc1"
     "@zetachain/protocol-contracts-ton" "1.0.0-rc3"
     ansis "^3.3.2"
     bip39 "^3.1.0"
@@ -3284,7 +3284,17 @@
   dependencies:
     ethers "^6.13.2"
 
-"@zetachain/protocol-contracts@12.0.0", "@zetachain/protocol-contracts@^12.0.0":
+"@zetachain/protocol-contracts@13.0.0-rc1":
+  version "13.0.0-rc1"
+  resolved "https://registry.npmjs.org/@zetachain/protocol-contracts/-/protocol-contracts-13.0.0-rc1.tgz#24eb7cbfbe14e1d2b9fdcf8701885d8e10e0652a"
+  integrity sha512-KV58rCWwwSDGdG+SUfQgLfXnQZpBqmy1f42M+s5NbkrdUHLk1NtugGhxBWNYg0J6StQhs5F4H3jeHWZ7Jr86qQ==
+  dependencies:
+    "@openzeppelin/contracts" "^5.0.2"
+    "@openzeppelin/contracts-upgradeable" "^5.0.2"
+    "@zetachain/networks" "^10.0.0"
+    ethers "6.13.5"
+
+"@zetachain/protocol-contracts@^12.0.0":
   version "12.0.0"
   resolved "https://registry.npmjs.org/@zetachain/protocol-contracts/-/protocol-contracts-12.0.0.tgz#42897490f4ec798213e5ef06dcc464a21f944771"
   integrity sha512-NfrKdMI4nIXcIY/VK7kP2nWEUxlqL99g8LRasiUj2jzQiRuHT6n2NSWxv0kaBVSIyAL4Bau/qp1IriuZgW19CA==
@@ -5080,7 +5090,7 @@ ethers@5.7.2:
     "@ethersproject/web" "5.7.1"
     "@ethersproject/wordlists" "5.7.0"
 
-ethers@^6.13.2:
+ethers@6.13.5, ethers@^6.13.2:
   version "6.13.5"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-6.13.5.tgz#8c1d6ac988ac08abc3c1d8fabbd4b8b602851ac4"
   integrity sha512-+knKNieu5EKRThQJWwqaJ10a6HE9sSehGeqWN65//wE7j47ZpFhKAnHB/JJFibwwg61I/koxaPsXbXpD/skNOQ==
