@@ -52,6 +52,8 @@ const main = async (options: NewOptions): Promise<void> => {
         console.error("An unknown error occurred:", error);
       }
     }
+    console.error("\nTo get the examples, please run:\n");
+    console.error("git clone https://github.com/zeta-chain/example-contracts");
     process.exit(1);
   }
 };
