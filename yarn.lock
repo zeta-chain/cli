@@ -3251,17 +3251,17 @@
     wait-on "^7.2.0"
     zod "^3.24.2"
 
+"@zetachain/networks@14.0.0-rc1":
+  version "14.0.0-rc1"
+  resolved "https://registry.npmjs.org/@zetachain/networks/-/networks-14.0.0-rc1.tgz#b1085778136d0cdeea6a707e38869efadc0ab204"
+  integrity sha512-glTskelKYgeVaj7lKsWQLqO1LrTZ57Akep6bsJsdZNN9jsLZRYiWR6BMdR70BUZZLh8VwV5mLb8+fgEueVdPnQ==
+  dependencies:
+    dotenv "^16.1.4"
+
 "@zetachain/networks@^10.0.0":
   version "10.0.0"
   resolved "https://registry.yarnpkg.com/@zetachain/networks/-/networks-10.0.0.tgz#dd5d14a0870f6b658644aded8c96859f15531089"
   integrity sha512-FPolaO19oVkSLSPDUA/Hu+8AhG3lDEslRDpLnMzbMbnNSC669Fkah0/TEf+6egrQbAifBRfFLzwWidAGs8oxtA==
-  dependencies:
-    dotenv "^16.1.4"
-
-"@zetachain/networks@^13.0.0":
-  version "13.0.0"
-  resolved "https://registry.npmjs.org/@zetachain/networks/-/networks-13.0.0.tgz#eb6d3e8fe311801dfe7eea8b96f0c4d1edb21668"
-  integrity sha512-Uq4zM17gNw+fRri56wl8KlyAYEjUo8x6bmX2d2ctCrCfZBjvSv6KykRxSqUccQYCBymGOWTnw2OiMocR2gVAsw==
   dependencies:
     dotenv "^16.1.4"
 
@@ -3304,10 +3304,10 @@
     "@zetachain/networks" "^10.0.0"
     ethers "5.6.8"
 
-"@zetachain/toolkit@13.0.1-rc1":
-  version "13.0.1-rc1"
-  resolved "https://registry.npmjs.org/@zetachain/toolkit/-/toolkit-13.0.1-rc1.tgz#2a4c19ed01a0141db687193dd58a93c77d144318"
-  integrity sha512-zq5CRd3m3P1mUyfxjnsqCzG9iZTqW+RK2+G4Mb6hmnOkZipOIdw3AzLGasca8eUq34sSvYSBMtywaMFo/gfXng==
+"@zetachain/toolkit@14.0.0-rc1":
+  version "14.0.0-rc1"
+  resolved "https://registry.npmjs.org/@zetachain/toolkit/-/toolkit-14.0.0-rc1.tgz#f2821bfe3745fe1dd560bb98e0a58b70a24efea7"
+  integrity sha512-iB+OjX9RM6yIrd46WY9J662w3D7xOh+Xrf2SokU1zogdydXyUYfwVgdL4Af0cgOfhiACcWhIgqLCqv8jVCSVVA==
   dependencies:
     "@coral-xyz/anchor" "^0.30.1"
     "@ethersproject/units" "^5.8.0"
@@ -3320,8 +3320,9 @@
     "@solana/wallet-adapter-react" "^0.15.35"
     "@solana/web3.js" "1.95.8"
     "@uniswap/v2-periphery" "^1.1.0-beta.0"
+    "@uniswap/v3-periphery" "^1.4.4"
     "@zetachain/faucet-cli" "^4.1.1"
-    "@zetachain/networks" "^13.0.0"
+    "@zetachain/networks" "14.0.0-rc1"
     "@zetachain/protocol-contracts" "^12.0.0"
     "@zetachain/protocol-contracts-solana" "2.0.0-rc1"
     axios "^1.4.0"
