@@ -2,8 +2,8 @@
 import { localnetCommand } from "@zetachain/localnet/commands";
 import {
   accountsCommand,
-  solanaCommand,
   bitcoinCommand,
+  solanaCommand,
 } from "@zetachain/toolkit/commands";
 import { Command } from "commander";
 
