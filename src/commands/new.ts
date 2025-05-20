@@ -19,13 +19,13 @@ const main = async (options: NewOptions): Promise<void> => {
   const exampleName: string | undefined = options.project;
 
   try {
-    await cloneRepository(REPO_URL, TEMP_DIR, BRANCH_NAME, options, isVerbose);
+    await cloneRepository(REPO_URL, TEMP_DIR, BRANCH_NAME, isVerbose);
     const directories = await getExampleDirectories(EXAMPLES_DIR);
 
     let chosenExample: string;
     if (exampleName) {
       const matchingExample = directories.find(
-        (dir) => dir.name === exampleName,
+        (dir) => dir.name === exampleName
       );
       if (!matchingExample) {
         console.error(`Error: Example "${exampleName}" not found.`);
@@ -33,7 +33,7 @@ const main = async (options: NewOptions): Promise<void> => {
           "Available examples:",
           directories
             .map((dir) => `${dir.name} - ${dir.description}`)
-            .join("\n"),
+            .join("\n")
         );
         process.exit(1);
       }
@@ -58,11 +58,10 @@ const main = async (options: NewOptions): Promise<void> => {
 
 export const newCommand = new Command("new")
   .description("Create a new universal contract project.")
-  .option("--no-cache", "Bypass cached repository and re-clone")
   .option("--verbose", "Enable verbose logging")
   .option("--output <directory>", "Specify custom output directory or name")
   .option(
     "--project <projectName>",
-    "Specify the example project to use and skip the prompt",
+    "Specify the example project to use and skip the prompt"
   )
   .action(main);
