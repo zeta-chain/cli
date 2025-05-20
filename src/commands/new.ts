@@ -25,7 +25,7 @@ const main = async (options: NewOptions): Promise<void> => {
     let chosenExample: string;
     if (exampleName) {
       const matchingExample = directories.find(
-        (dir) => dir.name === exampleName
+        (dir) => dir.name === exampleName,
       );
       if (!matchingExample) {
         console.error(`Error: Example "${exampleName}" not found.`);
@@ -33,7 +33,7 @@ const main = async (options: NewOptions): Promise<void> => {
           "Available examples:",
           directories
             .map((dir) => `${dir.name} - ${dir.description}`)
-            .join("\n")
+            .join("\n"),
         );
         process.exit(1);
       }
@@ -62,6 +62,6 @@ export const newCommand = new Command("new")
   .option("--output <directory>", "Specify custom output directory or name")
   .option(
     "--project <projectName>",
-    "Specify the example project to use and skip the prompt"
+    "Specify the example project to use and skip the prompt",
   )
   .action(main);

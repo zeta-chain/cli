@@ -5,7 +5,7 @@ export const cloneRepository = async (
   repoUrl: string,
   tempDir: string,
   branchName: string,
-  isVerbose: boolean
+  isVerbose: boolean,
 ) => {
   if (fs.existsSync(tempDir)) {
     if (isVerbose) console.log("Removing existing repository...");
