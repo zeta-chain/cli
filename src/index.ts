@@ -4,7 +4,7 @@ import { accountsCommand, solanaCommand } from "@zetachain/toolkit/commands";
 import { Command } from "commander";
 
 import { newCommand } from "./commands/new";
-import registerRun from "./commands/run";
+import { registerRun } from "./commands/run";
 
 const program: Command = new Command();
 

@@ -2,7 +2,7 @@ import { Command } from "commander";
 import fs from "fs";
 import path from "path";
 
-export default function registerRun(program: Command) {
+export const registerRun = (program: Command) => {
   const runCommand = program
     .command("run")
     .description("Run commands from the commands directory");
@@ -41,4 +41,4 @@ export default function registerRun(program: Command) {
         ]);
       });
   }
-}
+};
