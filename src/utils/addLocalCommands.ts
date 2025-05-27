@@ -1,6 +1,6 @@
 import { Command } from "commander";
-import path from "path";
 import fs from "fs/promises";
+import path from "path";
 
 export const addLocalCommands = async (runCommand: Command) => {
   try {

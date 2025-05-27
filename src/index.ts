@@ -2,9 +2,9 @@
 import { localnetCommand } from "@zetachain/localnet/commands";
 import { accountsCommand, solanaCommand } from "@zetachain/toolkit/commands";
 import { Command } from "commander";
+
 import { newCommand } from "./commands/new";
 import { runCommand } from "./commands/run";
-
 import { addLocalCommands } from "./utils/addLocalCommands";
 const program: Command = new Command();
 
