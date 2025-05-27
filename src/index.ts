@@ -6,7 +6,8 @@ import { Command } from "commander";
 import { newCommand } from "./commands/new";
 import { runCommand } from "./commands/run";
 import { addLocalCommands } from "./utils/addLocalCommands";
-const program: Command = new Command();
+
+const program: Command = new Command().helpCommand(false);
 
 const main = async () => {
   program
