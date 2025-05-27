@@ -7,3 +7,5 @@ export const program = new Command();
 program.addCommand(deployCommand);
 
 if (require.main === module) program.parse();
+
+export default program;
