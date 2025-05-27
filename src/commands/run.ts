@@ -1,14 +1,9 @@
 import { Command } from "commander";
-import { program as commandsProgram } from "../../commands/index.js";
 
-export const registerRun = (program: Command) => {
-  const runCommand = program
-    .command("run")
-    .description("Run commands from the commands directory");
-
-  const commands = commandsProgram.commands;
-
-  for (const cmd of commands) {
-    runCommand.addCommand(cmd);
-  }
+const main = async () => {
+  console.log("Running commands...");
 };
+
+export const runCommand = new Command("run")
+  .description("Run commands from the commands directory")
+  .action(main);
