@@ -1,6 +1,13 @@
 #!/usr/bin/env node
 import { localnetCommand } from "@zetachain/localnet/commands";
-import { accountsCommand, solanaCommand } from "@zetachain/toolkit/commands";
+import {
+  accountsCommand,
+  bitcoinCommand,
+  evmCommand,
+  queryCommand,
+  solanaCommand,
+  zetachainCommand,
+} from "@zetachain/toolkit/commands";
 import { Command } from "commander";
 
 import { newCommand } from "./commands/new";
@@ -12,9 +19,13 @@ program
   .description("CLI tool for ZetaChain development.")
   .version("dev");
 
-program.addCommand(newCommand);
-program.addCommand(localnetCommand);
 program.addCommand(accountsCommand);
+program.addCommand(bitcoinCommand);
+program.addCommand(evmCommand);
+program.addCommand(localnetCommand);
+program.addCommand(newCommand);
+program.addCommand(queryCommand);
 program.addCommand(solanaCommand);
+program.addCommand(zetachainCommand);
 
 program.parse(process.argv);
