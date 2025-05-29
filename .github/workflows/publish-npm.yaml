@@ -46,6 +46,6 @@ jobs:
         if: steps.determine-npm-tag.outputs.NPM_TAG == 'latest'
         run: |
           VERSION=${GITHUB_REF#refs/tags/v}
-          npm dist-tag add your-package@$VERSION next
+          npm dist-tag add zetachain@$VERSION next
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
