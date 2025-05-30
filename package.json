@@ -12,7 +12,8 @@
     "lint:js:fix": "eslint --ext .js,.ts . --fix",
     "lint:js": "eslint --ext .js,.ts .",
     "lint": "npm run lint:js",
-    "zetachain": "npx tsx src/index.ts"
+    "zetachain": "npx tsx src/index.ts",
+    "zetachain:js": "yarn build && node dist/index.js"
   },
   "repository": {
     "type": "git",
