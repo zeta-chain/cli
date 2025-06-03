@@ -3231,10 +3231,10 @@
     typescript "5.5.4"
     zod "3.22.4"
 
-"@zetachain/localnet@11.0.3-rc1":
-  version "11.0.3-rc1"
-  resolved "https://registry.yarnpkg.com/@zetachain/localnet/-/localnet-11.0.3-rc1.tgz#7a07014a065ba49b7efefc65ee5a19e37e070c63"
-  integrity sha512-qY4OsCYQwm6tqnv+LWA1DyW7p2BvqM/pU2+21ehnnHDDxXkcy3FD8Ez1ikIK6ZDTOp2wRSClMGGreM/13PuJ7Q==
+"@zetachain/localnet@11.0.3-rc2":
+  version "11.0.3-rc2"
+  resolved "https://registry.yarnpkg.com/@zetachain/localnet/-/localnet-11.0.3-rc2.tgz#ff21f19165b5fa188114522bb669e5a05da2aca3"
+  integrity sha512-rCSs+koaRuyvEz8c3QHYysHMPuIVlbIUK6Z8+8DCxI+0hEE8maW1sw1CaKs9UWfreueUBrNRV7dRV2ulSZohRQ==
   dependencies:
     "@coral-xyz/anchor" "^0.30.1"
     "@inquirer/prompts" "^5.5.0"
