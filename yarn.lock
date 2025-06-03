@@ -3231,10 +3231,10 @@
     typescript "5.5.4"
     zod "3.22.4"
 
-"@zetachain/localnet@11.0.2-rc5":
-  version "11.0.2-rc5"
-  resolved "https://registry.yarnpkg.com/@zetachain/localnet/-/localnet-11.0.2-rc5.tgz#8c73901b08de9d1cb7d25a65fc5b6b4fde8cece5"
-  integrity sha512-aeubIHdMfvtEHhws3mUXKteMrIZemWIVrDWasNWHyvJFeEOHRAG37AlsS0sl3oxdE+0TVNgMOAr3XQ5qQJMavw==
+"@zetachain/localnet@11.0.3-rc2":
+  version "11.0.3-rc2"
+  resolved "https://registry.yarnpkg.com/@zetachain/localnet/-/localnet-11.0.3-rc2.tgz#ff21f19165b5fa188114522bb669e5a05da2aca3"
+  integrity sha512-rCSs+koaRuyvEz8c3QHYysHMPuIVlbIUK6Z8+8DCxI+0hEE8maW1sw1CaKs9UWfreueUBrNRV7dRV2ulSZohRQ==
   dependencies:
     "@coral-xyz/anchor" "^0.30.1"
     "@inquirer/prompts" "^5.5.0"
@@ -3250,7 +3250,7 @@
     "@uniswap/v3-core" "^1.0.1"
     "@uniswap/v3-periphery" "^1.4.4"
     "@uniswap/v3-sdk" "^3.25.2"
-    "@zetachain/protocol-contracts" "13.0.0"
+    "@zetachain/protocol-contracts" "13.1.0-rc1"
     "@zetachain/protocol-contracts-ton" "1.0.0-rc3"
     ansis "^3.3.2"
     bip39 "^3.1.0"
@@ -3304,10 +3304,10 @@
   dependencies:
     ethers "^6.13.2"
 
-"@zetachain/protocol-contracts@13.0.0":
-  version "13.0.0"
-  resolved "https://registry.yarnpkg.com/@zetachain/protocol-contracts/-/protocol-contracts-13.0.0.tgz#dc194144b21bd333c6939cb7b6fa60f103bf8735"
-  integrity sha512-gqylJeCI4rt6VYVpyr+5wXaUVHmLpr7WiGO6weJX2sOlwOlUk4+HSeRUgI3muK+k3CrY6igCETx/EP3UGMLf+Q==
+"@zetachain/protocol-contracts@13.1.0-rc1":
+  version "13.1.0-rc1"
+  resolved "https://registry.yarnpkg.com/@zetachain/protocol-contracts/-/protocol-contracts-13.1.0-rc1.tgz#00940582a317078774a459d034d31427f4c6a907"
+  integrity sha512-zVyFz6hq3LhQqLq6VIsMb/WxKzEJH8mwbtoetskW1PKjOQHrWjqwUuwdDa7ai5wSQJwJwwmcKvJqTEGcwVe3yg==
   dependencies:
     "@openzeppelin/contracts" "^5.0.2"
     "@openzeppelin/contracts-upgradeable" "^5.0.2"
