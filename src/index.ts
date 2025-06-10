@@ -11,13 +11,14 @@ import {
 import { Command } from "commander";
 
 import { newCommand } from "./commands/new";
+import config from "./config.json";
 
 const program: Command = new Command();
 
 program
   .name("zetachain")
   .description("CLI tool for ZetaChain development.")
-  .version("dev");
+  .version(config.version);
 
 program.addCommand(accountsCommand);
 program.addCommand(bitcoinCommand);

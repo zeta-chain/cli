@@ -21,9 +21,6 @@ jobs:
       - name: Install Dependencies
         run: yarn install
 
-      - name: Build
-        run: yarn build
-
       - name: Determine NPM Tag
         id: determine-npm-tag
         run: |
@@ -35,6 +32,16 @@ jobs:
           fi
         env:
           GITHUB_REF: ${{ github.ref }}
+
+      - name: Update config.json version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          jq --arg v "$VERSION" '.version = $v' src/config.json > tmp.json && mv tmp.json src/config.json
+        env:
+          GITHUB_REF: ${{ github.ref }}
+
+      - name: Build
+        run: yarn build
 
       - name: Publish to NPM
         run: yarn publish --new-version ${GITHUB_REF#refs/tags/v} --tag ${{ steps.determine-npm-tag.outputs.NPM_TAG }} --no-git-tag-version
