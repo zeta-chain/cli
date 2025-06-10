@@ -9,6 +9,7 @@ import {
   zetachainCommand,
 } from "@zetachain/toolkit/commands";
 import { Command } from "commander";
+import config from "./config.json";
 
 import { newCommand } from "./commands/new";
 
@@ -17,7 +18,7 @@ const program: Command = new Command();
 program
   .name("zetachain")
   .description("CLI tool for ZetaChain development.")
-  .version("dev");
+  .version(config.version);
 
 program.addCommand(accountsCommand);
 program.addCommand(bitcoinCommand);
