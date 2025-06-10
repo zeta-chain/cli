@@ -3,8 +3,6 @@ name: Publish to NPM
 on:
   release:
     types: [published]
-  pull_request:
-    branches: [main]
 
 jobs:
   build:
@@ -43,18 +41,18 @@ jobs:
           GITHUB_REF: ${{ github.ref }}
 
       - name: Build
-        run: yarn build && cat dist/config.json
+        run: yarn build
 
-      # - name: Publish to NPM
-      #   run: yarn publish --new-version ${GITHUB_REF#refs/tags/v} --tag ${{ steps.determine-npm-tag.outputs.NPM_TAG }} --no-git-tag-version
-      #   env:
-      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      #     GITHUB_REF: ${{ github.ref }}
+      - name: Publish to NPM
+        run: yarn publish --new-version ${GITHUB_REF#refs/tags/v} --tag ${{ steps.determine-npm-tag.outputs.NPM_TAG }} --no-git-tag-version
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_REF: ${{ github.ref }}
 
-      # - name: Also tag as `next` if tag is `latest`
-      #   if: steps.determine-npm-tag.outputs.NPM_TAG == 'latest'
-      #   run: |
-      #     VERSION=${GITHUB_REF#refs/tags/v}
-      #     npm dist-tag add zetachain@$VERSION next
-      #   env:
-      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Also tag as `next` if tag is `latest`
+        if: steps.determine-npm-tag.outputs.NPM_TAG == 'latest'
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          npm dist-tag add zetachain@$VERSION next
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
