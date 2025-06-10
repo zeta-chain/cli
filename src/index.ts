@@ -9,9 +9,9 @@ import {
   zetachainCommand,
 } from "@zetachain/toolkit/commands";
 import { Command } from "commander";
-import config from "./config.json";
 
 import { newCommand } from "./commands/new";
+import config from "./config.json";
 
 const program: Command = new Command();
 
