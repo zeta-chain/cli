@@ -10,6 +10,7 @@ import {
 } from "@zetachain/toolkit/commands";
 import { Command } from "commander";
 
+import { docsCommand } from "./commands/docs";
 import { newCommand } from "./commands/new";
 
 const program: Command = new Command();
@@ -26,6 +27,7 @@ program.addCommand(localnetCommand);
 program.addCommand(newCommand);
 program.addCommand(queryCommand);
 program.addCommand(solanaCommand);
+program.addCommand(docsCommand);
 program.addCommand(zetachainCommand);
 
 program.parse(process.argv);
