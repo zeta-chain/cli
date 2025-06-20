@@ -13,3 +13,5 @@ artifacts
 access_token
 
 test-ledger
+
+localnet.json
