@@ -2984,10 +2984,10 @@
     typescript "5.5.4"
     zod "3.22.4"
 
-"@zetachain/localnet@^11.0.3":
-  version "11.0.3"
-  resolved "https://registry.npmjs.org/@zetachain/localnet/-/localnet-11.0.3.tgz#c3011916349b7462144094cd0ee85e248e133913"
-  integrity sha512-cL/GY/0g53JK5DOa2/0+/iMMJrTMr7X7fW98+wk3+oqJhW1zfaVHMCJ+cvcu4lljxnLGvU6mxB+K2HKWFHTXBQ==
+"@zetachain/localnet@11.0.3-rc2":
+  version "11.0.3-rc2"
+  resolved "https://registry.yarnpkg.com/@zetachain/localnet/-/localnet-11.0.3-rc2.tgz#ff21f19165b5fa188114522bb669e5a05da2aca3"
+  integrity sha512-rCSs+koaRuyvEz8c3QHYysHMPuIVlbIUK6Z8+8DCxI+0hEE8maW1sw1CaKs9UWfreueUBrNRV7dRV2ulSZohRQ==
   dependencies:
     "@coral-xyz/anchor" "^0.30.1"
     "@inquirer/prompts" "^5.5.0"
@@ -3003,7 +3003,7 @@
     "@uniswap/v3-core" "^1.0.1"
     "@uniswap/v3-periphery" "^1.4.4"
     "@uniswap/v3-sdk" "^3.25.2"
-    "@zetachain/protocol-contracts" "13.1.0-rc2"
+    "@zetachain/protocol-contracts" "13.1.0-rc1"
     "@zetachain/protocol-contracts-ton" "1.0.0-rc3"
     ansis "^3.3.2"
     bip39 "^3.1.0"
@@ -3064,10 +3064,10 @@
   dependencies:
     ethers "^6.13.2"
 
-"@zetachain/protocol-contracts@13.1.0-rc2":
-  version "13.1.0-rc2"
-  resolved "https://registry.npmjs.org/@zetachain/protocol-contracts/-/protocol-contracts-13.1.0-rc2.tgz#f8de4ceafdc3968b860579a5f082de5609137c72"
-  integrity sha512-EArk6pTLhV1xG8Yy9sYceBhS3/MpIFiwqyVJq31vIv2NrcG0OvbweMRiRVRMC7RbKb4wwR/9eEKqF4AdaQzKsA==
+"@zetachain/protocol-contracts@13.1.0-rc1":
+  version "13.1.0-rc1"
+  resolved "https://registry.yarnpkg.com/@zetachain/protocol-contracts/-/protocol-contracts-13.1.0-rc1.tgz#00940582a317078774a459d034d31427f4c6a907"
+  integrity sha512-zVyFz6hq3LhQqLq6VIsMb/WxKzEJH8mwbtoetskW1PKjOQHrWjqwUuwdDa7ai5wSQJwJwwmcKvJqTEGcwVe3yg==
   dependencies:
     "@openzeppelin/contracts" "^5.0.2"
     "@openzeppelin/contracts-upgradeable" "^5.0.2"
@@ -3084,7 +3084,7 @@
     "@zetachain/networks" "^10.0.0"
     ethers "6.13.5"
 
-"@zetachain/toolkit@^15.0.1":
+"@zetachain/toolkit@15.0.1":
   version "15.0.1"
   resolved "https://registry.yarnpkg.com/@zetachain/toolkit/-/toolkit-15.0.1.tgz#d8d6b33b79e5fc12a3706ac9cfdacc84cda9693a"
   integrity sha512-z1doCsI6ykzV0S5/Fl9ft8blsucT1g3ZRBBST+ZEW8Ai3Svg6MGaEEbC8SqjP8dpQuwYxeiDhYHKukbDiPATFA==
