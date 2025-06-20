@@ -19,6 +19,7 @@ const program: Command = new Command();
 program
   .name("zetachain")
   .description("CLI tool for ZetaChain development.")
+  .helpCommand(false)
   .version(config.version);
 
 program.addCommand(accountsCommand);
