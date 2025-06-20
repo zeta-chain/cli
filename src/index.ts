@@ -6,6 +6,8 @@ import {
   evmCommand,
   queryCommand,
   solanaCommand,
+  suiCommand,
+  tonCommand,
   zetachainCommand,
 } from "@zetachain/toolkit/commands";
 import { Command } from "commander";
@@ -22,14 +24,16 @@ program
   .helpCommand(false)
   .version(config.version);
 
-program.addCommand(accountsCommand);
-program.addCommand(bitcoinCommand);
-program.addCommand(evmCommand);
-program.addCommand(localnetCommand);
 program.addCommand(newCommand);
+program.addCommand(accountsCommand);
 program.addCommand(queryCommand);
-program.addCommand(solanaCommand);
-program.addCommand(docsCommand);
 program.addCommand(zetachainCommand);
+program.addCommand(evmCommand);
+program.addCommand(solanaCommand);
+program.addCommand(suiCommand);
+program.addCommand(tonCommand);
+program.addCommand(bitcoinCommand);
+program.addCommand(localnetCommand);
+program.addCommand(docsCommand);
 
 program.parse(process.argv);
