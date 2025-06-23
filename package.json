@@ -14,7 +14,7 @@
     "lint": "npm run lint:js",
     "zetachain": "npx tsx src/index.ts",
     "zetachain:js": "yarn build && node dist/index.js",
-    "docs": "tsx src/index.ts docs > docs/index.md"
+    "docs": "npx tsx src/index.ts docs > docs/index.md"
   },
   "repository": {
     "type": "git",
