@@ -1,0 +1,28 @@
+name: Generate docs
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Generate docs
+        run: yarn docs
+
+      - name: Check for changes
+        run: |
+          if git diff --exit-code --ignore-space-change --ignore-all-space --ignore-cr-at-eol -- docs/index.md; then
+            echo "Docs are up-to-date."
+          else
+            echo "::error::Docs are not up-to-date. Please run 'yarn docs' locally and commit any changes."
+            exit 1
+          fi
