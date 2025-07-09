@@ -20,8 +20,6 @@ Options:
 ```
 Usage: zetachain accounts [options] [command]
 
-Account management commands
-
 Options:
   -h, --help        display help for command
 
@@ -40,8 +38,6 @@ Commands:
 ```
 Usage: zetachain accounts create [options]
 
-Create a new account
-
 Options:
   --type <type>  Account type (choices: "evm", "solana", "sui", "bitcoin",
                  "ton")
@@ -54,8 +50,6 @@ Options:
 
 ```
 Usage: zetachain accounts delete [options]
-
-Delete an existing account
 
 Options:
   --type <type>  Account type (choices: "evm", "solana", "sui", "bitcoin",
@@ -87,8 +81,6 @@ Options:
 ```
 Usage: zetachain accounts list [options]
 
-List all available accounts
-
 Options:
   --json      Output in JSON format
   -h, --help  display help for command
@@ -99,8 +91,6 @@ Options:
 
 ```
 Usage: zetachain accounts show [options]
-
-Show details of an existing account
 
 Options:
   --type <type>  Account type (choices: "evm", "solana", "sui", "bitcoin",
@@ -113,9 +103,7 @@ Options:
 ## zetachain query
 
 ```
-Usage: zetachain query [options] [command]
-
-Query commands
+Usage: zetachain query|q [options] [command]
 
 Options:
   -h, --help          display help for command
@@ -123,6 +111,8 @@ Options:
 Commands:
   balances [options]  Fetch native and ZETA token balances
   cctx [options]      Query cross-chain transaction data in real-time
+  fees [options]      Fetch omnichain and cross-chain messaging fees
+  tokens|t            ZRC-20 token commands
 
 ```
 
@@ -130,8 +120,6 @@ Commands:
 
 ```
 Usage: zetachain query balances [options]
-
-Fetch native and ZETA token balances
 
 Options:
   --evm <address>      Fetch balances for a specific EVM address
@@ -143,6 +131,7 @@ Options:
   --network <network>  Network to use (choices: "mainnet", "testnet", default:
                        "testnet")
   --json               Output balances as JSON
+  --show-zero          Include zero balances (default: false)
   -h, --help           display help for command
 
 ```
@@ -166,12 +155,79 @@ Options:
 
 ```
 
+## zetachain query fees
+
+```
+Usage: zetachain query fees [options]
+
+Fetch omnichain and cross-chain messaging fees
+
+Options:
+  --api <url>          API endpoint URL (default:
+                       "https://zetachain-athens.blockpi.network/lcd/v1/public")
+  --rpc <url>          RPC endpoint URL (default:
+                       "https://zetachain-athens-evm.blockpi.network/v1/rpc/public")
+  --gas-limit <limit>  Gas limit for withdraw and call
+  --json               Output results in JSON format
+  -h, --help           display help for command
+
+```
+
+## zetachain query tokens
+
+```
+Usage: zetachain query tokens|t [options] [command]
+
+ZRC-20 token commands
+
+Options:
+  -h, --help        display help for command
+
+Commands:
+  list|l [options]  List all ZRC-20 tokens
+  show|s [options]  Show detailed information for a specific ZRC-20 token
+
+```
+
+## zetachain query tokens list
+
+```
+Usage: zetachain query tokens list|l [options]
+
+List all ZRC-20 tokens
+
+Options:
+  --api <url>            API endpoint URL (default:
+                         "https://zetachain-athens.blockpi.network/lcd/v1/public")
+  --json                 Output tokens as JSON
+  --columns <values...>  Additional columns to show (choices: "asset", "type",
+                         "decimals", default: [])
+  -h, --help             display help for command
+
+```
+
+## zetachain query tokens show
+
+```
+Usage: zetachain query tokens show|s [options]
+
+Show detailed information for a specific ZRC-20 token
+
+Options:
+  --api <url>           API endpoint URL (default:
+                        "https://zetachain-athens.blockpi.network/lcd/v1/public")
+  --symbol -s <symbol>  Token symbol (e.g., POL.AMOY, USDC.BSC)
+  --field -f <field>    Return specific field value (for scripting). Use 'zrc20'
+                        as shorthand for 'zrc20_contract_address'
+  --json                Output token as JSON
+  -h, --help            display help for command
+
+```
+
 ## zetachain zetachain
 
 ```
 Usage: zetachain zetachain|z [options] [command]
-
-ZetaChain commands
 
 Options:
   -h, --help                   display help for command
@@ -191,31 +247,29 @@ Commands:
 ```
 Usage: zetachain zetachain call [options]
 
-Call a contract on a connected chain from ZetaChain
-
 Options:
   --zrc20 <address>                 The address of ZRC-20 to pay fees
   --receiver <address>              The address of the receiver contract on a
                                     connected chain. Non-hex strings will be
                                     automatically encoded to hex.
   --name <name>                     Account name (default: "default")
-  --network <network>               Network to use (choices: "mainnet",
-                                    "testnet", default: "testnet")
+  --chain-id <chainId>              Chain ID of the network
   --private-key <key>               Private key for signing transactions
-  --gateway-zetachain <address>     Gateway contract address on ZetaChain
+  --rpc <url>                       RPC URL of the network
+  --gateway <address>               Gateway contract address on ZetaChain
   --revert-address <address>        Revert address (default:
                                     "0x0000000000000000000000000000000000000000")
   --abort-address <address>         Abort address (default:
                                     "0x0000000000000000000000000000000000000000")
   --call-on-revert                  Whether to call on revert (default: false)
   --on-revert-gas-limit <limit>     Gas limit for the revert transaction
-                                    (default: "7000000")
+                                    (default: "1000000")
   --revert-message <message>        Revert message (default: "0x")
   --tx-options-gas-limit <limit>    Gas limit for the transaction (default:
-                                    "7000000")
+                                    "1000000")
   --tx-options-gas-price <price>    Gas price for the transaction (default:
                                     "10000000000")
-  --call-options-gas-limit <limit>  Gas limit for the call (default: "7000000")
+  --call-options-gas-limit <limit>  Gas limit for the call (default: "1000000")
   --call-options-is-arbitrary-call  Call any function (default: false)
   --yes                             Skip confirmation prompt (default: false)
   --function <function>             Function to call (example: "hello(string)")
@@ -232,31 +286,29 @@ Options:
 ```
 Usage: zetachain zetachain withdraw [options]
 
-Withdraw tokens from ZetaChain to a connected chain
-
 Options:
   --zrc20 <address>                 The address of ZRC-20 to pay fees
   --receiver <address>              The address of the receiver contract on a
                                     connected chain. Non-hex strings will be
                                     automatically encoded to hex.
   --name <name>                     Account name (default: "default")
-  --network <network>               Network to use (choices: "mainnet",
-                                    "testnet", default: "testnet")
+  --chain-id <chainId>              Chain ID of the network
   --private-key <key>               Private key for signing transactions
-  --gateway-zetachain <address>     Gateway contract address on ZetaChain
+  --rpc <url>                       RPC URL of the network
+  --gateway <address>               Gateway contract address on ZetaChain
   --revert-address <address>        Revert address (default:
                                     "0x0000000000000000000000000000000000000000")
   --abort-address <address>         Abort address (default:
                                     "0x0000000000000000000000000000000000000000")
   --call-on-revert                  Whether to call on revert (default: false)
   --on-revert-gas-limit <limit>     Gas limit for the revert transaction
-                                    (default: "7000000")
+                                    (default: "1000000")
   --revert-message <message>        Revert message (default: "0x")
   --tx-options-gas-limit <limit>    Gas limit for the transaction (default:
-                                    "7000000")
+                                    "1000000")
   --tx-options-gas-price <price>    Gas price for the transaction (default:
                                     "10000000000")
-  --call-options-gas-limit <limit>  Gas limit for the call (default: "7000000")
+  --call-options-gas-limit <limit>  Gas limit for the call (default: "1000000")
   --call-options-is-arbitrary-call  Call any function (default: false)
   --yes                             Skip confirmation prompt (default: false)
   --amount <amount>                 The amount of tokens to withdraw
@@ -269,31 +321,29 @@ Options:
 ```
 Usage: zetachain zetachain withdraw-and-call [options]
 
-Withdraw tokens from ZetaChain and call a contract on a connected chain
-
 Options:
   --zrc20 <address>                 The address of ZRC-20 to pay fees
   --receiver <address>              The address of the receiver contract on a
                                     connected chain. Non-hex strings will be
                                     automatically encoded to hex.
   --name <name>                     Account name (default: "default")
-  --network <network>               Network to use (choices: "mainnet",
-                                    "testnet", default: "testnet")
+  --chain-id <chainId>              Chain ID of the network
   --private-key <key>               Private key for signing transactions
-  --gateway-zetachain <address>     Gateway contract address on ZetaChain
+  --rpc <url>                       RPC URL of the network
+  --gateway <address>               Gateway contract address on ZetaChain
   --revert-address <address>        Revert address (default:
                                     "0x0000000000000000000000000000000000000000")
   --abort-address <address>         Abort address (default:
                                     "0x0000000000000000000000000000000000000000")
   --call-on-revert                  Whether to call on revert (default: false)
   --on-revert-gas-limit <limit>     Gas limit for the revert transaction
-                                    (default: "7000000")
+                                    (default: "1000000")
   --revert-message <message>        Revert message (default: "0x")
   --tx-options-gas-limit <limit>    Gas limit for the transaction (default:
-                                    "7000000")
+                                    "1000000")
   --tx-options-gas-price <price>    Gas price for the transaction (default:
                                     "10000000000")
-  --call-options-gas-limit <limit>  Gas limit for the call (default: "7000000")
+  --call-options-gas-limit <limit>  Gas limit for the call (default: "1000000")
   --call-options-is-arbitrary-call  Call any function (default: false)
   --yes                             Skip confirmation prompt (default: false)
   --amount <amount>                 The amount of tokens to withdraw
@@ -310,8 +360,6 @@ Options:
 
 ```
 Usage: zetachain evm [options] [command]
-
-EVM commands
 
 Options:
   -h, --help                  display help for command
@@ -330,8 +378,6 @@ Commands:
 
 ```
 Usage: zetachain evm call [options]
-
-Call a contract on ZetaChain from an EVM-compatible chain
 
 Options:
   --chain-id <chainId>           Chain ID of the network
@@ -362,8 +408,6 @@ Options:
 
 ```
 Usage: zetachain evm deposit-and-call [options]
-
-Deposit tokens and call a contract on ZetaChain from an EVM-compatible chain
 
 Options:
   --chain-id <chainId>           Chain ID of the network
@@ -398,8 +442,6 @@ Options:
 ```
 Usage: zetachain evm deposit [options]
 
-Deposit tokens to ZetaChain from an EVM-compatible chain
-
 Options:
   --chain-id <chainId>           Chain ID of the network
   --receiver <address>           Receiver address on ZetaChain
@@ -431,8 +473,6 @@ Options:
 ```
 Usage: zetachain solana [options] [command]
 
-Solana commands
-
 Options:
   -h, --help                  display help for command
 
@@ -457,7 +497,7 @@ Options:
   --mnemonic <mnemonic>                     Mnemonic
   --name <name>                             Name of the wallet (default: "default")
   --private-key <privateKey>                Private key in base58 or hex format (with optional 0x prefix)
-  --network <network>                       Solana network (choices: "devnet", "localnet", "mainnet")
+  --chain-id <chainId>                      Chain ID of the network
   --revert-address <revertAddress>          Revert address
   --abort-address <abortAddress>            Abort address (default: "0x0000000000000000000000000000000000000000")
   --call-on-revert                          Call on revert (default: false)
@@ -481,7 +521,7 @@ Options:
   --mnemonic <mnemonic>                     Mnemonic
   --name <name>                             Name of the wallet (default: "default")
   --private-key <privateKey>                Private key in base58 or hex format (with optional 0x prefix)
-  --network <network>                       Solana network (choices: "devnet", "localnet", "mainnet")
+  --chain-id <chainId>                      Chain ID of the network
   --revert-address <revertAddress>          Revert address
   --abort-address <abortAddress>            Abort address (default: "0x0000000000000000000000000000000000000000")
   --call-on-revert                          Call on revert (default: false)
@@ -501,14 +541,12 @@ Options:
 ```
 Usage: zetachain solana deposit [options]
 
-Deposit tokens from Solana
-
 Options:
   --recipient <recipient>                   EOA or contract address on ZetaChain
   --mnemonic <mnemonic>                     Mnemonic
   --name <name>                             Name of the wallet (default: "default")
   --private-key <privateKey>                Private key in base58 or hex format (with optional 0x prefix)
-  --network <network>                       Solana network (choices: "devnet", "localnet", "mainnet")
+  --chain-id <chainId>                      Chain ID of the network
   --revert-address <revertAddress>          Revert address
   --abort-address <abortAddress>            Abort address (default: "0x0000000000000000000000000000000000000000")
   --call-on-revert                          Call on revert (default: false)
@@ -526,8 +564,6 @@ Options:
 ```
 Usage: zetachain solana encode [options]
 
-Encode payload data for Solana
-
 Options:
   --connected <address>     Connected PDA account address
   --data <data>             Data to encode
@@ -542,8 +578,6 @@ Options:
 
 ```
 Usage: zetachain sui [options] [command]
-
-Sui commands
 
 Options:
   -h, --help                  display help for command
@@ -561,8 +595,6 @@ Commands:
 ```
 Usage: zetachain sui deposit-and-call [options]
 
-Deposit tokens from Sui and call a contract on ZetaChain
-
 Options:
   --mnemonic <mnemonic>               Mnemonic for the account
   --private-key <privateKey>          Private key for the account
@@ -570,12 +602,9 @@ Options:
   --gateway-package <gatewayPackage>  Gateway package ID
   --receiver <receiver>               Receiver address on ZetaChain
   --amount <amount>                   Amount to deposit in decimal format
-  --chain-id <chainId>                Chain ID (choices: "0103", "101", "103",
-                                      default: "103")
+  --chain-id <chainId>                Chain ID
   --coin-type <coinType>              Coin type to deposit (default:
                                       "0x2::sui::SUI")
-  --network <network>                 Network to use (choices: "localnet",
-                                      "mainnet", "testnet")
   --gas-budget <gasBudget>            Gas budget in MIST (default: "10000000")
   --name <name>                       Account name (default: "default")
   --decimals <number>                 Number of decimals for the coin type
@@ -592,8 +621,6 @@ Options:
 ```
 Usage: zetachain sui deposit [options]
 
-Deposit tokens from Sui
-
 Options:
   --mnemonic <mnemonic>               Mnemonic for the account
   --private-key <privateKey>          Private key for the account
@@ -601,12 +628,9 @@ Options:
   --gateway-package <gatewayPackage>  Gateway package ID
   --receiver <receiver>               Receiver address on ZetaChain
   --amount <amount>                   Amount to deposit in decimal format
-  --chain-id <chainId>                Chain ID (choices: "0103", "101", "103",
-                                      default: "103")
+  --chain-id <chainId>                Chain ID
   --coin-type <coinType>              Coin type to deposit (default:
                                       "0x2::sui::SUI")
-  --network <network>                 Network to use (choices: "localnet",
-                                      "mainnet", "testnet")
   --gas-budget <gasBudget>            Gas budget in MIST (default: "10000000")
   --name <name>                       Account name (default: "default")
   --decimals <number>                 Number of decimals for the coin type
@@ -619,8 +643,6 @@ Options:
 
 ```
 Usage: zetachain sui encode [options]
-
-Encode payload data for SUI
 
 Options:
   --data <data>                        Data to encode
@@ -658,12 +680,12 @@ Deposit TON and call a universal contract on ZetaChain
 Options:
   --mnemonic <mnemonic>  Mnemonic for the account
   --name <name>          Name of the account (default: "default")
-  --gateway <gateway>    Gateway contract address (default: testnet) (default:
-                         "0:7a4d41496726aadb227cf4d313c95912f1fe6cc742c18ebde306ff59881d8816")
+  --gateway <gateway>    Gateway contract address (default: testnet)
   --receiver <receiver>  Receiver address
   --rpc <rpc>            RPC endpoint (default: testnet) (default:
                          "https://testnet.toncenter.com/api/v2/jsonRPC")
   --api-key <apiKey>     API key
+  --chain-id <chainId>   Chain ID
   --amount <amount>      Amount in TON
   --types <types...>     ABI types
   --values <values...>   Values corresponding to types
@@ -682,12 +704,12 @@ Deposit TON to an EOA or a contract on ZetaChain
 Options:
   --mnemonic <mnemonic>  Mnemonic for the account
   --name <name>          Name of the account (default: "default")
-  --gateway <gateway>    Gateway contract address (default: testnet) (default:
-                         "0:7a4d41496726aadb227cf4d313c95912f1fe6cc742c18ebde306ff59881d8816")
+  --gateway <gateway>    Gateway contract address (default: testnet)
   --receiver <receiver>  Receiver address
   --rpc <rpc>            RPC endpoint (default: testnet) (default:
                          "https://testnet.toncenter.com/api/v2/jsonRPC")
   --api-key <apiKey>     API key
+  --chain-id <chainId>   Chain ID
   --amount <amount>      Amount in TON
   -h, --help             display help for command
 
@@ -714,8 +736,6 @@ Commands:
 ```
 Usage: zetachain bitcoin inscription|i [options] [command]
 
-Make a transaction using inscriptions
-
 Options:
   -h, --help                  display help for command
 
@@ -732,8 +752,6 @@ Commands:
 
 ```
 Usage: zetachain bitcoin inscription call [options]
-
-Call a contract on ZetaChain
 
 Options:
   --yes                       Skip confirmation prompt (default: false)
@@ -760,8 +778,6 @@ Options:
 
 ```
 Usage: zetachain bitcoin inscription deposit-and-call [options]
-
-Deposit BTC and call a contract on ZetaChain
 
 Options:
   --yes                       Skip confirmation prompt (default: false)
@@ -790,8 +806,6 @@ Options:
 ```
 Usage: zetachain bitcoin inscription deposit [options]
 
-Deposit BTC to ZetaChain
-
 Options:
   --yes                       Skip confirmation prompt (default: false)
   -r, --receiver <address>    ZetaChain receiver address
@@ -817,8 +831,6 @@ Options:
 ```
 Usage: zetachain bitcoin inscription encode [options]
 
-Encode data for Bitcoin transactions using ABI encoding
-
 Options:
   -r, --receiver <address>        Receiver address
   -t, --types <types...>          ABI types (e.g. string uint256) (default: [])
@@ -838,8 +850,6 @@ Options:
 ```
 Usage: zetachain bitcoin memo|m [options] [command]
 
-Make a transaction using a memo (OP_RETURN)
-
 Options:
   -h, --help                  display help for command
 
@@ -855,13 +865,13 @@ Commands:
 ```
 Usage: zetachain bitcoin memo call [options]
 
-Call a contract on ZetaChain
-
 Options:
   --yes                     Skip confirmation prompt (default: false)
   -r, --receiver <address>  ZetaChain receiver address
   -g, --gateway <address>   Bitcoin gateway (TSS) address (default:
                             "tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur")
+  --private-key <key>       Bitcoin private key
+  --name <name>             Account name (default: "default")
   -d, --data <data>         Pass raw data
   --network-fee <fee>       Network fee (in sats) (default: "1750")
   -h, --help                display help for command
@@ -873,13 +883,13 @@ Options:
 ```
 Usage: zetachain bitcoin memo deposit-and-call [options]
 
-Deposit BTC and call a contract on ZetaChain
-
 Options:
   --yes                     Skip confirmation prompt (default: false)
   -r, --receiver <address>  ZetaChain receiver address
   -g, --gateway <address>   Bitcoin gateway (TSS) address (default:
                             "tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur")
+  --private-key <key>       Bitcoin private key
+  --name <name>             Account name (default: "default")
   -d, --data <data>         Pass raw data
   --network-fee <fee>       Network fee (in sats) (default: "1750")
   -a, --amount <btcAmount>  BTC amount to send (in BTC)
@@ -892,13 +902,13 @@ Options:
 ```
 Usage: zetachain bitcoin memo deposit [options]
 
-Deposit BTC to ZetaChain
-
 Options:
   --yes                     Skip confirmation prompt (default: false)
   -r, --receiver <address>  ZetaChain receiver address
   -g, --gateway <address>   Bitcoin gateway (TSS) address (default:
                             "tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur")
+  --private-key <key>       Bitcoin private key
+  --name <name>             Account name (default: "default")
   -d, --data <data>         Pass raw data
   --network-fee <fee>       Network fee (in sats) (default: "1750")
   -a, --amount <btcAmount>  BTC amount to send (in BTC)
