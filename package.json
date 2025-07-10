@@ -32,8 +32,8 @@
   },
   "homepage": "https://github.com/zeta-chain/cli#readme",
   "dependencies": {
-    "@zetachain/localnet": "11.0.4-rc1",
-    "@zetachain/toolkit": "15.0.2",
+    "@zetachain/localnet": "12.0.0",
+    "@zetachain/toolkit": "16.0.0",
     "commander": "^13.1.0",
     "fs-extra": "^11.3.0",
     "inquirer": "^12.3.2",
