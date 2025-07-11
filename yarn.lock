@@ -3002,10 +3002,10 @@
     typescript "5.5.4"
     zod "3.22.4"
 
-"@zetachain/localnet@12.0.1-rc2":
-  version "12.0.1-rc2"
-  resolved "https://registry.npmjs.org/@zetachain/localnet/-/localnet-12.0.1-rc2.tgz#0964672ebd251dc78a9683825d38465c2a84c180"
-  integrity sha512-ZZaooH84Fcj8AJDoLvHz5HF+8J/J+Ga/ep9xzc35NyW0WsdMQ8DUKHvFwUd6MR5ZmKb1yGRKkufiCKRUsM7ssQ==
+"@zetachain/localnet@12.0.1-rc3":
+  version "12.0.1-rc3"
+  resolved "https://registry.npmjs.org/@zetachain/localnet/-/localnet-12.0.1-rc3.tgz#6807fff1f82cafc670fbe4449154a1297aa926b8"
+  integrity sha512-V/J/nrt7/UbWnVJUKuolYpuTh7YlWkoHlZ41t/txrIqbDKD0oyK2Txoru3j+VuAgtUL4l9yHOUls3fDU1J4vzQ==
   dependencies:
     "@coral-xyz/anchor" "^0.30.1"
     "@inquirer/prompts" "^5.5.0"
