@@ -1,45 +1,82 @@
 # ZetaChain CLI
 
-A command-line interface tool for building and managing ZetaChain universal
-applications.
+A command-line interface for building and interacting with
+[ZetaChain](https://www.zetachain.com) universal applications. Seamlessly
+interact with EVM, Solana, Bitcoin, Sui, and TON, all from one CLI.
 
-## Installation
+## ✨ Features
 
-```bash
-npm install -g zetachain@next
-```
+- Scaffold new ZetaChain universal apps from templates
+- Spin up a local multi-chain development environment (EVM, Solana, etc.) in one
+  command
+- Query cross-chain fees, contracts, balances, cross-chain transaction, tokens,
+  and more
+- Make cross-chain calls between Solana, Sui, Bitcoin, TON, and universal apps
+  on ZetaChain
+- Transfer supported tokens across connected chains
 
-Or run directly with:
+## ✅ Requirements
 
-```bash
-npx zetachain@next <command>
-```
+- Node.js ≥ 18
+- Git (for template cloning)
+- (Optional) Docker ≥ 24 for `localnet`
 
-## Commands
+## 🚀 Quick Start
 
-### new
-
-Creates a new ZetaChain universal application:
+Run without installing:
 
 ```bash
 npx zetachain@next new
 ```
 
-### localnet
-
-Starts a local development environment for testing your ZetaChain applications.
+Or install globally:
 
 ```bash
-npx zetachain@next localnet
+npm install -g zetachain@latest
 ```
 
-## Contributing
+Use `zetachain@next` for bleeding-edge builds.
 
-Contributions are welcome! Please feel free to submit a pull request.
+## 📘 Examples
 
-## Support
+Create a new project:
 
-For bugs and feature requests, please open an issue in the repository.
+```bash
+zetachain new
+```
 
-For documentation and guides, visit [ZetaChain
-Documentation](https://www.zetachain.com/docs/).
+Start localnet:
+
+```bash
+zetachain localnet start
+```
+
+Query cross-chain balances:
+
+```bash
+zetachain query balances
+```
+
+## 🧭 CLI Reference
+
+For full command documentation:
+
+```bash
+zetachain docs
+```
+
+Or use `--help` with any command:
+
+```bash
+zetachain accounts --help
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Please open issues or submit pull requests.
+
+## 📚 Learn More
+
+- [ZetaChain Docs](https://www.zetachain.com/docs)
+- [CLI Docs](https://www.zetachain.com/docs/reference/cli/)
+- [Join Discord](https://discord.gg/zetachain)
