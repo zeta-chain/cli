@@ -15,7 +15,7 @@ interact with EVM, Solana, Bitcoin, Sui, and TON, all from one CLI.
   on ZetaChain
 - Transfer supported tokens across connected chains
 
-## ✅ Requirements
+## ✅ Prerequisites
 
 - Node.js ≥ 18
 - Git (for template cloning)
