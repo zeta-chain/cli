@@ -5,6 +5,4 @@ import { deployCommand } from "./deploy";
 
 const program = new Command().helpCommand(false).addCommand(deployCommand);
 
-if (require.main === module) program.parse();
-
 export default program;
