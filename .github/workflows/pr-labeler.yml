@@ -4,11 +4,6 @@ on:
   pull_request_target:
     types: [opened, synchronize, reopened, edited]
 
-permissions:
-  pull-requests: read
-  contents: read
-  issues: write
-
 jobs:
   validate-pr-title:
     runs-on: ubuntu-latest
