@@ -1,8 +1,13 @@
 name: PR Conventional Commit Validation
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened, edited]
+
+permissions:
+  pull-requests: read
+  contents: read
+  issues: write
 
 jobs:
   validate-pr-title:
@@ -11,4 +16,5 @@ jobs:
       - name: PR Conventional Commit Validation
         uses: ytanikin/pr-conventional-commits@1.4.1
         with:
-          task_types: '["feat","fix","docs","test","ci","refactor","chore", "dependabot"]'
+          task_types: '["feat","fix","docs","test","ci","refactor","chore","dependabot"]'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
