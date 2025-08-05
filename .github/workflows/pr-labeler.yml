@@ -4,11 +4,6 @@ on:
   pull_request_target:
     types: [opened, synchronize, reopened, edited]
 
-permissions:
-  pull-requests: read
-  contents: read
-  issues: write
-
 jobs:
   validate-pr-title:
     runs-on: ubuntu-latest
@@ -17,4 +12,3 @@ jobs:
         uses: ytanikin/pr-conventional-commits@1.4.1
         with:
           task_types: '["feat","fix","docs","test","ci","refactor","chore","dependabot"]'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
