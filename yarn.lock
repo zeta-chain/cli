@@ -2610,10 +2610,10 @@
   dependencies:
     "@wallet-standard/base" "^1.1.0"
 
-"@zetachain/localnet@12.0.2":
-  version "12.0.2"
-  resolved "https://registry.npmjs.org/@zetachain/localnet/-/localnet-12.0.2.tgz#8316586456795c71855e98e1fdff9fb64dd2d3b6"
-  integrity sha512-wEARR907MIMXWr51v2N9EMtEyWRXS6Y9Zp/XwB4mljqe64P9amy5CR2E4fSoa3uT8svBWvgWot3STMjMb5QS0w==
+"@zetachain/localnet@12.0.3":
+  version "12.0.3"
+  resolved "https://registry.yarnpkg.com/@zetachain/localnet/-/localnet-12.0.3.tgz#0fe16056bddbd43d7ac67affd03913e1c19aed7b"
+  integrity sha512-X/wojUMi8Pw5r8hULNaIeexEYv40HfyQPjKW71YZ0PfkpkNz18iGNjMn0ZVGgRtJT/ToxOh4gS1udooqwlbkGg==
   dependencies:
     "@coral-xyz/anchor" "^0.30.1"
     "@inquirer/prompts" "^5.5.0"
@@ -2719,10 +2719,10 @@
   resolved "https://registry.npmjs.org/@zetachain/standard-contracts/-/standard-contracts-2.0.1.tgz#aefd28bb81f1f05b183bd73dc62bd68e456a6ebf"
   integrity sha512-SHV9a1bSgy8litI/LRZ4VIus7Gsjy0wj3n9bZeIsEydn0C5NNZxYO4XW+P06dlEyDQjtcVJQHoQOyHkodBoVsQ==
 
-"@zetachain/toolkit@16.1.0":
-  version "16.1.0"
-  resolved "https://registry.npmjs.org/@zetachain/toolkit/-/toolkit-16.1.0.tgz#028759063a411e346e92c21219dff8f47678cc30"
-  integrity sha512-CzrjT6WrHMVRIyX6MabJ9cwbY2DbRSXv9f83qvOLVW2jfnFoWjaKYlI9t0U+QuR5LX3YYc4pOtYCQihGhS6i8Q==
+"@zetachain/toolkit@16.1.1":
+  version "16.1.1"
+  resolved "https://registry.yarnpkg.com/@zetachain/toolkit/-/toolkit-16.1.1.tgz#55f7edd3a25768198055cfeae914d399d2ae93ad"
+  integrity sha512-SzjsIq9dKQd5BcnGY/LFMbfSwwjjCfliehEFpDWTyAHiHao0z5OW4/WEkn61WqI3mpnjQsBZREnhiT6gl/y9DA==
   dependencies:
     "@coral-xyz/anchor" "^0.30.1"
     "@ethersproject/units" "^5.8.0"
