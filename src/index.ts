@@ -11,8 +11,8 @@ import {
   zetachainCommand,
 } from "@zetachain/toolkit/commands";
 import { Command } from "commander";
-import { setupAnalytics } from "./analytics";
 
+import { setupAnalytics } from "./analytics";
 import { docsCommand } from "./commands/docs";
 import { newCommand } from "./commands/new";
 import config from "./config.json";

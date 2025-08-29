@@ -1,15 +1,19 @@
 import { Command } from "commander";
+import fs from "fs";
 import { EventMessage, PostHog } from "posthog-node";
 import { v4 as uuid } from "uuid";
-import fs from "fs";
 
 import { getFullCommandPath } from "./commands/docs";
 import {
   POSTHOG_API_KEY,
   POSTHOG_ENDPOINT,
-  ZETACHIAN_DIR,
   ZETACHAIN_CONFIG_FILE,
+  ZETACHIAN_DIR,
 } from "./constants";
+
+type Config = {
+  uuid?: string;
+};
 
 const getOrCreateUserUUID = (): string => {
   try {
@@ -18,17 +22,17 @@ const getOrCreateUserUUID = (): string => {
     console.error(`Failed to ensure config directory: ${ZETACHIAN_DIR}`, err);
   }
 
-  let data: any = {};
+  let data: Config = {};
   let needsWrite = false;
 
   if (fs.existsSync(ZETACHAIN_CONFIG_FILE)) {
     try {
       const raw = fs.readFileSync(ZETACHAIN_CONFIG_FILE, "utf8");
-      if (raw.trim()) data = JSON.parse(raw);
+      if (raw.trim()) data = JSON.parse(raw) as Config;
     } catch (err) {
       console.error(
         `Failed to read/parse ${ZETACHAIN_CONFIG_FILE}; recreating`,
-        err
+        err,
       );
       data = {};
       needsWrite = true;
@@ -52,14 +56,14 @@ const getOrCreateUserUUID = (): string => {
       fs.writeFileSync(
         ZETACHAIN_CONFIG_FILE,
         JSON.stringify(data, null, 2),
-        "utf8"
+        "utf8",
       );
     } catch (err) {
       console.error(`Failed to write ${ZETACHAIN_CONFIG_FILE}`, err);
     }
   }
 
-  return data.uuid;
+  return data.uuid as string;
 };
 
 export const setupAnalytics = (program: Command) => {
