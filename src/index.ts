@@ -23,7 +23,8 @@ program
   .name("zetachain")
   .description("CLI tool for ZetaChain development.")
   .helpCommand(false)
-  .version(config.version);
+  .version(config.version)
+  .option("--no-analytics", "Disable analytics collection");
 
 program.addCommand(newCommand);
 program.addCommand(accountsCommand);

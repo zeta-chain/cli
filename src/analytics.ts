@@ -32,7 +32,7 @@ const getOrCreateUserUUID = (): string => {
     } catch (err) {
       console.error(
         `Failed to read/parse ${ZETACHAIN_CONFIG_FILE}; recreating`,
-        err,
+        err
       );
       data = {};
       needsWrite = true;
@@ -56,7 +56,7 @@ const getOrCreateUserUUID = (): string => {
       fs.writeFileSync(
         ZETACHAIN_CONFIG_FILE,
         JSON.stringify(data, null, 2),
-        "utf8",
+        "utf8"
       );
     } catch (err) {
       console.error(`Failed to write ${ZETACHAIN_CONFIG_FILE}`, err);
@@ -67,11 +67,14 @@ const getOrCreateUserUUID = (): string => {
 };
 
 export const setupAnalytics = (program: Command) => {
-  const analytics = new PostHog(POSTHOG_API_KEY, {
-    host: POSTHOG_ENDPOINT,
-  });
-
   program.hook("preAction", async (_thisCommand, actionCommand) => {
+    const opts = program.opts();
+    if (opts && opts.analytics === false) return;
+
+    const analytics = new PostHog(POSTHOG_API_KEY, {
+      host: POSTHOG_ENDPOINT,
+    });
+
     const event: EventMessage = {
       distinctId: getOrCreateUserUUID(),
       event: getFullCommandPath(actionCommand),
