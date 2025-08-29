@@ -40,6 +40,7 @@
     "marked": "^15.0.6",
     "marked-terminal": "^7.2.1",
     "node-fetch": "^3.3.2",
+    "posthog-node": "^5.8.1",
     "simple-git": "^3.27.0"
   },
   "devDependencies": {

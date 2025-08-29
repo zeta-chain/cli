@@ -11,6 +11,7 @@ import {
   zetachainCommand,
 } from "@zetachain/toolkit/commands";
 import { Command } from "commander";
+import { setupAnalytics } from "./analytics";
 
 import { docsCommand } from "./commands/docs";
 import { newCommand } from "./commands/new";
@@ -35,5 +36,7 @@ program.addCommand(tonCommand);
 program.addCommand(bitcoinCommand);
 program.addCommand(localnetCommand);
 program.addCommand(docsCommand);
+
+setupAnalytics(program);
 
 program.parse(process.argv);

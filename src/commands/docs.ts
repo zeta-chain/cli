@@ -1,6 +1,6 @@
 import { Command } from "commander";
 
-const getFullCommandPath = (cmd: Command): string => {
+export const getFullCommandPath = (cmd: Command): string => {
   if (!cmd.parent) return cmd.name();
   return `${getFullCommandPath(cmd.parent)} ${cmd.name()}`;
 };
@@ -20,7 +20,7 @@ const displayCommandHelp = (cmd: Command, depth: number = 0) => {
 export const docsCommand = new Command()
   .name("docs")
   .description(
-    "Display help information for all available commands and their subcommands",
+    "Display help information for all available commands and their subcommands"
   )
   .action((_, command) => {
     const parent = command.parent;
