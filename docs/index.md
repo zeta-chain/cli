@@ -80,6 +80,10 @@ We welcome contributions! Please open issues or submit pull requests.
 - [ZetaChain Docs](https://www.zetachain.com/docs)
 - [CLI Docs](https://www.zetachain.com/docs/reference/cli/)
 - [Join Discord](https://discord.gg/zetachain)
+{
+  distinctId: '6656541f-e633-4ad5-8423-60c0b7c895d0',
+  event: 'zetachain docs'
+}
 
 ## zetachain new
 

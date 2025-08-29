@@ -32,7 +32,7 @@ const getOrCreateUserUUID = (): string => {
     } catch (err) {
       console.error(
         `Failed to read/parse ${ZETACHAIN_CONFIG_FILE}; recreating`,
-        err
+        err,
       );
       data = {};
       needsWrite = true;
@@ -56,7 +56,7 @@ const getOrCreateUserUUID = (): string => {
       fs.writeFileSync(
         ZETACHAIN_CONFIG_FILE,
         JSON.stringify(data, null, 2),
-        "utf8"
+        "utf8",
       );
     } catch (err) {
       console.error(`Failed to write ${ZETACHAIN_CONFIG_FILE}`, err);
