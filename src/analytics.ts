@@ -11,11 +11,7 @@ import {
   ZETACHAIN_CONFIG_FILE,
 } from "./constants";
 
-const analytics = new PostHog(POSTHOG_API_KEY, {
-  host: POSTHOG_ENDPOINT,
-});
-
-function getOrCreateUserUUID(): string {
+const getOrCreateUserUUID = (): string => {
   try {
     fs.mkdirSync(ZETACHIAN_DIR, { recursive: true });
   } catch (err) {
@@ -64,9 +60,13 @@ function getOrCreateUserUUID(): string {
   }
 
   return data.uuid;
-}
+};
 
-export function setupAnalytics(program: Command) {
+export const setupAnalytics = (program: Command) => {
+  const analytics = new PostHog(POSTHOG_API_KEY, {
+    host: POSTHOG_ENDPOINT,
+  });
+
   program.hook("preAction", async (_thisCommand, actionCommand) => {
     const event: EventMessage = {
       distinctId: getOrCreateUserUUID(),
@@ -77,4 +77,4 @@ export function setupAnalytics(program: Command) {
 
     await analytics.shutdown();
   });
-}
+};
