@@ -112,8 +112,8 @@ export const setupAnalytics = (program: Command) => {
       analytics.capture(event);
 
       await analytics.shutdown();
-    } catch (_err) {
-      // Skip analytics errors (e.g. offline / network failures)
+    } catch {
+      // Skip analytics errors (e.g. offline / network failures), to prevent CLI disruption
     }
   });
 };
