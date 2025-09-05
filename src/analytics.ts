@@ -77,7 +77,10 @@ export const setupAnalytics = (program: Command) => {
 
     const event: EventMessage = {
       distinctId: getOrCreateUserUUID(),
-      event: getFullCommandPath(actionCommand),
+      event: "ZetaChain CLI command executed",
+      properties: {
+        command: getFullCommandPath(actionCommand),
+      },
     };
     analytics.capture(event);
 
