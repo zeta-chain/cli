@@ -85,8 +85,6 @@ export const setupAnalytics = (program: Command) => {
     const opts = program.opts();
     if (opts && opts.analytics === false) return;
 
-    if (!POSTHOG_API_KEY) return;
-
     // Skip analytics if the PostHog host cannot be resolved (offline).
     const host = new URL(POSTHOG_ENDPOINT).hostname;
     const canResolve = await canResolveHost(host);
