@@ -9,7 +9,7 @@ import {
   POSTHOG_API_KEY,
   POSTHOG_ENDPOINT,
   ZETACHAIN_CONFIG_FILE,
-  ZETACHIAN_DIR,
+  ZETACHAIN_DIR,
 } from "./constants";
 
 type Config = {
@@ -18,9 +18,9 @@ type Config = {
 
 const getOrCreateUserUUID = (): string => {
   try {
-    fs.mkdirSync(ZETACHIAN_DIR, { recursive: true });
+    fs.mkdirSync(ZETACHAIN_DIR, { recursive: true });
   } catch (err) {
-    console.error(`Failed to ensure config directory: ${ZETACHIAN_DIR}`, err);
+    console.error(`Failed to ensure config directory: ${ZETACHAIN_DIR}`, err);
   }
 
   let data: Config = {};
