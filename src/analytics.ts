@@ -67,6 +67,22 @@ const getOrCreateUserUUID = (): string => {
   return data.uuid as string;
 };
 
+const canResolveHost = async (
+  hostname: string,
+  timeout = 300,
+): Promise<boolean> => {
+  try {
+    const resolve = dns.promises.lookup(hostname);
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("dns-timeout")), timeout),
+    );
+    await Promise.race([resolve, timeoutPromise]);
+    return true;
+  } catch (_err) {
+    return false;
+  }
+};
+
 export const setupAnalytics = (program: Command) => {
   program.hook("preAction", async (_thisCommand, actionCommand) => {
     const opts = program.opts();
@@ -75,19 +91,8 @@ export const setupAnalytics = (program: Command) => {
     if (!POSTHOG_API_KEY) return;
 
     // Skip analytics if the PostHog host cannot be resolved (offline).
-    const canResolve = await (async () => {
-      try {
-        const host = new URL(POSTHOG_ENDPOINT).hostname;
-        const resolve = dns.promises.lookup(host);
-        const timeout = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("dns-timeout")), 300),
-        );
-        await Promise.race([resolve, timeout]);
-        return true;
-      } catch (_err) {
-        return false;
-      }
-    })();
+    const host = new URL(POSTHOG_ENDPOINT).hostname;
+    const canResolve = await canResolveHost(host);
     if (!canResolve) return;
 
     let analytics: PostHog | null = null;
