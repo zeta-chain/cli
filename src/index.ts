@@ -4,6 +4,7 @@ import {
   accountsCommand,
   bitcoinCommand,
   evmCommand,
+  faucetCommand,
   queryCommand,
   solanaCommand,
   suiCommand,
@@ -27,6 +28,7 @@ program
 program.addCommand(newCommand);
 program.addCommand(accountsCommand);
 program.addCommand(queryCommand);
+program.addCommand(faucetCommand);
 program.addCommand(zetachainCommand);
 program.addCommand(evmCommand);
 program.addCommand(solanaCommand);
