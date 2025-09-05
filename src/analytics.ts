@@ -1,7 +1,7 @@
 import { Command } from "commander";
+import dns from "dns";
 import fs from "fs";
 import { EventMessage, PostHog } from "posthog-node";
-import dns from "dns";
 import { v4 as uuid } from "uuid";
 
 import { getFullCommandPath } from "./commands/docs";
@@ -33,7 +33,7 @@ const getOrCreateUserUUID = (): string => {
     } catch (err) {
       console.error(
         `Failed to read/parse ${ZETACHAIN_CONFIG_FILE}; recreating`,
-        err
+        err,
       );
       data = {};
       needsWrite = true;
@@ -57,7 +57,7 @@ const getOrCreateUserUUID = (): string => {
       fs.writeFileSync(
         ZETACHAIN_CONFIG_FILE,
         JSON.stringify(data, null, 2),
-        "utf8"
+        "utf8",
       );
     } catch (err) {
       console.error(`Failed to write ${ZETACHAIN_CONFIG_FILE}`, err);
@@ -80,7 +80,7 @@ export const setupAnalytics = (program: Command) => {
         const host = new URL(POSTHOG_ENDPOINT).hostname;
         const resolve = dns.promises.lookup(host);
         const timeout = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("dns-timeout")), 300)
+          setTimeout(() => reject(new Error("dns-timeout")), 300),
         );
         await Promise.race([resolve, timeout]);
         return true;
