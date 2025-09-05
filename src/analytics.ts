@@ -19,8 +19,8 @@ type Config = {
 const getOrCreateUserUUID = (): string => {
   try {
     fs.mkdirSync(ZETACHAIN_DIR, { recursive: true });
-  } catch (err) {
-    console.error(`Failed to ensure config directory: ${ZETACHAIN_DIR}`, err);
+  } catch {
+    // Silently continue - analytics will work without persistent config
   }
 
   let data: Config = {};
@@ -31,10 +31,7 @@ const getOrCreateUserUUID = (): string => {
       const raw = fs.readFileSync(ZETACHAIN_CONFIG_FILE, "utf8");
       if (raw.trim()) data = JSON.parse(raw) as Config;
     } catch (err) {
-      console.error(
-        `Failed to read/parse ${ZETACHAIN_CONFIG_FILE}; recreating`,
-        err,
-      );
+      // Silently recreate config if corrupted
       data = {};
       needsWrite = true;
     }
@@ -59,8 +56,8 @@ const getOrCreateUserUUID = (): string => {
         JSON.stringify(data, null, 2),
         "utf8",
       );
-    } catch (err) {
-      console.error(`Failed to write ${ZETACHAIN_CONFIG_FILE}`, err);
+    } catch {
+      // Silently continue - will generate new UUID next time
     }
   }
 
