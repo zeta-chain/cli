@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import fs from "fs";
 import { EventMessage, PostHog } from "posthog-node";
+import dns from "dns";
 import { v4 as uuid } from "uuid";
 
 import { getFullCommandPath } from "./commands/docs";
@@ -71,19 +72,43 @@ export const setupAnalytics = (program: Command) => {
     const opts = program.opts();
     if (opts && opts.analytics === false) return;
 
-    const analytics = new PostHog(POSTHOG_API_KEY, {
-      host: POSTHOG_ENDPOINT,
-    });
+    if (!POSTHOG_API_KEY) return;
 
-    const event: EventMessage = {
-      distinctId: getOrCreateUserUUID(),
-      event: "ZetaChain CLI command executed",
-      properties: {
-        command: getFullCommandPath(actionCommand),
-      },
-    };
-    analytics.capture(event);
+    // Skip analytics if the PostHog host cannot be resolved (offline).
+    const canResolve = await (async () => {
+      try {
+        const host = new URL(POSTHOG_ENDPOINT).hostname;
+        const resolve = dns.promises.lookup(host);
+        const timeout = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("dns-timeout")), 300)
+        );
+        await Promise.race([resolve, timeout]);
+        return true;
+      } catch (_err) {
+        return false;
+      }
+    })();
+    if (!canResolve) return;
 
-    await analytics.shutdown();
+    let analytics: PostHog | null = null;
+    try {
+      analytics = new PostHog(POSTHOG_API_KEY, {
+        host: POSTHOG_ENDPOINT,
+      });
+      analytics.on("error", () => {});
+
+      const event: EventMessage = {
+        distinctId: getOrCreateUserUUID(),
+        event: "ZetaChain CLI command executed",
+        properties: {
+          command: getFullCommandPath(actionCommand),
+        },
+      };
+      analytics.capture(event);
+
+      await analytics.shutdown();
+    } catch (_err) {
+      // Skip analytics errors (e.g. offline / network failures)
+    }
   });
 };
