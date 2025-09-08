@@ -1,6 +1,6 @@
 import { Command } from "commander";
 
-const getFullCommandPath = (cmd: Command): string => {
+export const getFullCommandPath = (cmd: Command): string => {
   if (!cmd.parent) return cmd.name();
   return `${getFullCommandPath(cmd.parent)} ${cmd.name()}`;
 };

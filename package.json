@@ -14,7 +14,7 @@
     "lint": "npm run lint:js",
     "zetachain": "npx tsx src/index.ts",
     "zetachain:js": "yarn build && node dist/index.js",
-    "docs": "cat README.md > docs/index.md && npx tsx src/index.ts docs >> docs/index.md"
+    "docs": "cat README.md > docs/index.md && npx tsx src/index.ts docs --no-analytics >> docs/index.md"
   },
   "repository": {
     "type": "git",
@@ -40,7 +40,9 @@
     "marked": "^15.0.6",
     "marked-terminal": "^7.2.1",
     "node-fetch": "^3.3.2",
-    "simple-git": "^3.27.0"
+    "posthog-node": "^5.8.1",
+    "simple-git": "^3.27.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/clear": "^0.1.4",
