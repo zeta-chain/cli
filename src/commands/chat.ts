@@ -10,7 +10,7 @@ const DEFAULT_CHATBOT_ID = process.env.CHATBOT_ID || "HwoQ2Sf9rFFtdW59sbYKF";
 const streamSSE = async (url: string, body: unknown): Promise<void> => {
   const { default: fetch } = await import("node-fetch");
   const maxRetries = Number(process.env.CHAT_RETRIES ?? 2);
-  const baseDelayMs = Number(process.env.CHAT_RETRY_DELAY_MS ?? 750);
+  const baseDelayMs = Number(process.env.CHAT_RETRY_DELAY_MS ?? 2000);
 
   const doFetch = async () =>
     fetch(url, {
