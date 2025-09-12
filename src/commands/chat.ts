@@ -1,16 +1,22 @@
 import { Command } from "commander";
+import inquirer from "inquirer";
 
 type ChatbaseMessage = { content: string; role: "assistant" | "user" };
 
 const DEFAULT_CHAT_API_URL =
-  process.env.CHAT_API_URL ||
   "https://docs-v2-git-chat-api.zetachain.app/api/chat/";
 const DEFAULT_CHATBOT_ID = process.env.CHATBOT_ID || "HwoQ2Sf9rFFtdW59sbYKF";
+const maxRetries = 5;
+const baseDelayMs = 10000;
 
-const streamSSE = async (url: string, body: unknown): Promise<void> => {
+type FirstOutputCallback = () => void;
+
+const streamSSE = async (
+  url: string,
+  body: unknown,
+  onFirstOutput?: FirstOutputCallback
+): Promise<void> => {
   const { default: fetch } = await import("node-fetch");
-  const maxRetries = Number(process.env.CHAT_RETRIES ?? 2);
-  const baseDelayMs = Number(process.env.CHAT_RETRY_DELAY_MS ?? 2000);
 
   const doFetch = async () =>
     fetch(url, {
@@ -35,7 +41,6 @@ const streamSSE = async (url: string, body: unknown): Promise<void> => {
     attempt++;
   }
 
-  // If non-OK, try to read body and surface error
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     const isJson = res.headers
@@ -47,9 +52,17 @@ const streamSSE = async (url: string, body: unknown): Promise<void> => {
     throw new Error(`Upstream error ${res.status}: ${message}`);
   }
 
-  // Assume event-stream and stream the response
+  let notifiedFirstOutput = false;
+  const notifyFirstOutput = () => {
+    if (notifiedFirstOutput) return;
+    notifiedFirstOutput = true;
+    try {
+      onFirstOutput?.();
+    } catch (_) {
+      // ignore callback errors
+    }
+  };
 
-  // Stream using Web Streams API and decode SSE frames
   const reader = (res.body as any).getReader?.();
   if (reader && typeof reader.read === "function") {
     const decoder = new TextDecoder();
@@ -63,19 +76,19 @@ const streamSSE = async (url: string, body: unknown): Promise<void> => {
         const chunkStr = decoder.decode(value, { stream: true });
         const candidate = buffer + chunkStr;
         if (!sawSseData && !candidate.includes("data:")) {
+          notifyFirstOutput();
           process.stdout.write(chunkStr);
           continue;
         }
         buffer += chunkStr;
 
-        // Process complete lines
         const lines = buffer.split(/\r?\n/);
-        buffer = lines.pop() ?? ""; // keep the trailing partial line
+        buffer = lines.pop() ?? "";
 
         for (const line of lines) {
           const trimmed = line.trimStart();
-          if (!trimmed) continue; // skip empty keep-alives
-          if (trimmed.startsWith(":")) continue; // comment
+          if (!trimmed) continue;
+          if (trimmed.startsWith(":")) continue;
           if (trimmed.startsWith("event:")) continue;
           if (!trimmed.startsWith("data:")) continue;
 
@@ -93,10 +106,12 @@ const streamSSE = async (url: string, body: unknown): Promise<void> => {
             text = json;
           }
           if (typeof text === "string") {
+            notifyFirstOutput();
             process.stdout.write(text);
             continue;
           }
           if (payload.trim() !== "[object Object]") {
+            notifyFirstOutput();
             process.stdout.write(payload);
           }
         }
@@ -105,6 +120,7 @@ const streamSSE = async (url: string, body: unknown): Promise<void> => {
     if (buffer) {
       const trimmed = buffer.trimStart();
       if (!trimmed.startsWith("data:")) {
+        notifyFirstOutput();
         process.stdout.write(buffer);
       } else if (trimmed.startsWith("data:")) {
         const payload = trimmed.slice(5).trimStart();
@@ -115,8 +131,10 @@ const streamSSE = async (url: string, body: unknown): Promise<void> => {
             typeof json === "object" &&
             typeof json.text === "string"
           ) {
+            notifyFirstOutput();
             process.stdout.write(String(json.text));
           } else if (payload.trim() !== "[object Object]") {
+            notifyFirstOutput();
             process.stdout.write(payload);
           }
         }
@@ -126,7 +144,6 @@ const streamSSE = async (url: string, body: unknown): Promise<void> => {
     return;
   }
 
-  // Fallback: try piping as Node stream (older node-fetch/polyfills)
   const anyBody: any = res.body as any;
   if (anyBody && typeof anyBody.on === "function") {
     await new Promise<void>((resolve, reject) => {
@@ -136,6 +153,7 @@ const streamSSE = async (url: string, body: unknown): Promise<void> => {
         const chunkStr = chunk.toString();
         const candidate = buffer + chunkStr;
         if (!sawSseData && !candidate.includes("data:")) {
+          notifyFirstOutput();
           process.stdout.write(chunkStr);
           return;
         }
@@ -162,8 +180,10 @@ const streamSSE = async (url: string, body: unknown): Promise<void> => {
             text = json;
           }
           if (typeof text === "string") {
+            notifyFirstOutput();
             process.stdout.write(text);
           } else if (payload && payload.trim() !== "[object Object]") {
+            notifyFirstOutput();
             process.stdout.write(payload);
           }
         }
@@ -172,6 +192,7 @@ const streamSSE = async (url: string, body: unknown): Promise<void> => {
         if (buffer) {
           const trimmed = buffer.trimStart();
           if (!trimmed.startsWith("data:")) {
+            notifyFirstOutput();
             process.stdout.write(buffer);
           } else if (trimmed.startsWith("data:")) {
             const payload = trimmed.slice(5).trimStart();
@@ -182,8 +203,10 @@ const streamSSE = async (url: string, body: unknown): Promise<void> => {
                 typeof json === "object" &&
                 typeof json.text === "string"
               ) {
+                notifyFirstOutput();
                 process.stdout.write(String(json.text));
               } else if (payload.trim() !== "[object Object]") {
+                notifyFirstOutput();
                 process.stdout.write(payload);
               }
             }
@@ -206,39 +229,88 @@ function safeParseJson(text: string): unknown {
   }
 }
 
-// removed extractText; we assume a consistent streaming JSON payload
+function startSpinner(text: string): () => void {
+  if (!process.stdout.isTTY) return () => undefined;
+  const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+  let i = 0;
+  const interval = setInterval(() => {
+    try {
+      process.stdout.write(`\r${frames[i % frames.length]} ${text}`);
+      i++;
+    } catch (_) {
+      // ignore write errors
+    }
+  }, 80);
+  return () => {
+    clearInterval(interval);
+    try {
+      if (typeof (process.stdout as any).clearLine === "function") {
+        (process.stdout as any).clearLine(0);
+      }
+      if (typeof (process.stdout as any).cursorTo === "function") {
+        (process.stdout as any).cursorTo(0);
+      } else {
+        process.stdout.write("\r");
+      }
+    } catch (_) {
+      // ignore clear errors
+    }
+  };
+}
+
+async function promptOnce(): Promise<string> {
+  const { input } = await inquirer.prompt([
+    {
+      type: "input",
+      name: "input",
+      message: "Ask ZetaChain",
+    },
+  ]);
+  return String(input ?? "").trim();
+}
+
+const interactive = async (initialPrompt?: string): Promise<void> => {
+  let next = initialPrompt?.trim();
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    if (!next) {
+      next = await promptOnce();
+    }
+    const lower = next.toLowerCase();
+    if (!next || lower === "exit" || lower === "quit" || lower === ":q") {
+      break;
+    }
+
+    const messages: ChatbaseMessage[] = [{ content: next, role: "user" }];
+    const payload = {
+      chatbotId: DEFAULT_CHATBOT_ID,
+      messages,
+      stream: true,
+    };
+
+    const stop = startSpinner("Thinking...");
+    try {
+      await streamSSE(DEFAULT_CHAT_API_URL, payload, stop);
+    } catch (err) {
+      stop();
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`Chat error: ${message}`);
+      process.exitCode = 1;
+    }
+
+    next = ""; // force prompt again
+  }
+};
 
 const main = async (promptParts: string[]): Promise<void> => {
-  const prompt = promptParts.join(" ").trim();
-  if (!prompt) {
-    console.error("Please provide a prompt to send.");
-    process.exitCode = 1;
-    return;
-  }
-
-  const messages: ChatbaseMessage[] = [{ content: prompt, role: "user" }];
-
-  const payload = {
-    chatbotId: DEFAULT_CHATBOT_ID,
-    messages,
-    stream: true,
-  };
-
-  try {
-    await streamSSE(DEFAULT_CHAT_API_URL, payload);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.error(`Chat error: ${message}`);
-    process.exitCode = 1;
-  }
+  const initial = promptParts.join(" ").trim();
+  await interactive(initial || undefined);
 };
 
 export const chatCommand = new Command("chat")
   .description("Send a prompt and stream the chat response")
-  .argument("<prompt...>", "Prompt to send to the chatbot")
+  .argument("[prompt...]", "Prompt to send to the chatbot")
   .action((...args: any[]) => {
-    // Commander passes args then command; extract prompt parts
-    const command = args[args.length - 1];
     const promptParts = args.slice(0, -1);
     return main(promptParts);
   });
