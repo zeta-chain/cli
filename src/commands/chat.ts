@@ -8,7 +8,6 @@ const DEFAULT_CHAT_API_URL =
 const DEFAULT_CHATBOT_ID = process.env.CHATBOT_ID || "HwoQ2Sf9rFFtdW59sbYKF";
 
 const streamSSE = async (url: string, body: unknown): Promise<void> => {
-  const DEBUG = Boolean(process.env.DEBUG);
   const { default: fetch } = await import("node-fetch");
   const maxRetries = Number(process.env.CHAT_RETRIES ?? 2);
   const baseDelayMs = Number(process.env.CHAT_RETRY_DELAY_MS ?? 750);
@@ -23,10 +22,7 @@ const streamSSE = async (url: string, body: unknown): Promise<void> => {
       method: "POST",
     });
 
-  let res = await doFetch().catch((err: unknown) => {
-    if (DEBUG) console.error(`[chat] initial fetch error: ${String(err)}`);
-    return null as any;
-  });
+  let res = await doFetch().catch(() => null as any);
   let attempt = 0;
   while (
     (!res || !res.ok) &&
@@ -34,15 +30,8 @@ const streamSSE = async (url: string, body: unknown): Promise<void> => {
     (res == null || [429, 500, 502, 503, 504].includes(res.status))
   ) {
     const delay = baseDelayMs * Math.pow(2, attempt);
-    if (DEBUG)
-      console.error(
-        `[chat] retrying attempt=${attempt + 1} status=${res?.status ?? "network"} delayMs=${delay}`
-      );
     await new Promise((r) => setTimeout(r, delay));
-    res = await doFetch().catch((err: unknown) => {
-      if (DEBUG) console.error(`[chat] fetch error on retry: ${String(err)}`);
-      return null as any;
-    });
+    res = await doFetch().catch(() => null as any);
     attempt++;
   }
 
@@ -58,35 +47,13 @@ const streamSSE = async (url: string, body: unknown): Promise<void> => {
     throw new Error(`Upstream error ${res.status}: ${message}`);
   }
 
-  const contentType = res.headers.get("content-type") || "";
-  const isEventStream = contentType.includes("text/event-stream");
-  if (DEBUG) {
-    console.error(`[chat] status=${res.status} content-type=${contentType}`);
-  }
-
-  // If clearly JSON, just print JSON/text and exit
-  if (
-    (contentType.includes("application/json") && !isEventStream) ||
-    !res.body
-  ) {
-    const text = await res.text();
-    const data = safeParseJson(text);
-    if (data && typeof data === "object" && "text" in data) {
-      process.stdout.write(String((data as any).text) + "\n");
-    } else {
-      process.stdout.write(
-        (data ? JSON.stringify(data, null, 2) : text) + "\n"
-      );
-    }
-    return;
-  }
+  // Assume event-stream and stream the response
 
   // Stream using Web Streams API and decode SSE frames
   const reader = (res.body as any).getReader?.();
   if (reader && typeof reader.read === "function") {
     const decoder = new TextDecoder();
     let buffer = "";
-    let emitted = false;
     let sawSseData = false;
     let done = false;
     while (!done) {
@@ -94,20 +61,10 @@ const streamSSE = async (url: string, body: unknown): Promise<void> => {
       done = isDone;
       if (value) {
         const chunkStr = decoder.decode(value, { stream: true });
-        if (DEBUG) {
-          try {
-            const len = Buffer.from(value).length;
-            console.error(`[chat] chunk=${len}b`);
-          } catch {}
-        }
-        // If we haven't detected SSE yet and there is no SSE marker, stream raw
-        if (!sawSseData) {
-          const candidate = buffer + chunkStr;
-          if (!candidate.includes("data:")) {
-            process.stdout.write(chunkStr);
-            emitted = true;
-            continue;
-          }
+        const candidate = buffer + chunkStr;
+        if (!sawSseData && !candidate.includes("data:")) {
+          process.stdout.write(chunkStr);
+          continue;
         }
         buffer += chunkStr;
 
@@ -116,7 +73,6 @@ const streamSSE = async (url: string, body: unknown): Promise<void> => {
         buffer = lines.pop() ?? ""; // keep the trailing partial line
 
         for (const line of lines) {
-          if (DEBUG) console.error(`[chat] line=${JSON.stringify(line)}`);
           const trimmed = line.trimStart();
           if (!trimmed) continue; // skip empty keep-alives
           if (trimmed.startsWith(":")) continue; // comment
@@ -127,44 +83,43 @@ const streamSSE = async (url: string, body: unknown): Promise<void> => {
           if (!payload) continue;
           if (payload === "[DONE]") continue;
           sawSseData = true;
-
-          const json = safeParseJson(payload);
-          const text = extractText(json);
+          const json = safeParseJson(payload) as any;
+          let text: string | null = null;
+          if (json && typeof json === "object") {
+            if (typeof json.text === "string") text = json.text;
+            else if (typeof json.choices?.[0]?.delta?.content === "string")
+              text = json.choices[0].delta.content;
+          } else if (typeof json === "string") {
+            text = json;
+          }
           if (typeof text === "string") {
             process.stdout.write(text);
-            emitted = true;
-            if (DEBUG) console.error(`[chat] text=${JSON.stringify(text)}`);
             continue;
           }
           if (payload.trim() !== "[object Object]") {
             process.stdout.write(payload);
           }
-          emitted = true;
-          if (DEBUG) console.error(`[chat] payload=${JSON.stringify(payload)}`);
         }
       }
     }
-    // Flush remaining buffer if it contains a last complete payload
-    if (buffer.trim()) {
+    if (buffer) {
       const trimmed = buffer.trimStart();
-      if (trimmed.startsWith("data:")) {
-        const payload = trimmed.slice(5).trimStart();
-        const json = safeParseJson(payload);
-        if (
-          json &&
-          typeof json === "object" &&
-          typeof (json as any).text === "string"
-        ) {
-          process.stdout.write(String((json as any).text));
-          emitted = true;
-        } else if (payload) {
-          process.stdout.write(payload);
-          emitted = true;
-        }
-      } else if (!emitted) {
-        // As a last resort, print whatever buffered data remains
+      if (!trimmed.startsWith("data:")) {
         process.stdout.write(buffer);
-        emitted = true;
+      } else if (trimmed.startsWith("data:")) {
+        const payload = trimmed.slice(5).trimStart();
+        if (payload && payload !== "[DONE]") {
+          const json = safeParseJson(payload) as any;
+          if (
+            json &&
+            typeof json === "object" &&
+            typeof json.text === "string"
+          ) {
+            process.stdout.write(String(json.text));
+          } else if (payload.trim() !== "[object Object]") {
+            process.stdout.write(payload);
+          }
+        }
       }
     }
     process.stdout.write("\n");
@@ -176,46 +131,63 @@ const streamSSE = async (url: string, body: unknown): Promise<void> => {
   if (anyBody && typeof anyBody.on === "function") {
     await new Promise<void>((resolve, reject) => {
       let buffer = "";
-      let emitted = false;
       let sawSseData = false;
       anyBody.on("data", (chunk: Buffer) => {
-        if (DEBUG) console.error(`[chat] chunk=${chunk.length}b`);
         const chunkStr = chunk.toString();
-        if (!sawSseData) {
-          const candidate = buffer + chunkStr;
-          if (!candidate.includes("data:")) {
-            process.stdout.write(chunkStr);
-            emitted = true;
-            return;
-          }
+        const candidate = buffer + chunkStr;
+        if (!sawSseData && !candidate.includes("data:")) {
+          process.stdout.write(chunkStr);
+          return;
         }
         buffer += chunkStr;
         const lines = buffer.split(/\r?\n/);
         buffer = lines.pop() ?? "";
         for (const line of lines) {
-          if (DEBUG) console.error(`[chat] line=${JSON.stringify(line)}`);
           const trimmed = line.trimStart();
           if (!trimmed) continue;
           if (trimmed.startsWith(":")) continue;
           if (trimmed.startsWith("event:")) continue;
           if (!trimmed.startsWith("data:")) continue;
           const payload = trimmed.slice(5).trimStart();
+          if (!payload) continue;
+          if (payload === "[DONE]") continue;
           sawSseData = true;
-          const json = safeParseJson(payload);
-          const text = extractText(json);
+          const json = safeParseJson(payload) as any;
+          let text: string | null = null;
+          if (json && typeof json === "object") {
+            if (typeof json.text === "string") text = json.text;
+            else if (typeof json.choices?.[0]?.delta?.content === "string")
+              text = json.choices[0].delta.content;
+          } else if (typeof json === "string") {
+            text = json;
+          }
           if (typeof text === "string") {
             process.stdout.write(text);
-            emitted = true;
           } else if (payload && payload.trim() !== "[object Object]") {
             process.stdout.write(payload);
-            emitted = true;
           }
         }
       });
       anyBody.on("end", () => {
-        if (!emitted && buffer) {
-          process.stdout.write(buffer);
-          emitted = true;
+        if (buffer) {
+          const trimmed = buffer.trimStart();
+          if (!trimmed.startsWith("data:")) {
+            process.stdout.write(buffer);
+          } else if (trimmed.startsWith("data:")) {
+            const payload = trimmed.slice(5).trimStart();
+            if (payload && payload !== "[DONE]") {
+              const json = safeParseJson(payload) as any;
+              if (
+                json &&
+                typeof json === "object" &&
+                typeof json.text === "string"
+              ) {
+                process.stdout.write(String(json.text));
+              } else if (payload.trim() !== "[object Object]") {
+                process.stdout.write(payload);
+              }
+            }
+          }
         }
         process.stdout.write("\n");
         resolve();
@@ -234,20 +206,7 @@ function safeParseJson(text: string): unknown {
   }
 }
 
-function extractText(value: unknown): string | null {
-  if (typeof value === "string") return value;
-  if (!value || typeof value !== "object") return null;
-  const v = value as any;
-  if (typeof v.text === "string") return v.text;
-  if (typeof v.answer === "string") return v.answer;
-  if (typeof v.message === "string") return v.message;
-  if (typeof v.data === "string") return v.data;
-  const choice = v.choices?.[0];
-  if (choice && typeof choice.delta?.content === "string")
-    return choice.delta.content;
-  if (choice && typeof choice.text === "string") return choice.text;
-  return null;
-}
+// removed extractText; we assume a consistent streaming JSON payload
 
 const main = async (promptParts: string[]): Promise<void> => {
   const prompt = promptParts.join(" ").trim();
