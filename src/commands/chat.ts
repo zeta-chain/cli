@@ -259,14 +259,28 @@ function startSpinner(text: string): () => void {
 }
 
 async function promptOnce(): Promise<string> {
-  const { input } = await inquirer.prompt([
-    {
-      type: "input",
-      name: "input",
-      message: "Ask ZetaChain",
-    },
-  ]);
-  return String(input ?? "").trim();
+  try {
+    const { input } = await inquirer.prompt([
+      {
+        type: "input",
+        name: "input",
+        message: "Ask ZetaChain",
+      },
+    ]);
+    return String(input ?? "").trim();
+  } catch (err) {
+    const anyErr = err as any;
+    const name = anyErr?.name as string | undefined;
+    const message = (anyErr?.message as string | undefined) || "";
+    // Suppress Ctrl+C (ExitPromptError) and exit the loop quietly
+    if (
+      name === "ExitPromptError" ||
+      message.includes("User force closed the prompt")
+    ) {
+      return "";
+    }
+    throw err;
+  }
 }
 
 const interactive = async (initialPrompt?: string): Promise<void> => {
