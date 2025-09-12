@@ -35,6 +35,7 @@
     "@zetachain/localnet": "12.0.3",
     "@zetachain/toolkit": "16.1.2",
     "commander": "^13.1.0",
+    "cors": "^2.8.5",
     "fs-extra": "^11.3.0",
     "inquirer": "^12.3.2",
     "marked": "^15.0.6",
