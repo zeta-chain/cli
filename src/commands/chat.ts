@@ -1,204 +1,229 @@
 import { Command } from "commander";
-import http from "http";
-import https from "https";
-import readline from "readline";
-import { URL } from "url";
 
-type ChatMessage = { content: string; role: "assistant" | "user" };
+type ChatbaseMessage = { content: string; role: "assistant" | "user" };
 
-type ChatOptions = {
-  apiUrl?: string;
-  chatbotId?: string;
-  model?: string;
-  temperature?: number;
-};
-
-const DEFAULT_CHATBOT_ID = "HwoQ2Sf9rFFtdW59sbYKF";
-const DEFAULT_API_URL =
-  process.env.ZETACHAIN_CHAT_API_URL ||
+const DEFAULT_CHAT_API_URL =
+  process.env.CHAT_API_URL ||
   "https://docs-v2-git-chat-api.zetachain.app/api/chat/";
+const DEFAULT_CHATBOT_ID = process.env.CHATBOT_ID || "HwoQ2Sf9rFFtdW59sbYKF";
 
-const isHttps = (url: string) => url.startsWith("https:");
-
-const postSSE = async (
-  urlStr: string,
-  payload: Record<string, unknown>,
-  onData: (text: string) => void
-): Promise<{ body?: string; statusCode: number }> => {
-  return new Promise((resolve) => {
-    try {
-      const url = new URL(urlStr);
-      const body = JSON.stringify(payload);
-      const options: https.RequestOptions = {
-        headers: {
-          Accept: "text/event-stream",
-          "Content-Length": Buffer.byteLength(body),
-          "Content-Type": "application/json",
-        },
-        hostname: url.hostname,
-        method: "POST",
-        path: url.pathname + url.search,
-        port: url.port || (isHttps(urlStr) ? 443 : 80),
-      };
-
-      const req = (isHttps(urlStr) ? https : (http as any)).request(
-        options,
-        (res: http.IncomingMessage) => {
-          const statusCode = res.statusCode || 0;
-
-          // If not an SSE, buffer and return (probably an error)
-          const contentType = String(res.headers["content-type"] || "");
-          if (!contentType.includes("text/event-stream")) {
-            let data = "";
-            res.setEncoding("utf8");
-            res.on("data", (chunk) => (data += chunk));
-            res.on("end", () => resolve({ body: data, statusCode }));
-            return;
-          }
-
-          res.setEncoding("utf8");
-          let buffer = "";
-          res.on("data", (chunk) => {
-            buffer += chunk;
-            // Split on double newlines (end of SSE event)
-            const events = buffer.split(/\n\n/);
-            buffer = events.pop() || "";
-            for (const evt of events) {
-              // Each event can have multiple lines (event:, data:, id:)
-              const lines = evt.split(/\n/);
-              for (const line of lines) {
-                const trimmed = line.trim();
-                if (!trimmed.startsWith("data:")) continue;
-                const data = trimmed.slice(5).trim();
-                if (!data || data === "[DONE]") continue;
-                try {
-                  const json = JSON.parse(data);
-                  const text =
-                    typeof json?.text === "string"
-                      ? json.text
-                      : typeof json?.message === "string"
-                        ? json.message
-                        : typeof json?.answer === "string"
-                          ? json.answer
-                          : typeof json === "string"
-                            ? json
-                            : "";
-                  if (text) onData(text);
-                } catch {
-                  // If it's not JSON, try to print raw
-                  if (data && data !== "[DONE]") onData(data);
-                }
-              }
-            }
-          });
-
-          res.on("end", () => resolve({ statusCode }));
-        }
-      );
-
-      req.on("error", () => resolve({ body: "Network error", statusCode: 0 }));
-      req.write(body);
-      req.end();
-    } catch {
-      resolve({ body: "Invalid request", statusCode: 0 });
-    }
-  });
-};
-
-const chatLoop = async (options: ChatOptions) => {
-  const chatbotId = options.chatbotId || DEFAULT_CHATBOT_ID;
-  const apiUrl = options.apiUrl || DEFAULT_API_URL;
-  const messages: ChatMessage[] = [];
-
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
+const streamSSE = async (url: string, body: unknown): Promise<void> => {
+  const DEBUG = Boolean(process.env.DEBUG);
+  const { default: fetch } = await import("node-fetch");
+  const res = await fetch(url, {
+    body: JSON.stringify(body),
+    headers: {
+      Accept: "text/event-stream",
+      "Content-Type": "application/json",
+    },
+    method: "POST",
   });
 
-  const ask = () =>
-    new Promise<string>((resolve) => rl.question("You: ", resolve));
-
-  console.log(`Chatbot: ${chatbotId}`);
-  console.log("Type '/exit' to quit.\n");
-
-  while (true) {
-    const input = (await ask()).trim();
-    if (!input) continue;
-    if (input.toLowerCase() === "/exit") break;
-
-    messages.push({ content: input, role: "user" });
-
-    process.stdout.write("Assistant: ");
-    let assistantText = "";
-
-    const payload: Record<string, unknown> = {
-      chatbotId,
-      messages,
-      stream: true,
-    };
-    if (typeof options.temperature === "number") {
-      payload.temperature = Math.min(1, Math.max(0, options.temperature));
-    }
-    if (options.model && options.model.trim()) {
-      payload.model = options.model.trim();
-    }
-
-    const { statusCode, body } = await postSSE(apiUrl, payload, (chunk) => {
-      assistantText += chunk;
-      process.stdout.write(chunk);
-    });
-
-    if (statusCode < 200 || statusCode >= 300) {
-      const prefix = assistantText ? "\n\n" : "";
-      process.stdout.write(
-        `${prefix}[Error ${statusCode || "Network"}] ${body || "Request failed"}`
-      );
-    } else {
-      if (!assistantText && body) {
-        // Non-SSE response path: print JSON or raw text
-        try {
-          const parsed = JSON.parse(body);
-          const text =
-            typeof parsed?.text === "string"
-              ? parsed.text
-              : typeof parsed?.message === "string"
-                ? parsed.message
-                : typeof parsed?.answer === "string"
-                  ? parsed.answer
-                  : typeof parsed?.data === "string"
-                    ? parsed.data
-                    : typeof parsed === "string"
-                      ? parsed
-                      : "";
-          if (text) {
-            assistantText = text;
-            process.stdout.write(text);
-          } else {
-            assistantText = body;
-            process.stdout.write(body);
-          }
-        } catch {
-          assistantText = body;
-          process.stdout.write(body);
-        }
-      }
-      messages.push({ content: assistantText, role: "assistant" });
-    }
-
-    process.stdout.write("\n\n");
+  // If non-OK, try to read body and surface error
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    const isJson = res.headers
+      .get("content-type")
+      ?.includes("application/json");
+    const payload = isJson ? safeParseJson(text) : text;
+    const message =
+      (payload as any)?.error || (payload as any)?.message || res.statusText;
+    throw new Error(`Upstream error ${res.status}: ${message}`);
   }
 
-  rl.close();
+  const contentType = res.headers.get("content-type") || "";
+  const isEventStream = contentType.includes("text/event-stream");
+  if (DEBUG) {
+    console.error(`[chat] status=${res.status} content-type=${contentType}`);
+  }
+
+  // If clearly JSON, just print JSON/text and exit
+  if ((contentType.includes("application/json") && !isEventStream) || !res.body) {
+    const text = await res.text();
+    const data = safeParseJson(text);
+    if (data && typeof data === "object" && "text" in data) {
+      process.stdout.write(String((data as any).text) + "\n");
+    } else {
+      process.stdout.write(
+        (data ? JSON.stringify(data, null, 2) : text) + "\n"
+      );
+    }
+    return;
+  }
+
+  // Stream using Web Streams API and decode SSE frames
+  const reader = (res.body as any).getReader?.();
+  if (reader && typeof reader.read === "function") {
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let emitted = false;
+    let done = false;
+    while (!done) {
+      const { value, done: isDone } = await reader.read();
+      done = isDone;
+      if (value) {
+        buffer += decoder.decode(value, { stream: true });
+        if (DEBUG) {
+          try {
+            const len = Buffer.from(value).length;
+            console.error(`[chat] chunk=${len}b`);
+          } catch {}
+        }
+
+        // Process complete lines
+        const lines = buffer.split(/\r?\n/);
+        buffer = lines.pop() ?? ""; // keep the trailing partial line
+
+        for (const line of lines) {
+          if (DEBUG) console.error(`[chat] line=${JSON.stringify(line)}`);
+          const trimmed = line.trimStart();
+          if (!trimmed) continue; // skip empty keep-alives
+          if (trimmed.startsWith(":")) continue; // comment
+          if (trimmed.startsWith("event:")) continue;
+          if (!trimmed.startsWith("data:")) {
+            // Not a formal SSE data line; ignore unless debugging
+            continue;
+          }
+
+          const payload = trimmed.slice(5).trimStart();
+          if (!payload) continue;
+          if (payload === "[DONE]") continue;
+
+          const json = safeParseJson(payload);
+          if (json && typeof json === "object") {
+            const text =
+              (json as any).text ??
+              (json as any).answer ??
+              (json as any).message ??
+              (json as any).data ??
+              (json as any).choices?.[0]?.delta?.content ??
+              null;
+            if (typeof text === "string") {
+              process.stdout.write(text);
+              emitted = true;
+              if (DEBUG) console.error(`[chat] text=${JSON.stringify(text)}`);
+              continue;
+            }
+          }
+          process.stdout.write(payload);
+          emitted = true;
+          if (DEBUG) console.error(`[chat] payload=${JSON.stringify(payload)}`);
+        }
+      }
+    }
+    // Flush remaining buffer if it contains a last complete payload
+    if (buffer.trim()) {
+      const trimmed = buffer.trimStart();
+      if (trimmed.startsWith("data:")) {
+        const payload = trimmed.slice(5).trimStart();
+        const json = safeParseJson(payload);
+        if (
+          json &&
+          typeof json === "object" &&
+          typeof (json as any).text === "string"
+        ) {
+          process.stdout.write(String((json as any).text));
+          emitted = true;
+        } else if (payload) {
+          process.stdout.write(payload);
+          emitted = true;
+        }
+      } else if (!emitted) {
+        // As a last resort, print whatever buffered data remains
+        process.stdout.write(buffer);
+        emitted = true;
+      }
+    }
+    process.stdout.write("\n");
+    return;
+  }
+
+  // Fallback: try piping as Node stream (older node-fetch/polyfills)
+  const anyBody: any = res.body as any;
+  if (anyBody && typeof anyBody.on === "function") {
+    await new Promise<void>((resolve, reject) => {
+      let buffer = "";
+      let emitted = false;
+      anyBody.on("data", (chunk: Buffer) => {
+        if (DEBUG) console.error(`[chat] chunk=${chunk.length}b`);
+        buffer += chunk.toString();
+        const lines = buffer.split(/\r?\n/);
+        buffer = lines.pop() ?? "";
+        for (const line of lines) {
+          if (DEBUG) console.error(`[chat] line=${JSON.stringify(line)}`);
+          const trimmed = line.trimStart();
+          if (!trimmed) continue;
+          if (trimmed.startsWith(":")) continue;
+          if (trimmed.startsWith("event:")) continue;
+          if (!trimmed.startsWith("data:")) continue;
+          const payload = trimmed.slice(5).trimStart();
+          const json = safeParseJson(payload);
+          if (
+            json &&
+            typeof json === "object" &&
+            typeof (json as any).text === "string"
+          ) {
+            process.stdout.write(String((json as any).text));
+            emitted = true;
+          } else if (payload) {
+            process.stdout.write(payload);
+            emitted = true;
+          }
+        }
+      });
+      anyBody.on("end", () => {
+        if (!emitted && buffer) {
+          process.stdout.write(buffer);
+          emitted = true;
+        }
+        process.stdout.write("\n");
+        resolve();
+      });
+      anyBody.on("error", (err: unknown) => reject(err));
+    });
+    return;
+  }
+};
+
+function safeParseJson(text: string): unknown {
+  try {
+    return JSON.parse(text);
+  } catch (_) {
+    return null;
+  }
+}
+
+const main = async (promptParts: string[]): Promise<void> => {
+  const prompt = promptParts.join(" ").trim();
+  if (!prompt) {
+    console.error("Please provide a prompt to send.");
+    process.exitCode = 1;
+    return;
+  }
+
+  const messages: ChatbaseMessage[] = [{ content: prompt, role: "user" }];
+
+  const payload = {
+    chatbotId: DEFAULT_CHATBOT_ID,
+    messages,
+    stream: true,
+  };
+
+  try {
+    await streamSSE(DEFAULT_CHAT_API_URL, payload);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`Chat error: ${message}`);
+    process.exitCode = 1;
+  }
 };
 
 export const chatCommand = new Command("chat")
-  .description("Chat with ZetaChain’s assistant (streams responses)")
-  .option("--chatbot-id <id>", "Chatbase chatbotId to use", DEFAULT_CHATBOT_ID)
-  .option("--api-url <url>", "Override chat API URL", DEFAULT_API_URL)
-  .option("--model <name>", "Upstream model (optional)")
-  .option("--temperature <num>", "Sampling temperature 0..1 (optional)", (v) =>
-    Number(v)
-  )
-  .action(async (opts: ChatOptions) => {
-    await chatLoop(opts || {});
+  .description("Send a prompt and stream the chat response")
+  .argument("<prompt...>", "Prompt to send to the chatbot")
+  .action((...args: any[]) => {
+    // Commander passes args then command; extract prompt parts
+    const command = args[args.length - 1];
+    const promptParts = args.slice(0, -1);
+    return main(promptParts);
   });
