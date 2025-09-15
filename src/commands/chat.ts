@@ -1,3 +1,8 @@
+import axios, {
+  AxiosHeaders,
+  AxiosResponse,
+  RawAxiosResponseHeaders,
+} from "axios";
 import { Command } from "commander";
 import inquirer from "inquirer";
 
@@ -16,40 +21,55 @@ const streamSSE = async (
   body: unknown,
   onFirstOutput?: FirstOutputCallback,
 ): Promise<void> => {
-  const { default: fetch } = await import("node-fetch");
-
-  const doFetch = async () =>
-    fetch(url, {
-      body: JSON.stringify(body),
+  const doFetch = async (): Promise<AxiosResponse<unknown>> =>
+    axios.post(url, body, {
       headers: {
         Accept: "text/event-stream",
         "Content-Type": "application/json",
       },
-      method: "POST",
+      responseType: "stream",
+      // We'll handle non-2xx manually
+      validateStatus: () => true,
     });
 
-  let res = await doFetch().catch(() => null as any);
+  let res: AxiosResponse<unknown> | null;
+  try {
+    res = await doFetch();
+  } catch (_) {
+    res = null;
+  }
   let attempt = 0;
   while (
-    (!res || !res.ok) &&
+    (!res || !(res.status >= 200 && res.status < 300)) &&
     attempt < maxRetries &&
     (res == null || [429, 500, 502, 503, 504].includes(res.status))
   ) {
     const delay = baseDelayMs * Math.pow(2, attempt);
     await new Promise((r) => setTimeout(r, delay));
-    res = await doFetch().catch(() => null as any);
+    try {
+      res = await doFetch();
+    } catch (_) {
+      res = null;
+    }
     attempt++;
   }
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    const isJson = res.headers
-      .get("content-type")
-      ?.includes("application/json");
+  if (!res || !(res.status >= 200 && res.status < 300)) {
+    // Try to extract message from non-stream payloads
+    let text = "";
+    try {
+      if (res && (res.data == null || typeof res.data !== "object")) {
+        text = String(res.data ?? "");
+      }
+    } catch (_) {
+      text = "";
+    }
+    const contentType = getHeaderValue(res?.headers, "content-type");
+    const isJson = contentType?.includes("application/json");
     const payload = isJson ? safeParseJson(text) : text;
-    const message =
-      (payload as any)?.error || (payload as any)?.message || res.statusText;
-    throw new Error(`Upstream error ${res.status}: ${message}`);
+    const message = getPayloadMessage(payload) || res?.statusText || "Error";
+    const status = res?.status ?? 0;
+    throw new Error(`Upstream error ${status}: ${message}`);
   }
 
   let notifiedFirstOutput = false;
@@ -63,94 +83,15 @@ const streamSSE = async (
     }
   };
 
-  const reader = res.body.getReader?.();
-  if (reader && typeof reader.read === "function") {
-    const decoder = new TextDecoder();
-    let buffer = "";
-    let sawSseData = false;
-    let done = false;
-    while (!done) {
-      const { value, done: isDone } = await reader.read();
-      done = isDone;
-      if (value) {
-        const chunkStr = decoder.decode(value, { stream: true });
-        const candidate = buffer + chunkStr;
-        if (!sawSseData && !candidate.includes("data:")) {
-          notifyFirstOutput();
-          process.stdout.write(chunkStr);
-          continue;
-        }
-        buffer += chunkStr;
-
-        const lines = buffer.split(/\r?\n/);
-        buffer = lines.pop() ?? "";
-
-        for (const line of lines) {
-          const trimmed = line.trimStart();
-          if (!trimmed) continue;
-          if (trimmed.startsWith(":")) continue;
-          if (trimmed.startsWith("event:")) continue;
-          if (!trimmed.startsWith("data:")) continue;
-
-          const payload = trimmed.slice(5).trimStart();
-          if (!payload) continue;
-          if (payload === "[DONE]") continue;
-          sawSseData = true;
-          const json = safeParseJson(payload) as any;
-          let text: string | null = null;
-          if (json && typeof json === "object") {
-            if (typeof json.text === "string") text = json.text;
-            else if (typeof json.choices?.[0]?.delta?.content === "string")
-              text = json.choices[0].delta.content;
-          } else if (typeof json === "string") {
-            text = json;
-          }
-          if (typeof text === "string") {
-            notifyFirstOutput();
-            process.stdout.write(text);
-            continue;
-          }
-          if (payload.trim() !== "[object Object]") {
-            notifyFirstOutput();
-            process.stdout.write(payload);
-          }
-        }
-      }
-    }
-    if (buffer) {
-      const trimmed = buffer.trimStart();
-      if (!trimmed.startsWith("data:")) {
-        notifyFirstOutput();
-        process.stdout.write(buffer);
-      } else if (trimmed.startsWith("data:")) {
-        const payload = trimmed.slice(5).trimStart();
-        if (payload && payload !== "[DONE]") {
-          const json = safeParseJson(payload) as any;
-          if (
-            json &&
-            typeof json === "object" &&
-            typeof json.text === "string"
-          ) {
-            notifyFirstOutput();
-            process.stdout.write(String(json.text));
-          } else if (payload.trim() !== "[object Object]") {
-            notifyFirstOutput();
-            process.stdout.write(payload);
-          }
-        }
-      }
-    }
-    process.stdout.write("\n");
-    return;
-  }
-
-  const anyBody: any = res.body as any;
-  if (anyBody && typeof anyBody.on === "function") {
+  const bodyUnknown: unknown = (res as AxiosResponse<unknown>).data as unknown;
+  if (isEventEmitterLike(bodyUnknown)) {
     await new Promise<void>((resolve, reject) => {
       let buffer = "";
       let sawSseData = false;
-      anyBody.on("data", (chunk: Buffer) => {
-        const chunkStr = chunk.toString();
+      bodyUnknown.on("data", (chunk: unknown) => {
+        const chunkStr = Buffer.isBuffer(chunk)
+          ? chunk.toString()
+          : String(chunk);
         const candidate = buffer + chunkStr;
         if (!sawSseData && !candidate.includes("data:")) {
           notifyFirstOutput();
@@ -170,12 +111,26 @@ const streamSSE = async (
           if (!payload) continue;
           if (payload === "[DONE]") continue;
           sawSseData = true;
-          const json = safeParseJson(payload) as any;
+          const json = safeParseJson(payload);
           let text: string | null = null;
           if (json && typeof json === "object") {
-            if (typeof json.text === "string") text = json.text;
-            else if (typeof json.choices?.[0]?.delta?.content === "string")
-              text = json.choices[0].delta.content;
+            const obj = json as Record<string, unknown>;
+            const maybeText = obj.text;
+            if (typeof maybeText === "string") {
+              text = maybeText;
+            } else {
+              const choices = (obj as { choices?: unknown }).choices;
+              if (Array.isArray(choices) && choices.length > 0) {
+                const first = choices[0] as unknown;
+                if (first && typeof first === "object") {
+                  const delta = (first as { delta?: unknown }).delta;
+                  if (delta && typeof delta === "object") {
+                    const content = (delta as { content?: unknown }).content;
+                    if (typeof content === "string") text = content;
+                  }
+                }
+              }
+            }
           } else if (typeof json === "string") {
             text = json;
           }
@@ -188,7 +143,7 @@ const streamSSE = async (
           }
         }
       });
-      anyBody.on("end", () => {
+      bodyUnknown.on("end", () => {
         if (buffer) {
           const trimmed = buffer.trimStart();
           if (!trimmed.startsWith("data:")) {
@@ -197,14 +152,16 @@ const streamSSE = async (
           } else if (trimmed.startsWith("data:")) {
             const payload = trimmed.slice(5).trimStart();
             if (payload && payload !== "[DONE]") {
-              const json = safeParseJson(payload) as any;
-              if (
-                json &&
-                typeof json === "object" &&
-                typeof json.text === "string"
-              ) {
-                notifyFirstOutput();
-                process.stdout.write(String(json.text));
+              const json = safeParseJson(payload);
+              if (json && typeof json === "object") {
+                const obj = json as Record<string, unknown>;
+                if (typeof obj.text === "string") {
+                  notifyFirstOutput();
+                  process.stdout.write(String(obj.text));
+                } else if (payload.trim() !== "[object Object]") {
+                  notifyFirstOutput();
+                  process.stdout.write(payload);
+                }
               } else if (payload.trim() !== "[object Object]") {
                 notifyFirstOutput();
                 process.stdout.write(payload);
@@ -215,7 +172,7 @@ const streamSSE = async (
         process.stdout.write("\n");
         resolve();
       });
-      anyBody.on("error", (err: unknown) => reject(err));
+      bodyUnknown.on("error", (err: unknown) => reject(err));
     });
     return;
   }
@@ -244,11 +201,15 @@ const startSpinner = (text: string): (() => void) => {
   return () => {
     clearInterval(interval);
     try {
-      if (typeof (process.stdout as any).clearLine === "function") {
-        (process.stdout as any).clearLine(0);
+      const stdout = process.stdout as unknown as {
+        clearLine?: (dir: number) => void;
+        cursorTo?: (x: number, y?: number) => void;
+      };
+      if (typeof stdout.clearLine === "function") {
+        stdout.clearLine(0);
       }
-      if (typeof (process.stdout as any).cursorTo === "function") {
-        (process.stdout as any).cursorTo(0);
+      if (typeof stdout.cursorTo === "function") {
+        stdout.cursorTo(0);
       } else {
         process.stdout.write("\r");
       }
@@ -269,9 +230,7 @@ const promptOnce = async (): Promise<string> => {
     ]);
     return String(input ?? "").trim();
   } catch (err) {
-    const anyErr = err as any;
-    const name = anyErr?.name as string | undefined;
-    const message = (anyErr?.message as string | undefined) || "";
+    const { name, message } = getErrorInfo(err);
     // Suppress Ctrl+C (ExitPromptError) and exit the loop quietly
     if (
       name === "ExitPromptError" ||
@@ -325,7 +284,50 @@ const main = async (promptParts: string[]): Promise<void> => {
 export const chatCommand = new Command("chat")
   .description("Send a prompt and stream the chat response")
   .argument("[prompt...]", "Prompt to send to the chatbot")
-  .action((...args: any[]) => {
-    const promptParts = args.slice(0, -1);
+  .action((promptParts: string[], _cmd: Command) => {
     return main(promptParts);
   });
+
+// Helpers
+type EventOnFn = (
+  event: string,
+  listener: (...args: unknown[]) => unknown,
+) => unknown;
+
+const isEventEmitterLike = (body: unknown): body is { on: EventOnFn } =>
+  !!body && typeof (body as { on?: unknown }).on === "function";
+
+const getPayloadMessage = (payload: unknown): string | undefined => {
+  if (payload && typeof payload === "object") {
+    const obj = payload as { error?: unknown; message?: unknown };
+    if (typeof obj.error === "string") return obj.error;
+    if (typeof obj.message === "string") return obj.message;
+  }
+  return undefined;
+};
+
+const getErrorInfo = (err: unknown): { message: string; name?: string } => {
+  if (err && typeof err === "object") {
+    const name = (err as { name?: unknown }).name;
+    const message = (err as { message?: unknown }).message;
+    return {
+      message: typeof message === "string" ? message : String(err),
+      name: typeof name === "string" ? name : undefined,
+    };
+  }
+  return { message: String(err), name: undefined };
+};
+
+const getHeaderValue = (
+  headers: AxiosResponse["headers"] | undefined,
+  key: string,
+): string | undefined => {
+  if (!headers) return undefined;
+  if (headers instanceof AxiosHeaders) {
+    const v = headers.get?.(key);
+    return typeof v === "string" ? v : undefined;
+  }
+  const raw = headers as RawAxiosResponseHeaders;
+  const v = raw[key.toLowerCase()] ?? raw[key as keyof typeof raw];
+  return typeof v === "string" ? v : undefined;
+};

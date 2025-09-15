@@ -38,9 +38,9 @@
     "cors": "^2.8.5",
     "fs-extra": "^11.3.0",
     "inquirer": "^12.3.2",
+    "axios": "^1.7.7",
     "marked": "^15.0.6",
     "marked-terminal": "^7.2.1",
-    "node-fetch": "^3.3.2",
     "posthog-node": "^5.8.1",
     "simple-git": "^3.27.0",
     "uuid": "^11.1.0"
