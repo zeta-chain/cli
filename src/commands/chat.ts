@@ -5,6 +5,7 @@ import axios, {
 } from "axios";
 import { Command } from "commander";
 import inquirer from "inquirer";
+import ora from "ora";
 
 type ChatbaseMessage = { content: string; role: "assistant" | "user" };
 
@@ -19,7 +20,7 @@ type FirstOutputCallback = () => void;
 const streamSSE = async (
   url: string,
   body: unknown,
-  onFirstOutput?: FirstOutputCallback,
+  onFirstOutput?: FirstOutputCallback
 ): Promise<void> => {
   const doFetch = async (): Promise<AxiosResponse<unknown>> =>
     axios.post(url, body, {
@@ -188,33 +189,12 @@ const safeParseJson = (text: string): unknown => {
 
 const startSpinner = (text: string): (() => void) => {
   if (!process.stdout.isTTY) return () => undefined;
-  const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
-  let i = 0;
-  const interval = setInterval(() => {
-    try {
-      process.stdout.write(`\r${frames[i % frames.length]} ${text}`);
-      i++;
-    } catch (_) {
-      // ignore write errors
-    }
-  }, 80);
+  const spinner = ora({ text }).start();
   return () => {
-    clearInterval(interval);
     try {
-      const stdout = process.stdout as unknown as {
-        clearLine?: (dir: number) => void;
-        cursorTo?: (x: number, y?: number) => void;
-      };
-      if (typeof stdout.clearLine === "function") {
-        stdout.clearLine(0);
-      }
-      if (typeof stdout.cursorTo === "function") {
-        stdout.cursorTo(0);
-      } else {
-        process.stdout.write("\r");
-      }
+      spinner.stop();
     } catch (_) {
-      // ignore clear errors
+      // ignore stop errors
     }
   };
 };
@@ -244,15 +224,15 @@ const promptOnce = async (): Promise<string> => {
 
 const runOnce = async (
   initialPrompt?: string,
-  showSpinner: boolean = true,
-): Promise<void> => {
+  showSpinner: boolean = true
+): Promise<boolean> => {
   let prompt = initialPrompt?.trim();
   if (!prompt) {
     prompt = await promptOnce();
   }
   const lower = (prompt || "").toLowerCase();
   if (!prompt || lower === "exit" || lower === "quit" || lower === ":q") {
-    return;
+    return false;
   }
 
   const messages: ChatbaseMessage[] = [{ content: prompt, role: "user" }];
@@ -273,12 +253,20 @@ const runOnce = async (
     console.error(`Chat error: ${message}`);
     process.exitCode = 1;
   }
+  return true;
 };
 
 const main = async (promptParts: string[]): Promise<void> => {
   const initial = promptParts.join(" ").trim();
   const hasArg = initial.length > 0;
-  await runOnce(hasArg ? initial : undefined, /* showSpinner */ hasArg);
+  if (hasArg) {
+    const shouldContinue = await runOnce(initial, /* showSpinner */ true);
+    if (!shouldContinue) return;
+  }
+  for (;;) {
+    const shouldContinue = await runOnce(undefined, /* showSpinner */ true);
+    if (!shouldContinue) return;
+  }
 };
 
 export const chatCommand = new Command("chat")
@@ -291,7 +279,7 @@ export const chatCommand = new Command("chat")
 // Helpers
 type EventOnFn = (
   event: string,
-  listener: (...args: unknown[]) => unknown,
+  listener: (...args: unknown[]) => unknown
 ) => unknown;
 
 const isEventEmitterLike = (body: unknown): body is { on: EventOnFn } =>
@@ -320,7 +308,7 @@ const getErrorInfo = (err: unknown): { message: string; name?: string } => {
 
 const getHeaderValue = (
   headers: AxiosResponse["headers"] | undefined,
-  key: string,
+  key: string
 ): string | undefined => {
   if (!headers) return undefined;
   if (headers instanceof AxiosHeaders) {
