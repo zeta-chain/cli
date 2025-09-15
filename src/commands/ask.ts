@@ -7,20 +7,16 @@ import { Command } from "commander";
 import inquirer from "inquirer";
 import ora from "ora";
 
-type ChatbaseMessage = { content: string; role: "assistant" | "user" };
-
 const DEFAULT_CHAT_API_URL =
   "https://docs-v2-git-chat-api.zetachain.app/api/chat/";
 const DEFAULT_CHATBOT_ID = process.env.CHATBOT_ID || "HwoQ2Sf9rFFtdW59sbYKF";
 const maxRetries = 5;
 const baseDelayMs = 10000;
 
-type FirstOutputCallback = () => void;
-
 const streamSSE = async (
   url: string,
   body: unknown,
-  onFirstOutput?: FirstOutputCallback
+  onFirstOutput?: () => void
 ): Promise<void> => {
   const doFetch = async (): Promise<AxiosResponse<unknown>> =>
     axios.post(url, body, {
@@ -56,7 +52,6 @@ const streamSSE = async (
   }
 
   if (!res || !(res.status >= 200 && res.status < 300)) {
-    // Try to extract message from non-stream payloads
     let text = "";
     try {
       if (res && (res.data == null || typeof res.data !== "object")) {
@@ -65,12 +60,34 @@ const streamSSE = async (
     } catch (_) {
       text = "";
     }
-    const contentType = getHeaderValue(res?.headers, "content-type");
+    let contentType: string | undefined;
+    if (res?.headers instanceof AxiosHeaders) {
+      const v = res.headers.get?.("content-type");
+      contentType = typeof v === "string" ? v : undefined;
+    } else if (res?.headers) {
+      const raw = res.headers as RawAxiosResponseHeaders;
+      const v = raw["content-type"] ?? raw["Content-Type"];
+      contentType = typeof v === "string" ? v : undefined;
+    }
     const isJson = contentType?.includes("application/json");
-    const payload = isJson ? safeParseJson(text) : text;
-    const message = getPayloadMessage(payload) || res?.statusText || "Error";
+    let parsed: unknown = text;
+    if (isJson) {
+      try {
+        parsed = JSON.parse(text);
+      } catch (_) {
+        parsed = null;
+      }
+    }
+    let message: string | undefined;
+    if (parsed && typeof parsed === "object") {
+      const obj = parsed as { error?: unknown; message?: unknown };
+      if (typeof obj.error === "string") message = obj.error;
+      else if (typeof obj.message === "string") message = obj.message;
+    }
     const status = res?.status ?? 0;
-    throw new Error(`Upstream error ${status}: ${message}`);
+    throw new Error(
+      `Upstream error ${status}: ${message || res?.statusText || "Error"}`
+    );
   }
 
   let notifiedFirstOutput = false;
@@ -84,12 +101,12 @@ const streamSSE = async (
     }
   };
 
-  const bodyUnknown: unknown = (res as AxiosResponse<unknown>).data as unknown;
-  if (isEventEmitterLike(bodyUnknown)) {
+  const stream: any = (res as AxiosResponse<unknown>).data as any;
+  if (stream && typeof stream.on === "function") {
     await new Promise<void>((resolve, reject) => {
       let buffer = "";
       let sawSseData = false;
-      bodyUnknown.on("data", (chunk: unknown) => {
+      stream.on("data", (chunk: unknown) => {
         const chunkStr = Buffer.isBuffer(chunk)
           ? chunk.toString()
           : String(chunk);
@@ -112,7 +129,12 @@ const streamSSE = async (
           if (!payload) continue;
           if (payload === "[DONE]") continue;
           sawSseData = true;
-          const json = safeParseJson(payload);
+          let json: unknown = null;
+          try {
+            json = JSON.parse(payload);
+          } catch (_) {
+            json = null;
+          }
           let text: string | null = null;
           if (json && typeof json === "object") {
             const obj = json as Record<string, unknown>;
@@ -144,7 +166,7 @@ const streamSSE = async (
           }
         }
       });
-      bodyUnknown.on("end", () => {
+      stream.on("end", () => {
         if (buffer) {
           const trimmed = buffer.trimStart();
           if (!trimmed.startsWith("data:")) {
@@ -153,7 +175,12 @@ const streamSSE = async (
           } else if (trimmed.startsWith("data:")) {
             const payload = trimmed.slice(5).trimStart();
             if (payload && payload !== "[DONE]") {
-              const json = safeParseJson(payload);
+              let json: unknown = null;
+              try {
+                json = JSON.parse(payload);
+              } catch (_) {
+                json = null;
+              }
               if (json && typeof json === "object") {
                 const obj = json as Record<string, unknown>;
                 if (typeof obj.text === "string") {
@@ -173,149 +200,64 @@ const streamSSE = async (
         process.stdout.write("\n");
         resolve();
       });
-      bodyUnknown.on("error", (err: unknown) => reject(err));
+      stream.on("error", (err: unknown) => reject(err));
     });
     return;
-  }
-};
-
-const safeParseJson = (text: string): unknown => {
-  try {
-    return JSON.parse(text);
-  } catch (_) {
-    return null;
-  }
-};
-
-const startSpinner = (text: string): (() => void) => {
-  if (!process.stdout.isTTY) return () => undefined;
-  const spinner = ora({ text }).start();
-  return () => {
-    try {
-      spinner.stop();
-    } catch (_) {
-      // ignore stop errors
-    }
-  };
-};
-
-const promptOnce = async (): Promise<string> => {
-  try {
-    const { input } = await inquirer.prompt([
-      {
-        message: "Ask ZetaChain",
-        name: "input",
-        type: "input",
-      },
-    ]);
-    return String(input ?? "").trim();
-  } catch (err) {
-    const { name, message } = getErrorInfo(err);
-    // Suppress Ctrl+C (ExitPromptError) and exit the loop quietly
-    if (
-      name === "ExitPromptError" ||
-      message.includes("User force closed the prompt")
-    ) {
-      return "";
-    }
-    throw err;
-  }
-};
-
-const runOnce = async (
-  initialPrompt?: string,
-  showSpinner: boolean = true
-): Promise<boolean> => {
-  let prompt = initialPrompt?.trim();
-  if (!prompt) {
-    prompt = await promptOnce();
-  }
-  const lower = (prompt || "").toLowerCase();
-  if (!prompt || lower === "exit" || lower === "quit" || lower === ":q") {
-    return false;
-  }
-
-  const messages: ChatbaseMessage[] = [{ content: prompt, role: "user" }];
-  const payload = {
-    chatbotId: DEFAULT_CHATBOT_ID,
-    messages,
-    stream: true,
-  };
-
-  const shouldSpin =
-    !!showSpinner && !!initialPrompt && initialPrompt.trim().length > 0;
-  const stop = shouldSpin ? startSpinner("Thinking...") : () => undefined;
-  try {
-    await streamSSE(DEFAULT_CHAT_API_URL, payload, stop);
-  } catch (err) {
-    stop();
-    const message = err instanceof Error ? err.message : String(err);
-    console.error(`Chat error: ${message}`);
-    process.exitCode = 1;
-  }
-  return true;
-};
-
-const main = async (promptParts: string[]): Promise<void> => {
-  const initial = promptParts.join(" ").trim();
-  const hasArg = initial.length > 0;
-  if (hasArg) {
-    const shouldContinue = await runOnce(initial, /* showSpinner */ true);
-    if (!shouldContinue) return;
-  }
-  for (;;) {
-    const shouldContinue = await runOnce(undefined, /* showSpinner */ true);
-    if (!shouldContinue) return;
   }
 };
 
 export const askCommand = new Command("ask")
   .description("Send a prompt and stream the chat response")
   .argument("[prompt...]", "Prompt to send to the chatbot")
-  .action((promptParts: string[], _cmd: Command) => {
-    return main(promptParts);
+  .action(async (promptParts: string[]) => {
+    let nextPrompt = promptParts.join(" ").trim();
+    for (;;) {
+      let prompt = nextPrompt;
+      if (!prompt) {
+        try {
+          const { input } = await inquirer.prompt([
+            { message: "Ask ZetaChain", name: "input", type: "input" },
+          ]);
+          prompt = String(input ?? "").trim();
+        } catch (err) {
+          const name = (err as { name?: unknown } | null | undefined)?.name;
+          const message = (err as { message?: unknown } | null | undefined)
+            ?.message;
+          if (
+            name === "ExitPromptError" ||
+            (typeof message === "string" &&
+              message.includes("User force closed the prompt"))
+          ) {
+            return;
+          }
+          throw err;
+        }
+      }
+      const lower = (prompt || "").toLowerCase();
+      if (!prompt || lower === "exit" || lower === "quit" || lower === ":q") {
+        return;
+      }
+      const payload = {
+        chatbotId: DEFAULT_CHATBOT_ID,
+        messages: [{ content: prompt, role: "user" }],
+        stream: true,
+      };
+      const spinner = process.stdout.isTTY
+        ? ora({ text: "Thinking..." }).start()
+        : null;
+      const onFirstOutput = () => {
+        try {
+          spinner?.stop();
+        } catch (_) {}
+      };
+      try {
+        await streamSSE(DEFAULT_CHAT_API_URL, payload, onFirstOutput);
+      } catch (err) {
+        onFirstOutput();
+        const message = err instanceof Error ? err.message : String(err);
+        console.error(`Chat error: ${message}`);
+        process.exitCode = 1;
+      }
+      nextPrompt = "";
+    }
   });
-
-// Helpers
-type EventOnFn = (
-  event: string,
-  listener: (...args: unknown[]) => unknown
-) => unknown;
-
-const isEventEmitterLike = (body: unknown): body is { on: EventOnFn } =>
-  !!body && typeof (body as { on?: unknown }).on === "function";
-
-const getPayloadMessage = (payload: unknown): string | undefined => {
-  if (payload && typeof payload === "object") {
-    const obj = payload as { error?: unknown; message?: unknown };
-    if (typeof obj.error === "string") return obj.error;
-    if (typeof obj.message === "string") return obj.message;
-  }
-  return undefined;
-};
-
-const getErrorInfo = (err: unknown): { message: string; name?: string } => {
-  if (err && typeof err === "object") {
-    const name = (err as { name?: unknown }).name;
-    const message = (err as { message?: unknown }).message;
-    return {
-      message: typeof message === "string" ? message : String(err),
-      name: typeof name === "string" ? name : undefined,
-    };
-  }
-  return { message: String(err), name: undefined };
-};
-
-const getHeaderValue = (
-  headers: AxiosResponse["headers"] | undefined,
-  key: string
-): string | undefined => {
-  if (!headers) return undefined;
-  if (headers instanceof AxiosHeaders) {
-    const v = headers.get?.(key);
-    return typeof v === "string" ? v : undefined;
-  }
-  const raw = headers as RawAxiosResponseHeaders;
-  const v = raw[key.toLowerCase()] ?? raw[key as keyof typeof raw];
-  return typeof v === "string" ? v : undefined;
-};
