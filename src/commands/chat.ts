@@ -14,7 +14,7 @@ type FirstOutputCallback = () => void;
 const streamSSE = async (
   url: string,
   body: unknown,
-  onFirstOutput?: FirstOutputCallback
+  onFirstOutput?: FirstOutputCallback,
 ): Promise<void> => {
   const { default: fetch } = await import("node-fetch");
 
@@ -63,7 +63,7 @@ const streamSSE = async (
     }
   };
 
-  const reader = (res.body as any).getReader?.();
+  const reader = res.body.getReader?.();
   if (reader && typeof reader.read === "function") {
     const decoder = new TextDecoder();
     let buffer = "";
@@ -221,15 +221,15 @@ const streamSSE = async (
   }
 };
 
-function safeParseJson(text: string): unknown {
+const safeParseJson = (text: string): unknown => {
   try {
     return JSON.parse(text);
   } catch (_) {
     return null;
   }
-}
+};
 
-function startSpinner(text: string): () => void {
+const startSpinner = (text: string): (() => void) => {
   if (!process.stdout.isTTY) return () => undefined;
   const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
   let i = 0;
@@ -256,15 +256,15 @@ function startSpinner(text: string): () => void {
       // ignore clear errors
     }
   };
-}
+};
 
-async function promptOnce(): Promise<string> {
+const promptOnce = async (): Promise<string> => {
   try {
     const { input } = await inquirer.prompt([
       {
-        type: "input",
-        name: "input",
         message: "Ask ZetaChain",
+        name: "input",
+        type: "input",
       },
     ]);
     return String(input ?? "").trim();
@@ -281,44 +281,45 @@ async function promptOnce(): Promise<string> {
     }
     throw err;
   }
-}
+};
 
-const interactive = async (initialPrompt?: string): Promise<void> => {
-  let next = initialPrompt?.trim();
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    if (!next) {
-      next = await promptOnce();
-    }
-    const lower = next.toLowerCase();
-    if (!next || lower === "exit" || lower === "quit" || lower === ":q") {
-      break;
-    }
+const runOnce = async (
+  initialPrompt?: string,
+  showSpinner: boolean = true,
+): Promise<void> => {
+  let prompt = initialPrompt?.trim();
+  if (!prompt) {
+    prompt = await promptOnce();
+  }
+  const lower = (prompt || "").toLowerCase();
+  if (!prompt || lower === "exit" || lower === "quit" || lower === ":q") {
+    return;
+  }
 
-    const messages: ChatbaseMessage[] = [{ content: next, role: "user" }];
-    const payload = {
-      chatbotId: DEFAULT_CHATBOT_ID,
-      messages,
-      stream: true,
-    };
+  const messages: ChatbaseMessage[] = [{ content: prompt, role: "user" }];
+  const payload = {
+    chatbotId: DEFAULT_CHATBOT_ID,
+    messages,
+    stream: true,
+  };
 
-    const stop = startSpinner("Thinking...");
-    try {
-      await streamSSE(DEFAULT_CHAT_API_URL, payload, stop);
-    } catch (err) {
-      stop();
-      const message = err instanceof Error ? err.message : String(err);
-      console.error(`Chat error: ${message}`);
-      process.exitCode = 1;
-    }
-
-    next = ""; // force prompt again
+  const shouldSpin =
+    !!showSpinner && !!initialPrompt && initialPrompt.trim().length > 0;
+  const stop = shouldSpin ? startSpinner("Thinking...") : () => undefined;
+  try {
+    await streamSSE(DEFAULT_CHAT_API_URL, payload, stop);
+  } catch (err) {
+    stop();
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`Chat error: ${message}`);
+    process.exitCode = 1;
   }
 };
 
 const main = async (promptParts: string[]): Promise<void> => {
   const initial = promptParts.join(" ").trim();
-  await interactive(initial || undefined);
+  const hasArg = initial.length > 0;
+  await runOnce(hasArg ? initial : undefined, /* showSpinner */ hasArg);
 };
 
 export const chatCommand = new Command("chat")
