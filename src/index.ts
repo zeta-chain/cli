@@ -14,7 +14,7 @@ import {
 import { Command } from "commander";
 
 import { setupAnalytics } from "./analytics";
-import { chatCommand } from "./commands/chat";
+import { askCommand } from "./commands/ask";
 import { docsCommand } from "./commands/docs";
 import { newCommand } from "./commands/new";
 import config from "./config.json";
@@ -40,7 +40,7 @@ program.addCommand(tonCommand);
 program.addCommand(bitcoinCommand);
 program.addCommand(localnetCommand);
 program.addCommand(docsCommand);
-program.addCommand(chatCommand);
+program.addCommand(askCommand);
 
 setupAnalytics(program);
 

@@ -269,7 +269,7 @@ const main = async (promptParts: string[]): Promise<void> => {
   }
 };
 
-export const chatCommand = new Command("chat")
+export const askCommand = new Command("ask")
   .description("Send a prompt and stream the chat response")
   .argument("[prompt...]", "Prompt to send to the chatbot")
   .action((promptParts: string[], _cmd: Command) => {
