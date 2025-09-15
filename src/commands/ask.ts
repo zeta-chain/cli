@@ -206,58 +206,60 @@ const streamSSE = async (
   }
 };
 
+const main = async (promptParts: string[]): Promise<void> => {
+  let nextPrompt = promptParts.join(" ").trim();
+  for (;;) {
+    let prompt = nextPrompt;
+    if (!prompt) {
+      try {
+        const { input } = await inquirer.prompt([
+          { message: "Ask ZetaChain", name: "input", type: "input" },
+        ]);
+        prompt = String(input ?? "").trim();
+      } catch (err) {
+        const name = (err as { name?: unknown } | null | undefined)?.name;
+        const message = (err as { message?: unknown } | null | undefined)
+          ?.message;
+        if (
+          name === "ExitPromptError" ||
+          (typeof message === "string" &&
+            message.includes("User force closed the prompt"))
+        ) {
+          return;
+        }
+        throw err;
+      }
+    }
+    const lower = (prompt || "").toLowerCase();
+    if (!prompt || lower === "exit" || lower === "quit" || lower === ":q") {
+      return;
+    }
+    const payload = {
+      chatbotId: DEFAULT_CHATBOT_ID,
+      messages: [{ content: prompt, role: "user" }],
+      stream: true,
+    };
+    const spinner = process.stdout.isTTY
+      ? ora({ text: "Thinking..." }).start()
+      : null;
+    const onFirstOutput = () => {
+      try {
+        spinner?.stop();
+      } catch (_) {}
+    };
+    try {
+      await streamSSE(DEFAULT_CHAT_API_URL, payload, onFirstOutput);
+    } catch (err) {
+      onFirstOutput();
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`Chat error: ${message}`);
+      process.exitCode = 1;
+    }
+    nextPrompt = "";
+  }
+};
+
 export const askCommand = new Command("ask")
   .description("Send a prompt and stream the chat response")
   .argument("[prompt...]", "Prompt to send to the chatbot")
-  .action(async (promptParts: string[]) => {
-    let nextPrompt = promptParts.join(" ").trim();
-    for (;;) {
-      let prompt = nextPrompt;
-      if (!prompt) {
-        try {
-          const { input } = await inquirer.prompt([
-            { message: "Ask ZetaChain", name: "input", type: "input" },
-          ]);
-          prompt = String(input ?? "").trim();
-        } catch (err) {
-          const name = (err as { name?: unknown } | null | undefined)?.name;
-          const message = (err as { message?: unknown } | null | undefined)
-            ?.message;
-          if (
-            name === "ExitPromptError" ||
-            (typeof message === "string" &&
-              message.includes("User force closed the prompt"))
-          ) {
-            return;
-          }
-          throw err;
-        }
-      }
-      const lower = (prompt || "").toLowerCase();
-      if (!prompt || lower === "exit" || lower === "quit" || lower === ":q") {
-        return;
-      }
-      const payload = {
-        chatbotId: DEFAULT_CHATBOT_ID,
-        messages: [{ content: prompt, role: "user" }],
-        stream: true,
-      };
-      const spinner = process.stdout.isTTY
-        ? ora({ text: "Thinking..." }).start()
-        : null;
-      const onFirstOutput = () => {
-        try {
-          spinner?.stop();
-        } catch (_) {}
-      };
-      try {
-        await streamSSE(DEFAULT_CHAT_API_URL, payload, onFirstOutput);
-      } catch (err) {
-        onFirstOutput();
-        const message = err instanceof Error ? err.message : String(err);
-        console.error(`Chat error: ${message}`);
-        process.exitCode = 1;
-      }
-      nextPrompt = "";
-    }
-  });
+  .action(main);
