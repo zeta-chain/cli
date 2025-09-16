@@ -13,134 +13,160 @@ const DEFAULT_CHATBOT_ID = process.env.CHATBOT_ID || "HwoQ2Sf9rFFtdW59sbYKF";
 const maxRetries = 5;
 const baseDelayMs = 10000;
 
+const RETRYABLE = new Set([429, 500, 502, 503, 504]);
+const capMs = 60_000;
+const jitter = (ms: number): number =>
+  Math.min(capMs, ms) * (0.5 + Math.random());
+
+async function readBody(res: AxiosResponse): Promise<string> {
+  const data: any = res.data as any;
+  if (data && typeof data.on === "function") {
+    return await new Promise<string>((resolve) => {
+      let s = "";
+      data.setEncoding?.("utf8");
+      data.on(
+        "data",
+        (c: Buffer | string) => (s += Buffer.isBuffer(c) ? c.toString() : c)
+      );
+      data.on("end", () => resolve(s));
+      data.on("error", () => resolve(""));
+    });
+  }
+  return typeof res.data === "string"
+    ? (res.data as string)
+    : res.data == null
+      ? ""
+      : String(res.data);
+}
+
 const streamSSE = async (
   url: string,
   body: unknown,
   onFirstOutput?: () => void
 ): Promise<void> => {
-  const doFetch = async (): Promise<AxiosResponse<unknown>> =>
-    axios.post(url, body, {
-      headers: {
-        Accept: "text/event-stream",
-        "Content-Type": "application/json",
-      },
-      responseType: "stream",
-      // We'll handle non-2xx manually
-      validateStatus: () => true,
-    });
+  const controller = new AbortController();
+  const onSigint = (): void => controller.abort();
+  const onSigterm = (): void => controller.abort();
+  process.on("SIGINT", onSigint);
+  process.on("SIGTERM", onSigterm);
 
-  let res: AxiosResponse<unknown> | null;
   try {
-    res = await doFetch();
-  } catch (_) {
-    res = null;
-  }
-  let attempt = 0;
-  while (
-    (!res || !(res.status >= 200 && res.status < 300)) &&
-    attempt < maxRetries &&
-    (res == null || [429, 500, 502, 503, 504].includes(res.status))
-  ) {
-    const delay = baseDelayMs * Math.pow(2, attempt);
-    await new Promise((r) => setTimeout(r, delay));
+    const doFetch = async (): Promise<AxiosResponse<unknown>> =>
+      axios.post(url, body, {
+        headers: {
+          Accept: "text/event-stream",
+          "Content-Type": "application/json",
+        },
+        responseType: "stream",
+        signal: controller.signal,
+        timeout: 60_000,
+        validateStatus: () => true,
+      });
+
+    let res: AxiosResponse<unknown> | null;
     try {
       res = await doFetch();
     } catch (_) {
       res = null;
     }
-    attempt++;
-  }
-
-  if (!res || !(res.status >= 200 && res.status < 300)) {
-    let text = "";
-    try {
-      if (res && (res.data == null || typeof res.data !== "object")) {
-        text = String(res.data ?? "");
-      }
-    } catch (_) {
-      text = "";
-    }
-    let contentType: string | undefined;
-    if (res?.headers instanceof AxiosHeaders) {
-      const v = res.headers.get?.("content-type");
-      contentType = typeof v === "string" ? v : undefined;
-    } else if (res?.headers) {
-      const raw = res.headers as RawAxiosResponseHeaders;
-      const v = raw["content-type"] ?? raw["Content-Type"];
-      contentType = typeof v === "string" ? v : undefined;
-    }
-    const isJson = contentType?.includes("application/json");
-    let parsed: unknown = text;
-    if (isJson) {
+    let attempt = 0;
+    while (attempt < maxRetries && (!res || RETRYABLE.has(res.status))) {
+      const delay = jitter(baseDelayMs * Math.pow(2, attempt));
+      await new Promise((r) => setTimeout(r, delay));
       try {
-        parsed = JSON.parse(text);
+        res = await doFetch();
       } catch (_) {
-        parsed = null;
+        res = null;
       }
+      attempt++;
     }
-    let message: string | undefined;
-    if (parsed && typeof parsed === "object") {
-      const obj = parsed as { error?: unknown; message?: unknown };
-      if (typeof obj.error === "string") message = obj.error;
-      else if (typeof obj.message === "string") message = obj.message;
-    }
-    const status = res?.status ?? 0;
-    throw new Error(
-      `Upstream error ${status}: ${message || res?.statusText || "Error"}`
-    );
-  }
 
-  let notifiedFirstOutput = false;
-  const notifyFirstOutput = () => {
-    if (notifiedFirstOutput) return;
-    notifiedFirstOutput = true;
-    try {
-      onFirstOutput?.();
-    } catch (_) {
-      // ignore callback errors
-    }
-  };
-
-  const stream: any = (res as AxiosResponse<unknown>).data as any;
-  if (stream && typeof stream.on === "function") {
-    await new Promise<void>((resolve, reject) => {
-      let buffer = "";
-      let sawSseData = false;
-      stream.on("data", (chunk: unknown) => {
-        const chunkStr = Buffer.isBuffer(chunk)
-          ? chunk.toString()
-          : String(chunk);
-        const candidate = buffer + chunkStr;
-        if (!sawSseData && !candidate.includes("data:")) {
-          notifyFirstOutput();
-          process.stdout.write(chunkStr);
-          return;
+    if (!res || !(res.status >= 200 && res.status < 300)) {
+      // Fail fast on non-retryable 4xx
+      if (
+        res &&
+        !RETRYABLE.has(res.status) &&
+        (res.status < 200 || res.status >= 300)
+      ) {
+        const text = await readBody(res as AxiosResponse);
+        let contentType: string | undefined;
+        if (res?.headers instanceof AxiosHeaders) {
+          const v = res.headers.get?.("content-type");
+          contentType = typeof v === "string" ? v : undefined;
+        } else if (res?.headers) {
+          const raw = res.headers as RawAxiosResponseHeaders;
+          const v = raw["content-type"] ?? raw["Content-Type"];
+          contentType = typeof v === "string" ? v : undefined;
         }
-        buffer += chunkStr;
-        const lines = buffer.split(/\r?\n/);
-        buffer = lines.pop() ?? "";
-        for (const line of lines) {
-          const trimmed = line.trimStart();
-          if (!trimmed) continue;
-          if (trimmed.startsWith(":")) continue;
-          if (trimmed.startsWith("event:")) continue;
-          if (!trimmed.startsWith("data:")) continue;
-          const payload = trimmed.slice(5).trimStart();
-          if (!payload) continue;
-          if (payload === "[DONE]") continue;
-          sawSseData = true;
+        const isJson = contentType?.includes("application/json");
+        let parsed: unknown = text;
+        if (isJson) {
+          try {
+            parsed = JSON.parse(text);
+          } catch (_) {
+            parsed = null;
+          }
+        }
+        let message: string | undefined;
+        if (parsed && typeof parsed === "object") {
+          const obj = parsed as { error?: unknown; message?: unknown };
+          if (typeof obj.error === "string") message = obj.error;
+          else if (typeof obj.message === "string") message = obj.message;
+        }
+        const status = res?.status ?? 0;
+        throw new Error(
+          `Upstream error ${status}: ${message || res?.statusText || "Error"}`
+        );
+      }
+      // If no response or still not 2xx after retries
+      const status = res?.status ?? 0;
+      const text = res ? await readBody(res as AxiosResponse) : "";
+      throw new Error(
+        `Upstream error ${status}: ${text || res?.statusText || "Error"}`
+      );
+    }
+
+    let notifiedFirstOutput = false;
+    const notifyFirstOutput = () => {
+      if (notifiedFirstOutput) return;
+      notifiedFirstOutput = true;
+      try {
+        onFirstOutput?.();
+      } catch (_) {
+        // ignore callback errors
+      }
+    };
+
+    const stream: any = (res as AxiosResponse<unknown>).data as any;
+    if (stream && typeof stream.on === "function") {
+      await new Promise<void>((resolve, reject) => {
+        let buffer = "";
+        let prebuffer = "";
+        const PREBUF_LIMIT = 2048;
+        let sawSseData = false;
+        let eventBuf: string[] = [];
+        let sawDone = false;
+
+        const flushEvent = () => {
+          if (!eventBuf.length) return;
+          const payload = eventBuf.join("\n");
+          eventBuf = [];
+          if (payload === "[DONE]") {
+            sawDone = true;
+            return;
+          }
           let json: unknown = null;
           try {
             json = JSON.parse(payload);
           } catch (_) {
             json = null;
           }
-          let text: string | null = null;
+          let textOut: string | null = null;
           if (json && typeof json === "object") {
             const obj = json as Record<string, unknown>;
             const maybeText = obj.text;
             if (typeof maybeText === "string") {
-              text = maybeText;
+              textOut = maybeText;
             } else {
               const choices = (obj as { choices?: unknown }).choices;
               if (Array.isArray(choices) && choices.length > 0) {
@@ -149,66 +175,103 @@ const streamSSE = async (
                   const delta = (first as { delta?: unknown }).delta;
                   if (delta && typeof delta === "object") {
                     const content = (delta as { content?: unknown }).content;
-                    if (typeof content === "string") text = content;
+                    if (typeof content === "string") textOut = content;
                   }
                 }
               }
             }
           } else if (typeof json === "string") {
-            text = json;
+            textOut = json;
           }
-          if (typeof text === "string") {
-            notifyFirstOutput();
-            process.stdout.write(text);
+          notifyFirstOutput();
+          if (typeof textOut === "string") {
+            process.stdout.write(textOut);
           } else if (payload && payload.trim() !== "[object Object]") {
-            notifyFirstOutput();
             process.stdout.write(payload);
           }
-        }
-      });
-      stream.on("end", () => {
-        if (buffer) {
-          const trimmed = buffer.trimStart();
-          if (!trimmed.startsWith("data:")) {
+        };
+
+        stream.on("data", (chunk: unknown) => {
+          if (sawDone) return;
+          const chunkStr = Buffer.isBuffer(chunk)
+            ? chunk.toString()
+            : String(chunk);
+          prebuffer += chunkStr;
+          if (
+            !sawSseData &&
+            prebuffer.length < PREBUF_LIMIT &&
+            !/(\r?\n|^)data:/.test(prebuffer)
+          ) {
+            return;
+          }
+          if (!sawSseData && !/(\r?\n|^)data:/.test(prebuffer)) {
             notifyFirstOutput();
-            process.stdout.write(buffer);
-          } else if (trimmed.startsWith("data:")) {
-            const payload = trimmed.slice(5).trimStart();
-            if (payload && payload !== "[DONE]") {
-              let json: unknown = null;
-              try {
-                json = JSON.parse(payload);
-              } catch (_) {
-                json = null;
-              }
-              if (json && typeof json === "object") {
-                const obj = json as Record<string, unknown>;
-                if (typeof obj.text === "string") {
-                  notifyFirstOutput();
-                  process.stdout.write(String(obj.text));
-                } else if (payload.trim() !== "[object Object]") {
-                  notifyFirstOutput();
-                  process.stdout.write(payload);
-                }
-              } else if (payload.trim() !== "[object Object]") {
-                notifyFirstOutput();
-                process.stdout.write(payload);
-              }
+            process.stdout.write(prebuffer);
+            prebuffer = "";
+            return;
+          }
+
+          // Switch to SSE mode
+          buffer += prebuffer;
+          prebuffer = "";
+          const lines = buffer.split(/\r?\n/);
+          buffer = lines.pop() ?? "";
+          for (const line of lines) {
+            const trimmed = line.trimStart();
+            if (trimmed === "") {
+              flushEvent();
+              continue;
+            }
+            if (trimmed.startsWith(":")) continue; // comment
+            if (trimmed.startsWith("event:")) continue; // ignore event name
+            if (trimmed.startsWith("data:")) {
+              sawSseData = true;
+              const p = trimmed.slice(5).trimStart();
+              eventBuf.push(p);
+              continue;
             }
           }
-        }
-        process.stdout.write("\n");
-        resolve();
+        });
+        stream.on("end", () => {
+          if (!sawSseData && prebuffer) {
+            notifyFirstOutput();
+            process.stdout.write(prebuffer);
+            prebuffer = "";
+          }
+          if (buffer) {
+            const trimmed = buffer.trimStart();
+            if (!sawSseData || !/(\r?\n|^)data:/.test(trimmed)) {
+              notifyFirstOutput();
+              process.stdout.write(buffer);
+            } else {
+              // finalize any pending event
+              if (trimmed) {
+                const maybe = trimmed.startsWith("data:")
+                  ? trimmed.slice(5).trimStart()
+                  : trimmed;
+                if (maybe) {
+                  eventBuf.push(maybe);
+                }
+              }
+              flushEvent();
+            }
+          }
+          process.stdout.write("\n");
+          resolve();
+        });
+        stream.on("error", (err: unknown) => reject(err));
       });
-      stream.on("error", (err: unknown) => reject(err));
-    });
-    return;
+      return;
+    }
+  } finally {
+    process.off("SIGINT", onSigint);
+    process.off("SIGTERM", onSigterm);
   }
 };
 
 const main = async (promptParts: string[]): Promise<void> => {
   let nextPrompt = promptParts.join(" ").trim();
-  for (;;) {
+  while (true) {
     let prompt = nextPrompt;
     if (!prompt) {
       try {
