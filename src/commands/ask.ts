@@ -313,11 +313,46 @@ const main = async (promptParts: string[]): Promise<void> => {
       messages: [{ content: prompt, role: "user" }],
       stream: true,
     };
+    const phrases = [
+      "Untangling cosmic blockchains",
+      "Consulting the oracle logs",
+      "Herding universal contracts",
+      "Tickling the Gateway gremlins",
+      "Peering into quantum mempools",
+      "Polishing chain abstractions",
+      "Chasing runaway transactions",
+      "Listening to validator whispers",
+      "Feeding gas to the EVM dragons",
+      "Baking fresh consensus pies",
+      "Watering cross-chain bridges",
+      "Teaching tokens new tricks",
+      "Collecting stray opcodes",
+      "Aligning interchain stars",
+      "Summoning a clean response",
+    ];
+    const pickNextIndex = (prev: number, size: number): number => {
+      if (size <= 1) return prev;
+      let n = Math.floor(Math.random() * size);
+      if (n === prev) n = (n + 1) % size;
+      return n;
+    };
+    let phraseIndex = Math.floor(Math.random() * phrases.length);
     const spinner = process.stdout.isTTY
-      ? ora({ text: "Thinking..." }).start()
+      ? ora({ text: `${phrases[phraseIndex]}...` }).start()
       : null;
+    let spinnerInterval: NodeJS.Timeout | null = null;
+    if (spinner) {
+      spinnerInterval = setInterval(() => {
+        phraseIndex = pickNextIndex(phraseIndex, phrases.length);
+        spinner.text = phrases[phraseIndex];
+      }, 4000);
+    }
     const onFirstOutput = () => {
       try {
+        if (spinnerInterval) {
+          clearInterval(spinnerInterval);
+          spinnerInterval = null;
+        }
         spinner?.stop();
       } catch (_) {}
     };
