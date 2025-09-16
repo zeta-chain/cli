@@ -18,16 +18,26 @@ const capMs = 60_000;
 const jitter = (ms: number): number =>
   Math.min(capMs, ms) * (0.5 + Math.random());
 
-async function readBody(res: AxiosResponse): Promise<string> {
-  const data: any = res.data as any;
-  if (data && typeof data.on === "function") {
+type ReadableLike = {
+  on: (event: string, listener: (...args: unknown[]) => void) => void;
+  setEncoding?: (enc: string) => void;
+};
+
+const isReadableLike = (value: unknown): value is ReadableLike =>
+  typeof value === "object" &&
+  value !== null &&
+  typeof (value as { on?: unknown }).on === "function";
+
+const readBody = async (res: AxiosResponse): Promise<string> => {
+  const data = res.data as unknown;
+  if (isReadableLike(data)) {
     return await new Promise<string>((resolve) => {
       let s = "";
       data.setEncoding?.("utf8");
-      data.on(
-        "data",
-        (c: Buffer | string) => (s += Buffer.isBuffer(c) ? c.toString() : c)
-      );
+      data.on("data", (...args: unknown[]) => {
+        const c = args[0];
+        s += Buffer.isBuffer(c) ? c.toString() : String(c);
+      });
       data.on("end", () => resolve(s));
       data.on("error", () => resolve(""));
     });
@@ -37,12 +47,12 @@ async function readBody(res: AxiosResponse): Promise<string> {
     : res.data == null
       ? ""
       : String(res.data);
-}
+};
 
 const streamSSE = async (
   url: string,
   body: unknown,
-  onFirstOutput?: () => void
+  onFirstOutput?: () => void,
 ): Promise<void> => {
   const controller = new AbortController();
   const onSigint = (): void => controller.abort();
@@ -115,14 +125,14 @@ const streamSSE = async (
         }
         const status = res?.status ?? 0;
         throw new Error(
-          `Upstream error ${status}: ${message || res?.statusText || "Error"}`
+          `Upstream error ${status}: ${message || res?.statusText || "Error"}`,
         );
       }
       // If no response or still not 2xx after retries
       const status = res?.status ?? 0;
       const text = res ? await readBody(res as AxiosResponse) : "";
       throw new Error(
-        `Upstream error ${status}: ${text || res?.statusText || "Error"}`
+        `Upstream error ${status}: ${text || res?.statusText || "Error"}`,
       );
     }
 
@@ -137,8 +147,8 @@ const streamSSE = async (
       }
     };
 
-    const stream: any = (res as AxiosResponse<unknown>).data as any;
-    if (stream && typeof stream.on === "function") {
+    const stream = (res as AxiosResponse<unknown>).data as unknown;
+    if (isReadableLike(stream)) {
       await new Promise<void>((resolve, reject) => {
         let buffer = "";
         let prebuffer = "";
