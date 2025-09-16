@@ -53,7 +53,7 @@ const readBody = async (res: AxiosResponse): Promise<string> => {
 const streamSSE = async (
   url: string,
   body: unknown,
-  onFirstOutput?: () => void
+  onFirstOutput?: () => void,
 ): Promise<void> => {
   const controller = new AbortController();
   const onSigint = (): void => controller.abort();
@@ -126,14 +126,14 @@ const streamSSE = async (
         }
         const status = res?.status ?? 0;
         throw new Error(
-          `Upstream error ${status}: ${message || res?.statusText || "Error"}`
+          `Upstream error ${status}: ${message || res?.statusText || "Error"}`,
         );
       }
       // If no response or still not 2xx after retries
       const status = res?.status ?? 0;
       const text = res ? await readBody(res as AxiosResponse) : "";
       throw new Error(
-        `Upstream error ${status}: ${text || res?.statusText || "Error"}`
+        `Upstream error ${status}: ${text || res?.statusText || "Error"}`,
       );
     }
 
