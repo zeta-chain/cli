@@ -7,11 +7,12 @@ import { Command } from "commander";
 import inquirer from "inquirer";
 import ora from "ora";
 
-const DEFAULT_CHAT_API_URL =
-  "https://docs-v2-git-chat-api.zetachain.app/api/chat/";
-const DEFAULT_CHATBOT_ID = process.env.CHATBOT_ID || "HwoQ2Sf9rFFtdW59sbYKF";
-const maxRetries = 5;
-const baseDelayMs = 10000;
+import {
+  BASE_DELAY_MS,
+  DEFAULT_CHAT_API_URL,
+  DEFAULT_CHATBOT_ID,
+  MAX_RETRIES,
+} from "../constants";
 
 const RETRYABLE = new Set([429, 500, 502, 503, 504]);
 const capMs = 60_000;
@@ -80,8 +81,8 @@ const streamSSE = async (
       res = null;
     }
     let attempt = 0;
-    while (attempt < maxRetries && (!res || RETRYABLE.has(res.status))) {
-      const delay = jitter(baseDelayMs * Math.pow(2, attempt));
+    while (attempt < MAX_RETRIES && (!res || RETRYABLE.has(res.status))) {
+      const delay = jitter(BASE_DELAY_MS * Math.pow(2, attempt));
       await new Promise((r) => setTimeout(r, delay));
       try {
         res = await doFetch();
