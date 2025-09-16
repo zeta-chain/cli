@@ -6,6 +6,7 @@ import axios, {
 import { Command } from "commander";
 import inquirer from "inquirer";
 import ora from "ora";
+import { z } from "zod";
 
 import {
   ASK_BASE_DELAY_MS,
@@ -19,28 +20,54 @@ const RETRYABLE = new Set([429, 500, 502, 503, 504]);
 const jitter = (ms: number): number =>
   Math.min(60_000, ms) * (0.5 + Math.random());
 
-type ReadableLike = {
+// Type for validated streams
+type ValidatedStream = {
   on: (event: string, listener: (...args: unknown[]) => void) => void;
-  setEncoding?: (enc: string) => void;
+  setEncoding?: (encoding: string) => void;
 };
 
-const isReadableLike = (value: unknown): value is ReadableLike =>
-  typeof value === "object" &&
+// Helper function to validate stream objects
+const isValidStream = (value: unknown): value is ValidatedStream =>
   value !== null &&
-  typeof (value as { on?: unknown }).on === "function";
+  typeof value === "object" &&
+  typeof (value as Record<string, unknown>).on === "function";
+
+// Zod schemas for API response validation
+const ErrorResponseSchema = z.object({
+  error: z.string().optional(),
+  message: z.string().optional(),
+});
+
+const StreamChoiceSchema = z.object({
+  delta: z
+    .object({
+      content: z.string().optional(),
+    })
+    .optional(),
+});
+
+const StreamResponseSchema = z.object({
+  choices: z.array(StreamChoiceSchema).optional(),
+});
+
+const TextResponseSchema = z.object({
+  text: z.string(),
+});
 
 const readBody = async (res: AxiosResponse): Promise<string> => {
   const data = res.data as unknown;
-  if (isReadableLike(data)) {
+
+  if (isValidStream(data)) {
     return await new Promise<string>((resolve) => {
       let s = "";
-      data.setEncoding?.("utf8");
-      data.on("data", (...args: unknown[]) => {
+      const stream = data;
+      stream.setEncoding?.("utf8");
+      stream.on("data", (...args: unknown[]) => {
         const c = args[0];
         s += Buffer.isBuffer(c) ? c.toString() : String(c);
       });
-      data.on("end", () => resolve(s));
-      data.on("error", () => resolve(""));
+      stream.on("end", () => resolve(s));
+      stream.on("error", () => resolve(""));
     });
   }
   return typeof res.data === "string"
@@ -99,7 +126,8 @@ const streamSSE = async (
         !RETRYABLE.has(res.status) &&
         (res.status < 200 || res.status >= 300)
       ) {
-        const text = await readBody(res as AxiosResponse);
+        if (!res) throw new Error("No response received");
+        const text = await readBody(res);
         let contentType: string | undefined;
         if (res?.headers instanceof AxiosHeaders) {
           const v = res.headers.get?.("content-type");
@@ -119,10 +147,9 @@ const streamSSE = async (
           }
         }
         let message: string | undefined;
-        if (parsed && typeof parsed === "object") {
-          const obj = parsed as { error?: unknown; message?: unknown };
-          if (typeof obj.error === "string") message = obj.error;
-          else if (typeof obj.message === "string") message = obj.message;
+        const errorResult = ErrorResponseSchema.safeParse(parsed);
+        if (errorResult.success) {
+          message = errorResult.data.error || errorResult.data.message;
         }
         const status = res?.status ?? 0;
         throw new Error(
@@ -131,7 +158,7 @@ const streamSSE = async (
       }
       // If no response or still not 2xx after retries
       const status = res?.status ?? 0;
-      const text = res ? await readBody(res as AxiosResponse) : "";
+      const text = res ? await readBody(res) : "";
       throw new Error(
         `Upstream error ${status}: ${text || res?.statusText || "Error"}`,
       );
@@ -148,12 +175,14 @@ const streamSSE = async (
       }
     };
 
-    const stream = (res as AxiosResponse<unknown>).data as unknown;
-    if (isReadableLike(stream)) {
+    if (!res) throw new Error("No response received for streaming");
+    const stream = res.data as unknown;
+
+    if (isValidStream(stream)) {
+      const validStream = stream;
       await new Promise<void>((resolve, reject) => {
         let buffer = "";
         let prebuffer = "";
-        const PREBUF_LIMIT = 2048;
         let sawSseData = false;
         let eventBuf: string[] = [];
         let sawDone = false;
@@ -173,26 +202,22 @@ const streamSSE = async (
             json = null;
           }
           let textOut: string | null = null;
-          if (json && typeof json === "object") {
-            const obj = json as Record<string, unknown>;
-            const maybeText = obj.text;
-            if (typeof maybeText === "string") {
-              textOut = maybeText;
-            } else {
-              const choices = (obj as { choices?: unknown }).choices;
-              if (Array.isArray(choices) && choices.length > 0) {
-                const first = choices[0] as unknown;
-                if (first && typeof first === "object") {
-                  const delta = (first as { delta?: unknown }).delta;
-                  if (delta && typeof delta === "object") {
-                    const content = (delta as { content?: unknown }).content;
-                    if (typeof content === "string") textOut = content;
-                  }
-                }
-              }
+
+          // Try parsing as text response first
+          const textResult = TextResponseSchema.safeParse(json);
+          if (textResult.success) {
+            textOut = textResult.data.text;
+          } else {
+            // Try parsing as stream response
+            const streamResult = StreamResponseSchema.safeParse(json);
+            if (
+              streamResult.success &&
+              streamResult.data.choices?.[0]?.delta?.content
+            ) {
+              textOut = streamResult.data.choices[0].delta.content;
+            } else if (typeof json === "string") {
+              textOut = json;
             }
-          } else if (typeof json === "string") {
-            textOut = json;
           }
           notifyFirstOutput();
           if (typeof textOut === "string") {
@@ -202,7 +227,8 @@ const streamSSE = async (
           }
         };
 
-        stream.on("data", (chunk: unknown) => {
+        // validStream is already defined above
+        validStream.on("data", (chunk: unknown) => {
           if (sawDone) return;
           const chunkStr = Buffer.isBuffer(chunk)
             ? chunk.toString()
@@ -243,7 +269,7 @@ const streamSSE = async (
             }
           }
         });
-        stream.on("end", () => {
+        validStream.on("end", () => {
           if (!sawSseData && prebuffer) {
             notifyFirstOutput();
             process.stdout.write(prebuffer);
@@ -270,7 +296,7 @@ const streamSSE = async (
           process.stdout.write("\n");
           resolve();
         });
-        stream.on("error", (err: unknown) => reject(err));
+        validStream.on("error", (err: unknown) => reject(err));
       });
       return;
     }
@@ -291,15 +317,14 @@ const main = async (promptParts: string[]): Promise<void> => {
         ]);
         prompt = String(input ?? "").trim();
       } catch (err) {
-        const name = (err as { name?: unknown } | null | undefined)?.name;
-        const message = (err as { message?: unknown } | null | undefined)
-          ?.message;
-        if (
-          name === "ExitPromptError" ||
-          (typeof message === "string" &&
-            message.includes("User force closed the prompt"))
-        ) {
-          return;
+        // Handle inquirer exit scenarios
+        if (err instanceof Error) {
+          if (
+            err.name === "ExitPromptError" ||
+            err.message.includes("User force closed the prompt")
+          ) {
+            return;
+          }
         }
         throw err;
       }
