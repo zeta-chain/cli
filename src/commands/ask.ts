@@ -53,7 +53,7 @@ const readBody = async (res: AxiosResponse): Promise<string> => {
 const streamSSE = async (
   url: string,
   body: unknown,
-  onFirstOutput?: () => void,
+  onFirstOutput?: () => void
 ): Promise<void> => {
   const controller = new AbortController();
   const onSigint = (): void => controller.abort();
@@ -126,14 +126,14 @@ const streamSSE = async (
         }
         const status = res?.status ?? 0;
         throw new Error(
-          `Upstream error ${status}: ${message || res?.statusText || "Error"}`,
+          `Upstream error ${status}: ${message || res?.statusText || "Error"}`
         );
       }
       // If no response or still not 2xx after retries
       const status = res?.status ?? 0;
       const text = res ? await readBody(res as AxiosResponse) : "";
       throw new Error(
-        `Upstream error ${status}: ${text || res?.statusText || "Error"}`,
+        `Upstream error ${status}: ${text || res?.statusText || "Error"}`
       );
     }
 
@@ -207,24 +207,25 @@ const streamSSE = async (
           const chunkStr = Buffer.isBuffer(chunk)
             ? chunk.toString()
             : String(chunk);
-          prebuffer += chunkStr;
-          if (
-            !sawSseData &&
-            prebuffer.length < PREBUF_LIMIT &&
-            !/(\r?\n|^)data:/.test(prebuffer)
-          ) {
-            return;
-          }
-          if (!sawSseData && !/(\r?\n|^)data:/.test(prebuffer)) {
-            notifyFirstOutput();
-            process.stdout.write(prebuffer);
-            prebuffer = "";
-            return;
+
+          // Stream raw text immediately until we detect SSE lines (data: ...)
+          if (!sawSseData) {
+            const combined = prebuffer + chunkStr;
+            if (/(\r?\n|^)data:/.test(combined)) {
+              // Detected SSE, switch to SSE parsing mode
+              sawSseData = true;
+              buffer += combined;
+              prebuffer = "";
+            } else {
+              prebuffer = "";
+              notifyFirstOutput();
+              process.stdout.write(chunkStr);
+              return;
+            }
+          } else {
+            buffer += chunkStr;
           }
 
-          // Switch to SSE mode
-          buffer += prebuffer;
-          prebuffer = "";
           const lines = buffer.split(/\r?\n/);
           buffer = lines.pop() ?? "";
           for (const line of lines) {
@@ -236,7 +237,6 @@ const streamSSE = async (
             if (trimmed.startsWith(":")) continue; // comment
             if (trimmed.startsWith("event:")) continue; // ignore event name
             if (trimmed.startsWith("data:")) {
-              sawSseData = true;
               const p = trimmed.slice(5).trimStart();
               eventBuf.push(p);
               continue;
@@ -344,7 +344,7 @@ const main = async (promptParts: string[]): Promise<void> => {
     if (spinner) {
       spinnerInterval = setInterval(() => {
         phraseIndex = pickNextIndex(phraseIndex, phrases.length);
-        spinner.text = phrases[phraseIndex];
+        spinner.text = `${phrases[phraseIndex]}...`;
       }, 4000);
     }
     const onFirstOutput = () => {
