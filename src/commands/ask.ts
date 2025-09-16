@@ -8,10 +8,10 @@ import inquirer from "inquirer";
 import ora from "ora";
 
 import {
-  BASE_DELAY_MS,
+  ASK_BASE_DELAY_MS,
   DEFAULT_CHAT_API_URL,
   DEFAULT_CHATBOT_ID,
-  MAX_RETRIES,
+  ASK_MAX_RETRIES,
 } from "../constants";
 
 const RETRYABLE = new Set([429, 500, 502, 503, 504]);
@@ -53,7 +53,7 @@ const readBody = async (res: AxiosResponse): Promise<string> => {
 const streamSSE = async (
   url: string,
   body: unknown,
-  onFirstOutput?: () => void,
+  onFirstOutput?: () => void
 ): Promise<void> => {
   const controller = new AbortController();
   const onSigint = (): void => controller.abort();
@@ -81,8 +81,8 @@ const streamSSE = async (
       res = null;
     }
     let attempt = 0;
-    while (attempt < MAX_RETRIES && (!res || RETRYABLE.has(res.status))) {
-      const delay = jitter(BASE_DELAY_MS * Math.pow(2, attempt));
+    while (attempt < ASK_MAX_RETRIES && (!res || RETRYABLE.has(res.status))) {
+      const delay = jitter(ASK_BASE_DELAY_MS * Math.pow(2, attempt));
       await new Promise((r) => setTimeout(r, delay));
       try {
         res = await doFetch();
@@ -126,14 +126,14 @@ const streamSSE = async (
         }
         const status = res?.status ?? 0;
         throw new Error(
-          `Upstream error ${status}: ${message || res?.statusText || "Error"}`,
+          `Upstream error ${status}: ${message || res?.statusText || "Error"}`
         );
       }
       // If no response or still not 2xx after retries
       const status = res?.status ?? 0;
       const text = res ? await readBody(res as AxiosResponse) : "";
       throw new Error(
-        `Upstream error ${status}: ${text || res?.statusText || "Error"}`,
+        `Upstream error ${status}: ${text || res?.statusText || "Error"}`
       );
     }
 
