@@ -70,7 +70,7 @@ const streamSSE = async (
         },
         responseType: "stream",
         signal: controller.signal,
-        timeout: 60_000,
+        timeout: 360_000,
         validateStatus: () => true,
       });
 
