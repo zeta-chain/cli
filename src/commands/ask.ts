@@ -15,9 +15,9 @@ import {
 } from "../constants";
 
 const RETRYABLE = new Set([429, 500, 502, 503, 504]);
-const capMs = 60_000;
+
 const jitter = (ms: number): number =>
-  Math.min(capMs, ms) * (0.5 + Math.random());
+  Math.min(60_000, ms) * (0.5 + Math.random());
 
 type ReadableLike = {
   on: (event: string, listener: (...args: unknown[]) => void) => void;
