@@ -369,6 +369,6 @@ const main = async (promptParts: string[]): Promise<void> => {
 };
 
 export const askCommand = new Command("ask")
-  .description("Send a prompt and stream the chat response")
-  .argument("[prompt...]", "Prompt to send to the chatbot")
+  .description("Chat with ZetaChain Docs AI")
+  .argument("[prompt...]", "Prompt to send to AI")
   .action(main);
