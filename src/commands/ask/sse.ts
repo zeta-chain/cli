@@ -11,7 +11,7 @@ export interface SSEProcessor {
 
 export const createSSEProcessor = (
   onFirstOutput: () => void,
-  onTextChunk?: (text: string) => void
+  onTextChunk?: (text: string) => void,
 ): SSEProcessor => {
   let buffer = "";
   let prebuffer = "";
@@ -159,7 +159,7 @@ export const createSSEProcessor = (
 
 export const processStream = async (
   stream: StreamLike,
-  processor: SSEProcessor
+  processor: SSEProcessor,
 ): Promise<void> => {
   return new Promise<void>((resolve, reject) => {
     stream.on("data", processor.onData);

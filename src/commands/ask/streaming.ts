@@ -11,7 +11,7 @@ export const streamChatResponse = async (
   url: string,
   body: unknown,
   onFirstOutput?: () => void,
-  onTextChunk?: (text: string) => void
+  onTextChunk?: (text: string) => void,
 ): Promise<void> => {
   const controller = new AbortController();
   const onSigint = (): void => controller.abort();
@@ -38,7 +38,7 @@ export const streamChatResponse = async (
     // 5. Create SSE processor and handle stream
     const processor = createSSEProcessor(
       onFirstOutput || (() => {}),
-      onTextChunk
+      onTextChunk,
     );
     await processStream(stream, processor);
   } finally {

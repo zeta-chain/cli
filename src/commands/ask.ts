@@ -9,7 +9,7 @@ import { validateAndSanitizePrompt } from "./ask/validation";
 
 const main = async (promptParts: string[]): Promise<void> => {
   let conversationId: string = uuidv4();
-  const messages: { role: "user" | "assistant"; content: string }[] = [];
+  const messages: { content: string; role: "assistant" | "user" }[] = [];
   let nextPrompt = promptParts.join(" ").trim();
   while (true) {
     let prompt = nextPrompt;
@@ -40,13 +40,13 @@ const main = async (promptParts: string[]): Promise<void> => {
     try {
       const sanitizedPrompt = validateAndSanitizePrompt(prompt);
 
-      messages.push({ role: "user", content: sanitizedPrompt });
+      messages.push({ content: sanitizedPrompt, role: "user" });
 
       const payload = {
         chatbotId: DEFAULT_CHATBOT_ID,
+        conversationId,
         messages,
         stream: true,
-        conversationId,
       };
 
       const spinner = createChatSpinner();
@@ -61,10 +61,10 @@ const main = async (promptParts: string[]): Promise<void> => {
         onFirstOutput,
         (text) => {
           assistantBuffer += text;
-        }
+        },
       );
       if (assistantBuffer.trim()) {
-        messages.push({ role: "assistant", content: assistantBuffer });
+        messages.push({ content: assistantBuffer, role: "assistant" });
       }
     } catch (securityError) {
       const message =
