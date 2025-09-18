@@ -9,7 +9,10 @@ export interface SSEProcessor {
   onError: (err: unknown) => void;
 }
 
-export const createSSEProcessor = (onFirstOutput: () => void): SSEProcessor => {
+export const createSSEProcessor = (
+  onFirstOutput: () => void,
+  onTextChunk?: (text: string) => void
+): SSEProcessor => {
   let buffer = "";
   let prebuffer = "";
   let sawSseData = false;
@@ -65,8 +68,10 @@ export const createSSEProcessor = (onFirstOutput: () => void): SSEProcessor => {
 
     notifyFirstOutput();
     if (typeof textOut === "string") {
+      if (onTextChunk) onTextChunk(textOut);
       process.stdout.write(textOut);
     } else if (payload && payload.trim() !== "[object Object]") {
+      if (onTextChunk) onTextChunk(payload);
       process.stdout.write(payload);
     }
   };
@@ -87,6 +92,7 @@ export const createSSEProcessor = (onFirstOutput: () => void): SSEProcessor => {
       } else {
         prebuffer = "";
         notifyFirstOutput();
+        if (onTextChunk) onTextChunk(chunkStr);
         process.stdout.write(chunkStr);
         return;
       }
@@ -116,6 +122,7 @@ export const createSSEProcessor = (onFirstOutput: () => void): SSEProcessor => {
   const onEnd = () => {
     if (!sawSseData && prebuffer) {
       notifyFirstOutput();
+      if (onTextChunk) onTextChunk(prebuffer);
       process.stdout.write(prebuffer);
       prebuffer = "";
     }
@@ -124,6 +131,7 @@ export const createSSEProcessor = (onFirstOutput: () => void): SSEProcessor => {
       const trimmed = buffer.trimStart();
       if (!sawSseData || !/(\r?\n|^)data:/.test(trimmed)) {
         notifyFirstOutput();
+        if (onTextChunk) onTextChunk(buffer);
         process.stdout.write(buffer);
       } else {
         // finalize any pending event
@@ -151,7 +159,7 @@ export const createSSEProcessor = (onFirstOutput: () => void): SSEProcessor => {
 
 export const processStream = async (
   stream: StreamLike,
-  processor: SSEProcessor,
+  processor: SSEProcessor
 ): Promise<void> => {
   return new Promise<void>((resolve, reject) => {
     stream.on("data", processor.onData);

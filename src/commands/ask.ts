@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import inquirer from "inquirer";
+import { v4 as uuidv4 } from "uuid";
 
 import { DEFAULT_CHAT_API_URL, DEFAULT_CHATBOT_ID } from "../constants";
 import { streamChatResponse } from "./ask/streaming";
@@ -7,6 +8,8 @@ import { createChatSpinner } from "./ask/ui";
 import { validateAndSanitizePrompt } from "./ask/validation";
 
 const main = async (promptParts: string[]): Promise<void> => {
+  let conversationId: string = uuidv4();
+  const messages: { role: "user" | "assistant"; content: string }[] = [];
   let nextPrompt = promptParts.join(" ").trim();
   while (true) {
     let prompt = nextPrompt;
@@ -35,13 +38,15 @@ const main = async (promptParts: string[]): Promise<void> => {
     }
 
     try {
-      // Validate and sanitize input
       const sanitizedPrompt = validateAndSanitizePrompt(prompt);
+
+      messages.push({ role: "user", content: sanitizedPrompt });
 
       const payload = {
         chatbotId: DEFAULT_CHATBOT_ID,
-        messages: [{ content: sanitizedPrompt, role: "user" }],
+        messages,
         stream: true,
+        conversationId,
       };
 
       const spinner = createChatSpinner();
@@ -49,7 +54,18 @@ const main = async (promptParts: string[]): Promise<void> => {
         spinner.stop();
       };
 
-      await streamChatResponse(DEFAULT_CHAT_API_URL, payload, onFirstOutput);
+      let assistantBuffer = "";
+      await streamChatResponse(
+        DEFAULT_CHAT_API_URL,
+        payload,
+        onFirstOutput,
+        (text) => {
+          assistantBuffer += text;
+        }
+      );
+      if (assistantBuffer.trim()) {
+        messages.push({ role: "assistant", content: assistantBuffer });
+      }
     } catch (securityError) {
       const message =
         securityError instanceof Error
