@@ -10,7 +10,7 @@ export interface SSEProcessor {
 }
 
 export const createSSEProcessor = (
-  onFirstOutput: () => void,
+  onFirstOutput?: () => void,
   onTextChunk?: (text: string) => void,
 ): SSEProcessor => {
   let buffer = "";
@@ -24,7 +24,7 @@ export const createSSEProcessor = (
     if (notifiedFirstOutput) return;
     notifiedFirstOutput = true;
     try {
-      onFirstOutput();
+      if (onFirstOutput) onFirstOutput();
     } catch (_) {
       // ignore callback errors
     }
