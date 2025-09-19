@@ -8,4 +8,4 @@ RUN npm install
 
 COPY . .
 
-RUN npx -y @smithery/cli build -o .smithery/index.cjs
+RUN npx -y @smithery/cli build -o .smithery/index.cjs src/mcp/index.ts
