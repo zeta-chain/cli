@@ -1,4 +1,8 @@
 {
   "name": "zetachain",
-  "module": "index.ts"
+  "module": "index.ts",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.4",
+    "zod": "^4.1.8"
+  }
 }
