@@ -6,7 +6,6 @@
   "bin": {
     "zetachain": "./dist/index.js"
   },
-  "module": "src/index.ts",
   "scripts": {
     "build": "yarn tsc",
     "lint:fix": "npm run lint:js:fix",
