@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "module": "./src/index.ts",
+  "module": "./index.ts",
   "type": "module",
   "scripts": {
     "dev": "npx @smithery/cli dev",
