@@ -23,11 +23,11 @@ export const configSchema = z.object({
   debug: z.boolean().default(false).describe("Enable debug logging"),
 });
 
-export const createServer = ({
+export default function createServer({
   config,
 }: {
   config: z.infer<typeof configSchema>; // Define your config in smithery.yaml
-}) => {
+}) {
   const server = new McpServer({
     name: "Say Hello",
     version: "1.0.0",
@@ -92,4 +92,4 @@ export const createServer = ({
   );
 
   return server.server;
-};
+}
