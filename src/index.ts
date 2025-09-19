@@ -19,6 +19,8 @@ import { docsCommand } from "./commands/docs";
 import { newCommand } from "./commands/new";
 import config from "./config.json";
 
+export { default as createServer } from "./mcp";
+
 const program: Command = new Command();
 
 program
