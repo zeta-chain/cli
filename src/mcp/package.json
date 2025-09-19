@@ -1,23 +1,4 @@
 {
   "name": "zetachain",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "module": "./index.ts",
-  "type": "module",
-  "scripts": {
-    "dev": "npx @smithery/cli dev",
-    "build": "npx @smithery/cli build"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.4",
-    "zod": "^4.1.8"
-  },
-  "devDependencies": {
-    "@smithery/cli": "^1.2.4",
-    "tsx": "^4.19.4"
-  }
+  "module": "index.ts"
 }
