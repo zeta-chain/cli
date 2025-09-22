@@ -71,10 +71,12 @@ async function executeCommand(
 }
 
 function ensureZetachainAvailable(): void {
-  const result = spawnSync("zetachain", ["--version"], { encoding: "utf8" });
+  const result = spawnSync("npx", ["-y", "zetachain", "--version"], {
+    encoding: "utf8",
+  });
   if (result.error && (result.error as any).code === "ENOENT") {
     throw new Error(
-      "'zetachain' CLI not found in PATH. Please install it or add it to PATH."
+      "Failed to execute 'npx'. Please ensure Node.js and npm are installed."
     );
   }
 }
@@ -128,7 +130,7 @@ async function spawnBinary(
   args: string[]
 ): Promise<{ stdout: string; stderr: string; exitCode: number | null }> {
   return new Promise((resolve) => {
-    const child = spawn(command, args, {
+    const child = spawn("npx", ["-y", command, ...args], {
       cwd: process.cwd(),
       env: { ...process.env, FORCE_COLOR: "0" },
     });
@@ -147,7 +149,7 @@ async function spawnBinary(
     });
     child.on("error", (err: any) => {
       if (err && err.code === "ENOENT") {
-        stderr += `'${command}' not found in PATH.`;
+        stderr += `'npx' not found in PATH.`;
         resolve({ stdout, stderr, exitCode: 1 });
         return;
       }
