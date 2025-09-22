@@ -15,7 +15,7 @@ export default function createServer({
   config: z.infer<typeof configSchema>;
 }) {
   const server = new McpServer({
-    name: "Say Hello",
+    name: "Universal Blockchain",
     version: "1.0.0",
   });
 
