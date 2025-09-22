@@ -56,10 +56,6 @@ export default function createServer({
   return server.server;
 }
 
-/**
- * Execute a CLI command in a child process, mapping a tool name and args to CLI argv.
- * Runs the compiled CLI (dist/index.js) to avoid affecting the MCP server process.
- */
 async function executeCommand(
   toolName: string,
   args: Record<string, unknown>
