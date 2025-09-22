@@ -1924,22 +1924,5 @@
     },
     "name": "docs",
     "title": "Docs"
-  },
-  {
-    "description": "Ask",
-    "inputSchema": {
-      "additionalProperties": false,
-      "properties": {
-        "prompt": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
-    "name": "ask",
-    "title": "Ask"
   }
 ]

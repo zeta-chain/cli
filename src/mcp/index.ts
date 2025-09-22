@@ -96,18 +96,7 @@ function buildArgvFromArgs(
   const positionals: string[] = [];
   const flags: string[] = [];
 
-  // Special handling for positional arguments in certain commands
-  if (toolName === "ask") {
-    const prompt = args?.["prompt"];
-    if (Array.isArray(prompt)) {
-      for (const p of prompt) positionals.push(String(p));
-    } else if (typeof prompt === "string" && prompt.trim()) {
-      positionals.push(prompt.trim());
-    }
-  }
-
   for (const [key, value] of Object.entries(args)) {
-    if (key === "prompt") continue; // already handled as positionals for ask
     if (value === undefined || value === null) continue;
     const flag = `--${toKebabCase(key)}`;
 

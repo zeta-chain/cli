@@ -155,7 +155,8 @@ const isRunnableCommand = (cmd: Command): boolean => {
 
 const collectToolsJson = (cmd: Command): ToolDoc[] => {
   const list: ToolDoc[] = [];
-  if (isRunnableCommand(cmd)) {
+  const shouldSkip = typeof cmd.name === "function" && cmd.name() === "ask";
+  if (isRunnableCommand(cmd) && !shouldSkip) {
     list.push(commandToToolJson(cmd));
   }
   cmd.commands.forEach((sub) => {
