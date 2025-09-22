@@ -39,14 +39,14 @@ const argumentToSchema = (arg: any) => {
   const description: string = String(arg?.description || "");
 
   const schema: any = isVariadic
-    ? { type: "array", items: { type: "string" } }
+    ? { items: { type: "string" }, type: "array" }
     : { type: "string" };
 
   if (description) schema.description = description;
 
-  return { schema, isRequired } as {
-    schema: Record<string, unknown>;
+  return { isRequired, schema } as {
     isRequired: boolean;
+    schema: Record<string, unknown>;
   };
 };
 
@@ -69,10 +69,10 @@ const optionToSchema = (opt: any) => {
   if (description) schema.description = description;
   if (defaultValue !== undefined) schema.default = defaultValue;
 
-  return { name, schema, isMandatory } as {
+  return { isMandatory, name, schema } as {
+    isMandatory: boolean;
     name: string;
     schema: Record<string, unknown>;
-    isMandatory: boolean;
   };
 };
 
@@ -97,10 +97,10 @@ const buildInputSchemaForCommand = (cmd: Command) => {
   });
 
   return {
-    type: "object",
+    additionalProperties: false,
     properties,
     required: required.length > 0 ? required : undefined,
-    additionalProperties: false,
+    type: "object",
   } as Record<string, unknown>;
 };
 
@@ -111,10 +111,10 @@ const commandToToolJson = (cmd: Command) => {
   const description = cmd.description() || title;
 
   return {
-    name,
-    title,
     description,
     inputSchema: buildInputSchemaForCommand(cmd),
+    name,
+    title,
   } as Record<string, unknown>;
 };
 
@@ -137,7 +137,7 @@ const collectToolsJson = (cmd: Command): Record<string, unknown>[] => {
 export const docsCommand = new Command()
   .name("docs")
   .description(
-    "Display help information for all available commands and their subcommands"
+    "Display help information for all available commands and their subcommands",
   )
   .option("--json", "Output documentation as JSON (tools schema)")
   .action((opts: { json?: boolean }, command: Command) => {
