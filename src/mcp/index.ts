@@ -84,30 +84,13 @@ function ensureZetachainAvailable(): void {
 }
 
 function toolNameToCommandPath(name: string): string[] {
-  const parts = String(name || "")
-    .split("_")
-    .filter(Boolean);
-  if (parts.length === 0) return [];
-  const pathSegments: string[] = [];
-  // First segment is the top-level command (e.g., accounts, evm, new, docs)
-  pathSegments.push(parts[0]);
-  // Remaining segments may include patterns like deposit + and + call → deposit-and-call
-  for (let i = 1; i < parts.length; i++) {
-    const p = parts[i];
-    const next = parts[i + 1];
-    const next2 = parts[i + 2];
-    if (
-      (p === "deposit" || p === "withdraw") &&
-      next === "and" &&
-      next2 === "call"
-    ) {
-      pathSegments.push(`${p}-and-call`);
-      i += 2; // skip "and", "call"
-      continue;
-    }
-    pathSegments.push(p);
-  }
-  return pathSegments;
+  const normalized = String(name || "")
+    .trim()
+    .replace(/_/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!normalized) return [];
+  return normalized.split(" ");
 }
 
 function buildArgvFromArgs(

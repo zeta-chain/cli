@@ -731,7 +731,7 @@
         "amount"
       ]
     },
-    "name": "zetachain_withdraw_and_call",
+    "name": "zetachain_withdraw-and-call",
     "title": "Zetachain Withdraw-and-call"
   },
   {
@@ -912,7 +912,7 @@
         "values"
       ]
     },
-    "name": "evm_deposit_and_call",
+    "name": "evm_deposit-and-call",
     "title": "Evm Deposit-and-call"
   },
   {
@@ -1151,7 +1151,7 @@
         "values"
       ]
     },
-    "name": "solana_deposit_and_call",
+    "name": "solana_deposit-and-call",
     "title": "Solana Deposit-and-call"
   },
   {
@@ -1333,7 +1333,7 @@
         "chainId"
       ]
     },
-    "name": "sui_deposit_and_call",
+    "name": "sui_deposit-and-call",
     "title": "Sui Deposit-and-call"
   },
   {
@@ -1485,7 +1485,7 @@
         "amount"
       ]
     },
-    "name": "ton_deposit_and_call",
+    "name": "ton_deposit-and-call",
     "title": "Ton Deposit-and-call"
   },
   {
@@ -1714,7 +1714,7 @@
         "amount"
       ]
     },
-    "name": "bitcoin_inscription_deposit_and_call",
+    "name": "bitcoin_inscription_deposit-and-call",
     "title": "Bitcoin Inscription Deposit-and-call"
   },
   {
@@ -1997,7 +1997,7 @@
         "amount"
       ]
     },
-    "name": "bitcoin_memo_deposit_and_call",
+    "name": "bitcoin_memo_deposit-and-call",
     "title": "Bitcoin Memo Deposit-and-call"
   },
   {

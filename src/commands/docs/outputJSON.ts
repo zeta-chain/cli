@@ -23,11 +23,16 @@ const toTitleCase = (text: string): string => {
 };
 
 const toSnakeCase = (text: string): string => {
-  return text
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "_")
-    .replace(/^_+|_+$/g, "");
+  return (
+    text
+      .trim()
+      .toLowerCase()
+      // Replace spaces with underscores, but keep dashes as is
+      .replace(/\s+/g, "_")
+      // Replace any remaining disallowed chars (excluding dashes and underscores) with underscore
+      .replace(/[^a-z0-9_-]+/g, "_")
+      .replace(/^_+|_+$/g, "")
+  );
 };
 
 const argumentToSchema = (
