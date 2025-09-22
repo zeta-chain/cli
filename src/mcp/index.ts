@@ -1,3 +1,6 @@
+/* eslint-disable */
+// Disabling eslint, because Smithery for some reason fails when functions are declared as const
+
 /**
  * 👋 Welcome to your Smithery project!
  * To run your server, run "npm run dev"
@@ -46,7 +49,7 @@ export default function createServer({
       return {
         content: [{ text: `Hello, ${name}!`, type: "text" }],
       } as any;
-    }
+    },
   );
 
   // Add a resource
@@ -65,7 +68,7 @@ export default function createServer({
           uri: uri.href,
         },
       ],
-    })
+    }),
   );
 
   // Add a prompt
@@ -88,7 +91,7 @@ export default function createServer({
           },
         ],
       } as any;
-    }
+    },
   );
 
   return server.server;
