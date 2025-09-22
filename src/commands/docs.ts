@@ -80,7 +80,6 @@ const buildInputSchemaForCommand = (cmd: Command) => {
   const properties: Record<string, unknown> = {};
   const required: string[] = [];
 
-  // Include positional arguments first, use their raw names if available
   const args: any[] = (cmd as any)?.registeredArguments || [];
   args.forEach((arg, index) => {
     const argName: string =
@@ -90,7 +89,6 @@ const buildInputSchemaForCommand = (cmd: Command) => {
     if (isRequired) required.push(argName);
   });
 
-  // Include command-local options
   const opts: any[] = (cmd.options as any[]) || [];
   opts.forEach((opt) => {
     const { name, schema, isMandatory } = optionToSchema(opt);
@@ -120,9 +118,16 @@ const commandToToolJson = (cmd: Command) => {
   } as Record<string, unknown>;
 };
 
+const isRunnableCommand = (cmd: Command): boolean => {
+  const anyCmd = cmd as any;
+  return Boolean(anyCmd?._actionHandler || anyCmd?._executableHandler);
+};
+
 const collectToolsJson = (cmd: Command): Record<string, unknown>[] => {
   const list: Record<string, unknown>[] = [];
-  list.push(commandToToolJson(cmd));
+  if (isRunnableCommand(cmd)) {
+    list.push(commandToToolJson(cmd));
+  }
   cmd.commands.forEach((sub) => {
     list.push(...collectToolsJson(sub));
   });
