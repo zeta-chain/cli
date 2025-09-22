@@ -1249,6 +1249,7 @@ Usage: zetachain docs [options]
 Display help information for all available commands and their subcommands
 
 Options:
+  --json      Output documentation as JSON (tools schema)
   -h, --help  display help for command
 
 ```
