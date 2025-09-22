@@ -35,11 +35,15 @@ export default function createServer({
           name,
           args ?? {}
         );
-        const text =
-          (stdout || "").trim() ||
-          (stderr
+        const trimmedStdout = (stdout || "").trim();
+        const showStderr = !!config?.debug;
+        const text = trimmedStdout
+          ? showStderr && stderr
+            ? `${trimmedStdout}\n\n[stderr]\n${stderr}`
+            : trimmedStdout
+          : stderr
             ? `Command produced no output. Stderr:\n${stderr}`
-            : `Executed '${name}'.`);
+            : `Executed '${name}'.`;
         return {
           content: [
             {
@@ -47,7 +51,7 @@ export default function createServer({
               text,
             },
           ],
-          isError: !!stderr || (typeof exitCode === "number" && exitCode !== 0),
+          isError: typeof exitCode === "number" && exitCode !== 0,
         } as any;
       }
     );
