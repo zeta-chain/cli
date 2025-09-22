@@ -2,6 +2,7 @@
 // Disabling eslint, because Smithery for some reason fails when functions are declared as const
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z, ZodRawShape } from "zod";
+import { spawn, spawnSync } from "child_process";
 import commands from "./commands.json";
 
 export const configSchema = z.object({
@@ -30,21 +31,162 @@ export default function createServer({
         inputSchema: jsonSchemaToZodShape(tool.inputSchema),
       } as any,
       async (args: any) => {
+        const { stdout, stderr, exitCode } = await executeCommand(
+          name,
+          args ?? {}
+        );
+        const text =
+          (stdout || "").trim() ||
+          (stderr
+            ? `Command produced no output. Stderr:\n${stderr}`
+            : `Executed '${name}'.`);
         return {
           content: [
             {
               type: "text",
-              text: `Tool '${name}' invoked. Handler not implemented yet. Args: ${JSON.stringify(
-                args ?? {}
-              )}`,
+              text,
             },
           ],
+          isError: !!stderr || (typeof exitCode === "number" && exitCode !== 0),
         } as any;
       }
     );
   }
 
   return server.server;
+}
+
+/**
+ * Execute a CLI command in a child process, mapping a tool name and args to CLI argv.
+ * Runs the compiled CLI (dist/index.js) to avoid affecting the MCP server process.
+ */
+async function executeCommand(
+  toolName: string,
+  args: Record<string, unknown>
+): Promise<{ stdout: string; stderr: string; exitCode: number | null }> {
+  const commandPath = toolNameToCommandPath(toolName);
+  const { positionals, flags } = buildArgvFromArgs(toolName, args);
+
+  ensureZetachainAvailable();
+
+  const argv = ["--no-analytics", ...commandPath, ...positionals, ...flags];
+
+  return await spawnBinary("zetachain", argv);
+}
+
+function ensureZetachainAvailable(): void {
+  const result = spawnSync("zetachain", ["--version"], { encoding: "utf8" });
+  if (result.error && (result.error as any).code === "ENOENT") {
+    throw new Error(
+      "'zetachain' CLI not found in PATH. Please install it or add it to PATH."
+    );
+  }
+}
+
+function toolNameToCommandPath(name: string): string[] {
+  const parts = String(name || "")
+    .split("_")
+    .filter(Boolean);
+  if (parts.length === 0) return [];
+  const pathSegments: string[] = [];
+  // First segment is the top-level command (e.g., accounts, evm, new, docs)
+  pathSegments.push(parts[0]);
+  // Remaining segments may include patterns like deposit + and + call → deposit-and-call
+  for (let i = 1; i < parts.length; i++) {
+    const p = parts[i];
+    const next = parts[i + 1];
+    const next2 = parts[i + 2];
+    if (
+      (p === "deposit" || p === "withdraw") &&
+      next === "and" &&
+      next2 === "call"
+    ) {
+      pathSegments.push(`${p}-and-call`);
+      i += 2; // skip "and", "call"
+      continue;
+    }
+    pathSegments.push(p);
+  }
+  return pathSegments;
+}
+
+function buildArgvFromArgs(
+  toolName: string,
+  args: Record<string, unknown>
+): { positionals: string[]; flags: string[] } {
+  const positionals: string[] = [];
+  const flags: string[] = [];
+
+  // Special handling for positional arguments in certain commands
+  if (toolName === "ask") {
+    const prompt = args?.["prompt"];
+    if (Array.isArray(prompt)) {
+      for (const p of prompt) positionals.push(String(p));
+    } else if (typeof prompt === "string" && prompt.trim()) {
+      positionals.push(prompt.trim());
+    }
+  }
+
+  for (const [key, value] of Object.entries(args)) {
+    if (key === "prompt") continue; // already handled as positionals for ask
+    if (value === undefined || value === null) continue;
+    const flag = `--${toKebabCase(key)}`;
+
+    if (typeof value === "boolean") {
+      if (value) flags.push(flag);
+      continue;
+    }
+    if (Array.isArray(value)) {
+      for (const v of value) {
+        flags.push(flag, String(v));
+      }
+      continue;
+    }
+    flags.push(flag, String(value));
+  }
+
+  return { positionals, flags };
+}
+
+function toKebabCase(input: string): string {
+  return String(input)
+    .replace(/_/g, "-")
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    .toLowerCase();
+}
+
+async function spawnBinary(
+  command: string,
+  args: string[]
+): Promise<{ stdout: string; stderr: string; exitCode: number | null }> {
+  return new Promise((resolve) => {
+    const child = spawn(command, args, {
+      cwd: process.cwd(),
+      env: { ...process.env, FORCE_COLOR: "0" },
+    });
+
+    let stdout = "";
+    let stderr = "";
+
+    child.stdout.on("data", (data) => {
+      stdout += data?.toString?.() ?? "";
+    });
+    child.stderr.on("data", (data) => {
+      stderr += data?.toString?.() ?? "";
+    });
+    child.on("close", (code) => {
+      resolve({ stdout, stderr, exitCode: code });
+    });
+    child.on("error", (err: any) => {
+      if (err && err.code === "ENOENT") {
+        stderr += `'${command}' not found in PATH.`;
+        resolve({ stdout, stderr, exitCode: 1 });
+        return;
+      }
+      stderr += `${err?.message ?? String(err)}`;
+      resolve({ stdout, stderr, exitCode: 1 });
+    });
+  });
 }
 
 const jsonSchemaToZodShape = (schema: any): ZodRawShape => {
