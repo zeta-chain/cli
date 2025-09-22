@@ -1,4 +1,13 @@
+import type { Argument, Option } from "commander";
 import { Command } from "commander";
+
+type JSONSchema = Record<string, unknown>;
+
+type CommandWithInternals = Command & {
+  _actionHandler?: unknown;
+  _executableHandler?: unknown;
+  registeredArguments?: Argument[];
+};
 
 export const getFullCommandPath = (cmd: Command): string => {
   if (!cmd.parent) return cmd.name();
@@ -33,78 +42,108 @@ const toSnakeCase = (text: string): string => {
     .replace(/^_+|_+$/g, "");
 };
 
-const argumentToSchema = (arg: any) => {
-  const isVariadic: boolean = Boolean(arg?.variadic);
-  const isRequired: boolean = Boolean(arg?.required);
-  const description: string = String(arg?.description || "");
+const argumentToSchema = (
+  arg: Argument
+): { isRequired: boolean; schema: JSONSchema } => {
+  const isVariadic: boolean = Boolean(
+    (arg as unknown as { variadic?: boolean })?.variadic
+  );
+  const isRequired: boolean = Boolean(
+    (arg as unknown as { required?: boolean })?.required
+  );
+  const description: string = String(
+    (arg as unknown as { description?: string })?.description || ""
+  );
 
-  const schema: any = isVariadic
+  const schema: JSONSchema = isVariadic
     ? { items: { type: "string" }, type: "array" }
     : { type: "string" };
 
-  if (description) schema.description = description;
+  if (description)
+    (schema as { description?: string }).description = description;
 
-  return { isRequired, schema } as {
-    isRequired: boolean;
-    schema: Record<string, unknown>;
-  };
+  return { isRequired, schema };
 };
 
-const optionToSchema = (opt: any) => {
+const optionToSchema = (
+  opt: Option
+): { isMandatory: boolean; name: string; schema: JSONSchema } => {
   const name: string =
-    typeof opt?.attributeName === "function"
+    typeof opt.attributeName === "function"
       ? opt.attributeName()
-      : String(opt?.long || opt?.short || "").replace(/^--?/, "");
-  const description: string = String(opt?.description || "");
+      : String(
+          (opt as unknown as { long?: string; short?: string })?.long ||
+            (opt as unknown as { long?: string; short?: string })?.short ||
+            ""
+        ).replace(/^--?/, "");
+  const description: string = String(
+    (opt as unknown as { description?: string })?.description || ""
+  );
   const isBoolean: boolean =
-    typeof opt?.isBoolean === "function" ? opt.isBoolean() : false;
-  const isMandatory: boolean = Boolean(opt?.mandatory);
-  const choices: string[] | undefined = Array.isArray(opt?.argChoices)
-    ? opt.argChoices
+    typeof opt.isBoolean === "function" ? opt.isBoolean() : false;
+  const isMandatory: boolean = Boolean(
+    (opt as unknown as { mandatory?: boolean })?.mandatory
+  );
+  const choices: string[] | undefined = Array.isArray(
+    (opt as unknown as { argChoices?: string[] })?.argChoices
+  )
+    ? (opt as unknown as { argChoices?: string[] })?.argChoices
     : undefined;
-  const defaultValue = opt?.defaultValue;
+  const defaultValue = (opt as unknown as { defaultValue?: unknown })
+    ?.defaultValue;
 
-  const schema: any = isBoolean ? { type: "boolean" } : { type: "string" };
-  if (choices && choices.length > 0) schema.enum = choices;
-  if (description) schema.description = description;
-  if (defaultValue !== undefined) schema.default = defaultValue;
+  const schema: JSONSchema = isBoolean
+    ? { type: "boolean" }
+    : { type: "string" };
+  if (choices && choices.length > 0)
+    (schema as { enum?: string[] }).enum = choices;
+  if (description)
+    (schema as { description?: string }).description = description;
+  if (defaultValue !== undefined)
+    (schema as { default?: unknown }).default = defaultValue;
 
-  return { isMandatory, name, schema } as {
-    isMandatory: boolean;
-    name: string;
-    schema: Record<string, unknown>;
-  };
+  return { isMandatory, name, schema };
 };
 
-const buildInputSchemaForCommand = (cmd: Command) => {
-  const properties: Record<string, unknown> = {};
+const buildInputSchemaForCommand = (cmd: Command): JSONSchema => {
+  const properties: Record<string, JSONSchema> = {};
   const required: string[] = [];
 
-  const args: any[] = (cmd as any)?.registeredArguments || [];
+  const args: Argument[] =
+    (cmd as CommandWithInternals)?.registeredArguments || [];
   args.forEach((arg, index) => {
     const argName: string =
-      typeof arg?.name === "function" ? arg.name() : `arg${index + 1}`;
+      typeof arg.name === "function" ? arg.name() : `arg${index + 1}`;
     const { schema, isRequired } = argumentToSchema(arg);
     properties[argName] = schema;
     if (isRequired) required.push(argName);
   });
 
-  const opts: any[] = (cmd.options as any[]) || [];
+  const opts: readonly Option[] = cmd.options;
   opts.forEach((opt) => {
     const { name, schema, isMandatory } = optionToSchema(opt);
     properties[name] = schema;
     if (isMandatory) required.push(name);
   });
 
-  return {
+  const result: JSONSchema = {
     additionalProperties: false,
     properties,
-    required: required.length > 0 ? required : undefined,
     type: "object",
-  } as Record<string, unknown>;
+  };
+  if (required.length > 0)
+    (result as { required?: string[] }).required = required;
+  return result;
 };
 
-const commandToToolJson = (cmd: Command) => {
+interface ToolDoc {
+  description: string;
+  inputSchema: JSONSchema;
+  name: string;
+  title: string;
+}
+
+const commandToToolJson = (cmd: Command): ToolDoc => {
   const fullPath = getFullCommandPath(cmd).replace(/^zetachain\s+/, "");
   const name = toSnakeCase(fullPath);
   const title = toTitleCase(fullPath);
@@ -115,16 +154,16 @@ const commandToToolJson = (cmd: Command) => {
     inputSchema: buildInputSchemaForCommand(cmd),
     name,
     title,
-  } as Record<string, unknown>;
+  };
 };
 
 const isRunnableCommand = (cmd: Command): boolean => {
-  const anyCmd = cmd as any;
-  return Boolean(anyCmd?._actionHandler || anyCmd?._executableHandler);
+  const internals = cmd as CommandWithInternals;
+  return Boolean(internals?._actionHandler || internals?._executableHandler);
 };
 
-const collectToolsJson = (cmd: Command): Record<string, unknown>[] => {
-  const list: Record<string, unknown>[] = [];
+const collectToolsJson = (cmd: Command): ToolDoc[] => {
+  const list: ToolDoc[] = [];
   if (isRunnableCommand(cmd)) {
     list.push(commandToToolJson(cmd));
   }
@@ -137,7 +176,7 @@ const collectToolsJson = (cmd: Command): Record<string, unknown>[] => {
 export const docsCommand = new Command()
   .name("docs")
   .description(
-    "Display help information for all available commands and their subcommands",
+    "Display help information for all available commands and their subcommands"
   )
   .option("--json", "Output documentation as JSON (tools schema)")
   .action((opts: { json?: boolean }, command: Command) => {
@@ -148,7 +187,7 @@ export const docsCommand = new Command()
     }
 
     if (opts?.json) {
-      const tools: Record<string, unknown>[] = [];
+      const tools: ToolDoc[] = [];
       parent.commands.forEach((cmd: Command) => {
         tools.push(...collectToolsJson(cmd));
       });
