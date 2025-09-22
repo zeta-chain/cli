@@ -45,15 +45,14 @@ const argumentToSchema = (
     (arg as unknown as { required?: boolean })?.required
   );
   const description: string = String(
-    (arg as unknown as { description?: string })?.description || ""
+    (arg as unknown as { summary?: string })?.summary || ""
   );
 
   const schema: JSONSchema = isVariadic
     ? { items: { type: "string" }, type: "array" }
     : { type: "string" };
 
-  if (description)
-    (schema as { description?: string }).description = description;
+  if (description) (schema as { summary?: string }).summary = description;
 
   return { isRequired, schema };
 };
@@ -70,7 +69,7 @@ const optionToSchema = (
             ""
         ).replace(/^--?/, "");
   const description: string = String(
-    (opt as unknown as { description?: string })?.description || ""
+    (opt as unknown as { summary?: string })?.summary || ""
   );
   const isBoolean: boolean =
     typeof opt.isBoolean === "function" ? opt.isBoolean() : false;
@@ -90,8 +89,7 @@ const optionToSchema = (
     : { type: "string" };
   if (choices && choices.length > 0)
     (schema as { enum?: string[] }).enum = choices;
-  if (description)
-    (schema as { description?: string }).description = description;
+  if (description) (schema as { summary?: string }).summary = description;
   if (defaultValue !== undefined)
     (schema as { default?: unknown }).default = defaultValue;
 
@@ -140,7 +138,7 @@ const commandToToolJson = (cmd: Command): ToolDoc => {
   const fullPath = getFullCommandPath(cmd).replace(/^zetachain\s+/, "");
   const name = toSnakeCase(fullPath);
   const title = toTitleCase(fullPath);
-  const description = cmd.description() || title;
+  const description = cmd.summary() || title;
 
   return {
     description,
