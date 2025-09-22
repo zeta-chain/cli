@@ -65,7 +65,7 @@ async function executeCommand(
 
   ensureZetachainAvailable();
 
-  const argv = ["--no-analytics", ...commandPath, ...positionals, ...flags];
+  const argv = [...commandPath, ...positionals, ...flags];
 
   return await spawnBinary("zetachain", argv);
 }
