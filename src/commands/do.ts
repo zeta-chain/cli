@@ -8,7 +8,7 @@ const DEFAULT_API_URL = "https://docs-v2-git-mcp-server.zetachain.app/api/mcp";
 
 const doOptionsSchema = z.object({
   instruction: z.string().min(1),
-  model: z.string().default("gpt-4o-mini"),
+  model: z.string().default("gpt-4o"),
   apiUrl: z.string().url().default(DEFAULT_API_URL),
   raw: z.boolean().default(false),
 });
@@ -85,7 +85,7 @@ export const doCommand = new Command()
   .argument("<instruction...>", "What you want to do, in natural language")
   .addOption(
     new Option("--model <model>", "Model name for the server route").default(
-      "gpt-4o-mini"
+      "gpt-4o"
     )
   )
   .addOption(
