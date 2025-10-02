@@ -15,6 +15,7 @@ import { Command } from "commander";
 
 import { setupAnalytics } from "./analytics";
 import { askCommand } from "./commands/ask";
+import { doCommand } from "./commands/do";
 import { docsCommand } from "./commands/docs";
 import { newCommand } from "./commands/new";
 import config from "./config.json";
@@ -41,6 +42,7 @@ program.addCommand(bitcoinCommand);
 program.addCommand(localnetCommand);
 program.addCommand(docsCommand);
 program.addCommand(askCommand);
+program.addCommand(doCommand);
 
 setupAnalytics(program);
 
