@@ -643,7 +643,7 @@ Usage: zetachain solana call [options]
 Call a universal contract on ZetaChain
 
 Options:
-  --recipient <recipient>                   EOA or contract address on ZetaChain
+  --receiver <receiver>                     EOA or contract address on ZetaChain
   --mnemonic <mnemonic>                     Mnemonic
   --name <name>                             Name of the wallet (default: "default")
   --private-key <privateKey>                Private key in base58 or hex format (with optional 0x prefix)
@@ -667,7 +667,7 @@ Usage: zetachain solana deposit-and-call [options]
 Deposit tokens from Solana and call a universal contract on ZetaChain
 
 Options:
-  --recipient <recipient>                   EOA or contract address on ZetaChain
+  --receiver <receiver>                     EOA or contract address on ZetaChain
   --mnemonic <mnemonic>                     Mnemonic
   --name <name>                             Name of the wallet (default: "default")
   --private-key <privateKey>                Private key in base58 or hex format (with optional 0x prefix)
@@ -692,7 +692,7 @@ Options:
 Usage: zetachain solana deposit [options]
 
 Options:
-  --recipient <recipient>                   EOA or contract address on ZetaChain
+  --receiver <receiver>                     EOA or contract address on ZetaChain
   --mnemonic <mnemonic>                     Mnemonic
   --name <name>                             Name of the wallet (default: "default")
   --private-key <privateKey>                Private key in base58 or hex format (with optional 0x prefix)
