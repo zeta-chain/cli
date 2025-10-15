@@ -2724,10 +2724,10 @@
   resolved "https://registry.npmjs.org/@zetachain/standard-contracts/-/standard-contracts-2.0.1.tgz#aefd28bb81f1f05b183bd73dc62bd68e456a6ebf"
   integrity sha512-SHV9a1bSgy8litI/LRZ4VIus7Gsjy0wj3n9bZeIsEydn0C5NNZxYO4XW+P06dlEyDQjtcVJQHoQOyHkodBoVsQ==
 
-"@zetachain/toolkit@16.1.2":
-  version "16.1.2"
-  resolved "https://registry.npmjs.org/@zetachain/toolkit/-/toolkit-16.1.2.tgz#e191b9ff8039a4f7390eba7f289dbf6f642e1d5f"
-  integrity sha512-tr6kZZNrz8xX1q41hRXDh1+rM5obX6TCChYsmkCKl/JF6G0SwNLHM/1s+i7Ykz1MusZKfW6vf0ARrKhuYpHibg==
+"@zetachain/toolkit@16.1.5-rc1":
+  version "16.1.5-rc1"
+  resolved "https://registry.yarnpkg.com/@zetachain/toolkit/-/toolkit-16.1.5-rc1.tgz#47faee6ba1d8b1ceacbc3258a0997b324141db66"
+  integrity sha512-3FqhL2nBF0EBbOXWWIRnYr7NJtZutcTTMVb58lzg9mL4n97BFkXhZR8GShahPgVRMPdxRSNUluZP/2BmMjRljA==
   dependencies:
     "@coral-xyz/anchor" "^0.30.1"
     "@ethersproject/units" "^5.8.0"
@@ -2758,7 +2758,7 @@
     dayjs "^1.11.13"
     dotenv "16.0.3"
     ecpair "^2.1.0"
-    envfile "^6.18.0"
+    envfile "^7.1.0"
     ethers "^6.13.2"
     eventemitter3 "^5.0.1"
     form-data "^4.0.0"
@@ -4026,10 +4026,10 @@ env-paths@^2.2.0:
   resolved "https://registry.yarnpkg.com/env-paths/-/env-paths-2.2.1.tgz#420399d416ce1fbe9bc0a07c62fa68d67fd0f8f2"
   integrity sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==
 
-envfile@^6.18.0:
-  version "6.22.0"
-  resolved "https://registry.npmjs.org/envfile/-/envfile-6.22.0.tgz#c6f3c789a2ec522ef377e44ed9136d1e069ccab3"
-  integrity sha512-G9vwmk9O+eJzHh6JEfva0aTmyKtbolqGx9l/KnEVslsR3hl5XZ+g+wgY/j8gTJoikgP5upt6wxXM+E19o36iUg==
+envfile@^7.1.0:
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/envfile/-/envfile-7.1.0.tgz#c0b101279dc710c25546602d5d17cfb9ab132e48"
+  integrity sha512-dyH4QnnZsArCLhPASr29eqBWDvKpq0GggQFTmysTT/S9TTmt1JrEKNvTBc09Cd7ujVZQful2HBGRMe2agu7Krg==
 
 environment@^1.0.0:
   version "1.1.0"
