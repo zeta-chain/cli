@@ -7,7 +7,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { spawn, spawnSync, SpawnSyncReturns } from "child_process";
 import { z, ZodRawShape } from "zod";
 
-import * as commandsModule from "./commands.json";
+import commandsJson from "./commands.json";
 
 // Type definitions
 interface JSONSchemaProperty {
@@ -17,14 +17,15 @@ interface JSONSchemaProperty {
     enum?: string[];
     type?: string;
   };
-  type: "array" | "boolean" | "object" | "string";
+  type?: string;
 }
 
 interface JSONSchema {
+  [key: string]: unknown;
   additionalProperties?: boolean;
-  properties?: Record<string, JSONSchemaProperty>;
+  properties?: Record<string, unknown>;
   required?: string[];
-  type: "object";
+  type?: string;
 }
 
 interface CommandTool {
@@ -44,7 +45,13 @@ interface NodeError extends Error {
   code?: string;
 }
 
-const commands = commandsModule as unknown as CommandTool[];
+interface CommandsModule {
+  default?: CommandTool[];
+}
+
+const commands: CommandTool[] = Array.isArray(commandsJson)
+  ? commandsJson
+  : (commandsJson as CommandsModule).default || [];
 
 export const configSchema = z.object({
   debug: z.boolean().default(false).describe("Enable debug logging"),
@@ -164,7 +171,8 @@ function jsonSchemaToZodShape(schema: JSONSchema): ZodRawShape {
   const required = new Set<string>(schema.required ?? []);
   const shape: Record<string, z.ZodTypeAny> = {};
 
-  for (const [key, prop] of Object.entries<JSONSchemaProperty>(props)) {
+  for (const [key, propValue] of Object.entries(props)) {
+    const prop = propValue as JSONSchemaProperty;
     let v: z.ZodTypeAny;
 
     if (prop.type === "boolean") {
