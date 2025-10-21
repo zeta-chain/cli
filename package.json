@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/zeta-chain/cli#readme",
   "dependencies": {
-    "@zetachain/localnet": "13.0.1-rc2",
+    "@zetachain/localnet": "13.0.1",
     "@zetachain/toolkit": "16.1.2",
     "axios": "^1.7.7",
     "commander": "^13.1.0",
