@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /* eslint-disable func-style */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 // Disabling eslint, because Smithery for some reason fails when functions are declared as const
