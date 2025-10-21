@@ -4,7 +4,8 @@
   "description": "CLI tool for creating universal smart contracts on ZetaChain",
   "main": "index.js",
   "bin": {
-    "zetachain": "./dist/index.js"
+    "zetachain": "./dist/index.js",
+    "zetachain-mcp": "./dist/mcp/index.js"
   },
   "scripts": {
     "build": "yarn tsc",

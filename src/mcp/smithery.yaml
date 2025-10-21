@@ -1,1 +1,18 @@
-runtime: typescript
+# Smithery configuration file
+startCommand:
+  type: stdio
+
+configSchema:
+  type: object
+  properties:
+    debug:
+      type: boolean
+      description: Enable debug logging
+      default: false
+
+commandFunction: |-
+  (config) => ({
+    command: 'npx',
+    args: ['-y', 'zetachain@latest', 'zetachain-mcp'],
+    env: config.debug ? { DEBUG: 'true' } : {}
+  })

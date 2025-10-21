@@ -1,6 +1,7 @@
 /* eslint-disable */
 // Disabling eslint, because Smithery for some reason fails when functions are declared as const
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z, ZodRawShape } from "zod";
 import { spawn, spawnSync } from "child_process";
 import commands from "./commands.json";
@@ -196,3 +197,15 @@ const jsonSchemaToZodShape = (schema: any): ZodRawShape => {
 
   return shape as ZodRawShape;
 };
+
+// Start the MCP server when this file is run directly
+async function main() {
+  const server = createServer({ config: { debug: false } });
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+}
+
+main().catch((error) => {
+  console.error("Failed to start MCP server:", error);
+  process.exit(1);
+});
