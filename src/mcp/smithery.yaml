@@ -13,6 +13,6 @@ configSchema:
 commandFunction: |-
   (config) => ({
     command: 'npx',
-    args: ['-y', 'zetachain@latest', 'zetachain-mcp'],
+    args: ['-y', 'zetachain@7.0.1-rc1', 'zetachain-mcp'],
     env: config.debug ? { DEBUG: 'true' } : {}
   })
