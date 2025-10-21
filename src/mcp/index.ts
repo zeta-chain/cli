@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /* eslint-disable func-style */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 // Disabling eslint, because Smithery for some reason fails when functions are declared as const
@@ -248,3 +249,21 @@ function createServer({ config }: { config: z.infer<typeof configSchema> }) {
 
 // Export for Smithery (HTTP mode)
 export default createServer;
+
+// Start the stdio server only when run as a CLI command (not when imported)
+// Check if this module is being run directly
+if (require.main === module) {
+  async function main() {
+    const { StdioServerTransport } = await import(
+      "@modelcontextprotocol/sdk/server/stdio.js"
+    );
+    const server = createServer({ config: { debug: false } });
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+  }
+
+  main().catch((error) => {
+    console.error("Failed to start MCP server:", error);
+    process.exit(1);
+  });
+}
