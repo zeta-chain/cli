@@ -250,8 +250,8 @@ function createServer({ config }: { config: z.infer<typeof configSchema> }) {
 // Export for Smithery (HTTP mode)
 export default createServer;
 
-// Start the stdio server only when run as a CLI command (not when imported)
-// Check if this module is being run directly
+// Start the stdio server only when run as a CLI command (e.g., npx --project=zetachain -y zetachain-mcp).
+// Don't start the server when this file is imported by Smithery for HTTP mode.
 if (require.main === module) {
   async function main() {
     const { StdioServerTransport } = await import(
