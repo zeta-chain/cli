@@ -1912,6 +1912,58 @@
     "title": "Localnet Ton Withdraw"
   },
   {
+    "description": "Mcp Install",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "client": {
+          "type": "string",
+          "enum": [
+            "claude",
+            "cursor"
+          ]
+        }
+      },
+      "type": "object",
+      "required": [
+        "client"
+      ]
+    },
+    "name": "mcp_install",
+    "title": "Mcp Install"
+  },
+  {
+    "description": "Mcp Remove",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "client": {
+          "type": "string",
+          "enum": [
+            "claude",
+            "cursor"
+          ]
+        }
+      },
+      "type": "object",
+      "required": [
+        "client"
+      ]
+    },
+    "name": "mcp_remove",
+    "title": "Mcp Remove"
+  },
+  {
+    "description": "Mcp List",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "name": "mcp_list",
+    "title": "Mcp List"
+  },
+  {
     "description": "Docs",
     "inputSchema": {
       "additionalProperties": false,
