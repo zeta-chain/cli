@@ -1,9 +1,7 @@
-#!/usr/bin/env node
 /* eslint-disable func-style */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 // Disabling eslint, because Smithery for some reason fails when functions are declared as const
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { spawn, spawnSync, SpawnSyncReturns } from "child_process";
 import { z, ZodRawShape } from "zod";
 
@@ -201,11 +199,7 @@ function jsonSchemaToZodShape(schema: JSONSchema): ZodRawShape {
   return shape;
 }
 
-export default function createServer({
-  config,
-}: {
-  config: z.infer<typeof configSchema>;
-}) {
+function createServer({ config }: { config: z.infer<typeof configSchema> }) {
   const server = new McpServer({
     name: "Universal Blockchain",
     version: "1.0.0",
@@ -252,14 +246,5 @@ export default function createServer({
   return server.server;
 }
 
-// Start the MCP server when this file is run directly
-async function main() {
-  const server = createServer({ config: { debug: false } });
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-}
-
-main().catch((error) => {
-  console.error("Failed to start MCP server:", error);
-  process.exit(1);
-});
+// Export for Smithery (HTTP mode)
+export default createServer;
