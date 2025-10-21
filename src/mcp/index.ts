@@ -49,69 +49,11 @@ export const configSchema = z.object({
   debug: z.boolean().default(false).describe("Enable debug logging"),
 });
 
-export default function createServer({
-  config,
-}: {
-  config: z.infer<typeof configSchema>;
-}) {
-  const server = new McpServer({
-    name: "Universal Blockchain",
-    version: "1.0.0",
-  });
-
-  for (const tool of commands) {
-    const name: string = String(tool?.name ?? "").trim();
-    if (!name) continue;
-
-    server.registerTool(
-      tool.name,
-      {
-        description: tool.description,
-        inputSchema: jsonSchemaToZodShape(tool.inputSchema),
-        title: tool.title,
-      },
-      async (args: Record<string, unknown>): Promise<ToolResponse> => {
-        const { stdout, stderr, exitCode } = await executeCommand(
-          name,
-          args ?? {},
-        );
-        const trimmedStdout = (stdout || "").trim();
-        const showStderr = !!config?.debug;
-        const text = trimmedStdout
-          ? showStderr && stderr
-            ? `${trimmedStdout}\n\n[stderr]\n${stderr}`
-            : trimmedStdout
-          : stderr
-            ? `Command produced no output. Stderr:\n${stderr}`
-            : `Executed '${name}'.`;
-        return {
-          content: [
-            {
-              text,
-              type: "text",
-            },
-          ],
-          isError: typeof exitCode === "number" && exitCode !== 0,
-        };
-      },
-    );
-  }
-
-  return server.server;
-}
-
-async function executeCommand(
-  toolName: string,
-  args: Record<string, unknown>,
-): Promise<{ exitCode: number | null; stderr: string; stdout: string }> {
-  const commandPath = toolNameToCommandPath(toolName);
-  const { positionals, flags } = buildArgvFromArgs(toolName, args);
-
-  ensureZetachainAvailable();
-
-  const argv = [...commandPath, ...positionals, ...flags];
-
-  return await spawnBinary("zetachain", argv);
+function toKebabCase(input: string): string {
+  return String(input)
+    .replace(/_/g, "-")
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    .toLowerCase();
 }
 
 function ensureZetachainAvailable(): void {
@@ -167,13 +109,6 @@ function buildArgvFromArgs(
   return { flags, positionals };
 }
 
-function toKebabCase(input: string): string {
-  return String(input)
-    .replace(/_/g, "-")
-    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
-    .toLowerCase();
-}
-
 async function spawnBinary(
   command: string,
   args: string[],
@@ -209,6 +144,20 @@ async function spawnBinary(
   });
 }
 
+async function executeCommand(
+  toolName: string,
+  args: Record<string, unknown>,
+): Promise<{ exitCode: number | null; stderr: string; stdout: string }> {
+  const commandPath = toolNameToCommandPath(toolName);
+  const { positionals, flags } = buildArgvFromArgs(toolName, args);
+
+  ensureZetachainAvailable();
+
+  const argv = [...commandPath, ...positionals, ...flags];
+
+  return await spawnBinary("zetachain", argv);
+}
+
 function jsonSchemaToZodShape(schema: JSONSchema): ZodRawShape {
   const props = schema.properties ?? {};
   const required = new Set<string>(schema.required ?? []);
@@ -241,6 +190,57 @@ function jsonSchemaToZodShape(schema: JSONSchema): ZodRawShape {
   }
 
   return shape;
+}
+
+export default function createServer({
+  config,
+}: {
+  config: z.infer<typeof configSchema>;
+}) {
+  const server = new McpServer({
+    name: "Universal Blockchain",
+    version: "1.0.0",
+  });
+
+  for (const tool of commands) {
+    const name: string = String(tool?.name ?? "").trim();
+    if (!name) continue;
+
+    server.registerTool(
+      tool.name,
+      {
+        description: tool.description,
+        inputSchema: jsonSchemaToZodShape(tool.inputSchema),
+        title: tool.title,
+      },
+      async (args: Record<string, unknown>): Promise<ToolResponse> => {
+        const { stdout, stderr, exitCode } = await executeCommand(
+          name,
+          args ?? {},
+        );
+        const trimmedStdout = (stdout || "").trim();
+        const showStderr = !!config?.debug;
+        const text = trimmedStdout
+          ? showStderr && stderr
+            ? `${trimmedStdout}\n\n[stderr]\n${stderr}`
+            : trimmedStdout
+          : stderr
+            ? `Command produced no output. Stderr:\n${stderr}`
+            : `Executed '${name}'.`;
+        return {
+          content: [
+            {
+              text,
+              type: "text",
+            },
+          ],
+          isError: typeof exitCode === "number" && exitCode !== 0,
+        };
+      },
+    );
+  }
+
+  return server.server;
 }
 
 // Start the MCP server when this file is run directly
