@@ -1,10 +1,49 @@
-/* eslint-disable */
+/* eslint-disable func-style */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 // Disabling eslint, because Smithery for some reason fails when functions are declared as const
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { spawn, spawnSync, SpawnSyncReturns } from "child_process";
 import { z, ZodRawShape } from "zod";
-import { spawn, spawnSync } from "child_process";
-import commands from "./commands.json";
+
+import * as commandsModule from "./commands.json";
+
+// Type definitions
+interface JSONSchemaProperty {
+  default?: unknown;
+  enum?: string[];
+  items?: {
+    enum?: string[];
+    type?: string;
+  };
+  type: "array" | "boolean" | "object" | "string";
+}
+
+interface JSONSchema {
+  additionalProperties?: boolean;
+  properties?: Record<string, JSONSchemaProperty>;
+  required?: string[];
+  type: "object";
+}
+
+interface CommandTool {
+  description: string;
+  inputSchema: JSONSchema;
+  name: string;
+  title: string;
+}
+
+interface ToolResponse {
+  [key: string]: unknown;
+  content: Array<{ text: string; type: "text" }>;
+  isError: boolean;
+}
+
+interface NodeError extends Error {
+  code?: string;
+}
+
+const commands = commandsModule as unknown as CommandTool[];
 
 export const configSchema = z.object({
   debug: z.boolean().default(false).describe("Enable debug logging"),
@@ -28,13 +67,13 @@ export default function createServer({
       tool.name,
       {
         description: tool.description,
-        title: tool.title,
         inputSchema: jsonSchemaToZodShape(tool.inputSchema),
-      } as any,
-      async (args: any) => {
+        title: tool.title,
+      },
+      async (args: Record<string, unknown>): Promise<ToolResponse> => {
         const { stdout, stderr, exitCode } = await executeCommand(
           name,
-          args ?? {}
+          args ?? {},
         );
         const trimmedStdout = (stdout || "").trim();
         const showStderr = !!config?.debug;
@@ -48,13 +87,13 @@ export default function createServer({
         return {
           content: [
             {
-              type: "text",
               text,
+              type: "text",
             },
           ],
           isError: typeof exitCode === "number" && exitCode !== 0,
-        } as any;
-      }
+        };
+      },
     );
   }
 
@@ -63,8 +102,8 @@ export default function createServer({
 
 async function executeCommand(
   toolName: string,
-  args: Record<string, unknown>
-): Promise<{ stdout: string; stderr: string; exitCode: number | null }> {
+  args: Record<string, unknown>,
+): Promise<{ exitCode: number | null; stderr: string; stdout: string }> {
   const commandPath = toolNameToCommandPath(toolName);
   const { positionals, flags } = buildArgvFromArgs(toolName, args);
 
@@ -76,12 +115,17 @@ async function executeCommand(
 }
 
 function ensureZetachainAvailable(): void {
-  const result = spawnSync("npx", ["-y", "zetachain", "--version"], {
-    encoding: "utf8",
-  });
-  if (result.error && (result.error as any).code === "ENOENT") {
+  const result: SpawnSyncReturns<string> = spawnSync(
+    "npx",
+    ["-y", "zetachain", "--version"],
+    {
+      encoding: "utf8",
+    },
+  );
+  const error = result.error as NodeError | undefined;
+  if (error && error.code === "ENOENT") {
     throw new Error(
-      "Failed to execute 'npx'. Please ensure Node.js and npm are installed."
+      "Failed to execute 'npx'. Please ensure Node.js and npm are installed.",
     );
   }
 }
@@ -98,8 +142,8 @@ function toolNameToCommandPath(name: string): string[] {
 
 function buildArgvFromArgs(
   toolName: string,
-  args: Record<string, unknown>
-): { positionals: string[]; flags: string[] } {
+  args: Record<string, unknown>,
+): { flags: string[]; positionals: string[] } {
   const positionals: string[] = [];
   const flags: string[] = [];
 
@@ -120,7 +164,7 @@ function buildArgvFromArgs(
     flags.push(flag, String(value));
   }
 
-  return { positionals, flags };
+  return { flags, positionals };
 }
 
 function toKebabCase(input: string): string {
@@ -132,8 +176,8 @@ function toKebabCase(input: string): string {
 
 async function spawnBinary(
   command: string,
-  args: string[]
-): Promise<{ stdout: string; stderr: string; exitCode: number | null }> {
+  args: string[],
+): Promise<{ exitCode: number | null; stderr: string; stdout: string }> {
   return new Promise((resolve) => {
     const child = spawn("npx", ["-y", command, ...args], {
       cwd: process.cwd(),
@@ -150,26 +194,27 @@ async function spawnBinary(
       stderr += data?.toString?.() ?? "";
     });
     child.on("close", (code) => {
-      resolve({ stdout, stderr, exitCode: code });
+      resolve({ exitCode: code, stderr, stdout });
     });
-    child.on("error", (err: any) => {
-      if (err && err.code === "ENOENT") {
+    child.on("error", (err: Error) => {
+      const nodeError = err as NodeError;
+      if (nodeError.code === "ENOENT") {
         stderr += `'npx' not found in PATH.`;
-        resolve({ stdout, stderr, exitCode: 1 });
+        resolve({ exitCode: 1, stderr, stdout });
         return;
       }
-      stderr += `${err?.message ?? String(err)}`;
-      resolve({ stdout, stderr, exitCode: 1 });
+      stderr += `${err.message}`;
+      resolve({ exitCode: 1, stderr, stdout });
     });
   });
 }
 
-const jsonSchemaToZodShape = (schema: any): ZodRawShape => {
-  const props = schema?.properties ?? {};
-  const required = new Set<string>(schema?.required ?? []);
+function jsonSchemaToZodShape(schema: JSONSchema): ZodRawShape {
+  const props = schema.properties ?? {};
+  const required = new Set<string>(schema.required ?? []);
   const shape: Record<string, z.ZodTypeAny> = {};
 
-  for (const [key, prop] of Object.entries<any>(props)) {
+  for (const [key, prop] of Object.entries<JSONSchemaProperty>(props)) {
     let v: z.ZodTypeAny;
 
     if (prop.type === "boolean") {
@@ -179,13 +224,13 @@ const jsonSchemaToZodShape = (schema: any): ZodRawShape => {
       const item =
         t === "boolean"
           ? z.boolean()
-          : Array.isArray(prop.items?.enum) && prop.items.enum.length
+          : Array.isArray(prop.items?.enum) && prop.items.enum.length > 0
             ? z.enum(prop.items.enum as [string, ...string[]])
             : z.string();
       v = z.array(item);
     } else {
       v =
-        Array.isArray(prop.enum) && prop.enum.length
+        Array.isArray(prop.enum) && prop.enum.length > 0
           ? z.enum(prop.enum as [string, ...string[]])
           : z.string();
     }
@@ -195,8 +240,8 @@ const jsonSchemaToZodShape = (schema: any): ZodRawShape => {
     shape[key] = v;
   }
 
-  return shape as ZodRawShape;
-};
+  return shape;
+}
 
 // Start the MCP server when this file is run directly
 async function main() {
