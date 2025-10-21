@@ -2615,10 +2615,10 @@
   dependencies:
     "@wallet-standard/base" "^1.1.0"
 
-"@zetachain/localnet@12.0.3":
-  version "12.0.3"
-  resolved "https://registry.yarnpkg.com/@zetachain/localnet/-/localnet-12.0.3.tgz#0fe16056bddbd43d7ac67affd03913e1c19aed7b"
-  integrity sha512-X/wojUMi8Pw5r8hULNaIeexEYv40HfyQPjKW71YZ0PfkpkNz18iGNjMn0ZVGgRtJT/ToxOh4gS1udooqwlbkGg==
+"@zetachain/localnet@^13.0.0":
+  version "13.0.0"
+  resolved "https://registry.npmjs.org/@zetachain/localnet/-/localnet-13.0.0.tgz#25ab7ff7d788f675c7fd70bce9ad1f27f28595b0"
+  integrity sha512-5Yw8NhYQb8BNhXbSm39GR/frl5/OE80JRmGqTe4hkF/55QnjaIgGfiTntRM6wYiS7ICyjm+kOVXMGTz/+vszeA==
   dependencies:
     "@coral-xyz/anchor" "^0.30.1"
     "@inquirer/prompts" "^5.5.0"
@@ -2652,6 +2652,7 @@
     js-sha256 "^0.11.0"
     simple-git "^3.27.0"
     sudo-prompt "^9.2.1"
+    table "^6.9.0"
     wait-on "^7.2.0"
     winston "^3.17.0"
     zod "^3.24.2"
