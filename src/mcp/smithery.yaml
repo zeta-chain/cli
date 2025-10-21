@@ -1,16 +1,1 @@
-# Smithery configuration file
-startCommand:
-  commandFunction: |-
-    (config) => ({
-      command: 'npx',
-      args: ['--package=zetachain@7.0.1-rc4', '-y', 'zetachain-mcp'],
-      env: config.debug ? { DEBUG: 'true' } : {}
-    })
-
-configSchema:
-  type: object
-  properties:
-    debug:
-      type: boolean
-      description: Enable debug logging
-      default: false
+runtime: typescript
