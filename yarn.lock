@@ -2615,10 +2615,10 @@
   dependencies:
     "@wallet-standard/base" "^1.1.0"
 
-"@zetachain/localnet@13.0.1-rc1":
-  version "13.0.1-rc1"
-  resolved "https://registry.npmjs.org/@zetachain/localnet/-/localnet-13.0.1-rc1.tgz#d55b3ee85201b573b64eb726fba4ad145d0b3c35"
-  integrity sha512-6+WPlcjBFUDUldu1JEB12ebGlfgsN/r+qdq+gETPM//mZVD+6cTlb9gn/MmrmN5Wxan7M3rQP2U9sIUL0PUsrQ==
+"@zetachain/localnet@13.0.1-rc2":
+  version "13.0.1-rc2"
+  resolved "https://registry.npmjs.org/@zetachain/localnet/-/localnet-13.0.1-rc2.tgz#f33eaa652f96eb14ff8616c7024407143dbb9620"
+  integrity sha512-d6tIrYPEWnGx6jd8Y+MA8JBtd2Pblh1VTmaza3LnTPPpmfFgPAc48QNDLyKAm1Sxl+Bu8mJHLr4nH7q6P/1Nqg==
   dependencies:
     "@coral-xyz/anchor" "^0.30.1"
     "@inquirer/prompts" "^5.5.0"
