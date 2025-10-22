@@ -53,13 +53,12 @@ export const isZetaChainMCPServer = (
   }
 
   // Check for stdio installation (CLI)
-  if (!serverConfig.args || !Array.isArray(serverConfig.args)) {
-    return false;
+  // Check command field first
+  if (serverConfig.command && typeof serverConfig.command === "string") {
+    if (serverConfig.command.includes("zetachain-mcp")) {
+      return true;
+    }
   }
 
-  return serverConfig.args.some(
-    (arg) =>
-      typeof arg === "string" &&
-      (arg.includes("zetachain-mcp") || arg.includes("/mcp/index.js")),
-  );
+  return false;
 };

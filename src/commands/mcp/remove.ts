@@ -43,8 +43,9 @@ const removeMCPServer = async (clientId: string): Promise<void> => {
             }
           });
 
+          const mcpServers = proj.mcpServers;
           keysToRemove.forEach((key) => {
-            delete proj.mcpServers![key];
+            delete mcpServers[key];
             console.log(`  Removed '${key}' from project: ${projectPath}`);
             removedCount++;
           });
@@ -62,8 +63,9 @@ const removeMCPServer = async (clientId: string): Promise<void> => {
         }
       });
 
+      const mcpServers = directConfig.mcpServers;
       keysToRemove.forEach((key) => {
-        delete directConfig.mcpServers![key];
+        delete mcpServers[key];
         console.log(`  Removed '${key}'`);
         removedCount++;
       });

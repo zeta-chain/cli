@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /* eslint-disable func-style */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 // Disabling eslint, because Smithery for some reason fails when functions are declared as const
@@ -88,10 +89,10 @@ function toolNameToCommandPath(name: string): string[] {
   return normalized.split(" ");
 }
 
-function buildArgvFromArgs(
-  toolName: string,
-  args: Record<string, unknown>,
-): { flags: string[]; positionals: string[] } {
+function buildArgvFromArgs(args: Record<string, unknown>): {
+  flags: string[];
+  positionals: string[];
+} {
   const positionals: string[] = [];
   const flags: string[] = [];
 
@@ -155,7 +156,7 @@ async function executeCommand(
   args: Record<string, unknown>,
 ): Promise<{ exitCode: number | null; stderr: string; stdout: string }> {
   const commandPath = toolNameToCommandPath(toolName);
-  const { positionals, flags } = buildArgvFromArgs(toolName, args);
+  const { positionals, flags } = buildArgvFromArgs(args);
 
   ensureZetachainAvailable();
 
@@ -248,3 +249,21 @@ function createServer({ config }: { config: z.infer<typeof configSchema> }) {
 
 // Export for Smithery (HTTP mode)
 export default createServer;
+
+// Start the stdio server only when run as a CLI command (e.g., zetachain-mcp).
+// Don't start the server when this file is imported by Smithery for HTTP mode.
+if (require.main === module) {
+  async function main() {
+    const { StdioServerTransport } = await import(
+      "@modelcontextprotocol/sdk/server/stdio.js"
+    );
+    const server = createServer({ config: { debug: false } });
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+  }
+
+  main().catch((error) => {
+    console.error("Failed to start MCP server:", error);
+    process.exit(1);
+  });
+}
