@@ -1,3 +1,4 @@
+import { execSync } from "child_process";
 import { Command, Option } from "commander";
 import fs from "fs-extra";
 import path from "path";
@@ -9,12 +10,33 @@ import {
   SUPPORTED_CLIENTS,
 } from "../../utils/mcp";
 
+/**
+ * Check if zetachain CLI is globally installed
+ */
+const isZetaChainGloballyInstalled = (): boolean => {
+  try {
+    const command = process.platform === "win32" ? "where" : "which";
+    execSync(`${command} zetachain`, { stdio: "ignore" });
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 const installMCPServer = async (clientId: string): Promise<void> => {
   const client = MCP_CLIENTS[clientId];
   if (!client) {
     const availableClients = Object.keys(MCP_CLIENTS).join(", ");
     throw new Error(
       `Unknown client: ${clientId}. Available clients: ${availableClients}`,
+    );
+  }
+
+  // Require global zetachain installation
+  if (!isZetaChainGloballyInstalled()) {
+    throw new Error(
+      "ZetaChain CLI is not installed globally.\n" +
+        "Please install it first: npm install -g zetachain",
     );
   }
 
@@ -63,16 +85,18 @@ const installMCPServer = async (clientId: string): Promise<void> => {
       );
     }
 
-    projects[cwd].mcpServers!.zetachain = {
-      args: ["--package=zetachain@latest", "-y", "zetachain-mcp"],
-      command: "npx",
+    const mcpServers = projects[cwd].mcpServers;
+
+    mcpServers.zetachain = {
+      args: [],
+      command: "zetachain-mcp",
     };
 
-    await fs.writeJSON(client.configPath, config, { spaces: 2 });
-
     console.log(
-      `Added stdio MCP server zetachain with command: npx --package=zetachain@latest -y zetachain-mcp to local config`,
+      `Added stdio MCP server zetachain with command: zetachain-mcp to local config`,
     );
+
+    await fs.writeJSON(client.configPath, config, { spaces: 2 });
     console.log(`File modified: ${client.configPath} [project: ${cwd}]`);
   } else {
     if (!config.mcpServers) {
@@ -98,8 +122,8 @@ const installMCPServer = async (clientId: string): Promise<void> => {
     }
 
     mcpServers.zetachain = {
-      args: ["--package=zetachain@latest", "-y", "zetachain-mcp"],
-      command: "npx",
+      args: [],
+      command: "zetachain-mcp",
     };
 
     await fs.writeJSON(client.configPath, config, { spaces: 2 });
