@@ -57,6 +57,39 @@ Query cross-chain balances:
 zetachain query balances
 ```
 
+## 🤖 MCP Server Installation
+
+The ZetaChain CLI can be used as an MCP (Model Context Protocol) server, allowing AI assistants like Claude Code and Cursor to execute ZetaChain commands.
+
+### Local Installation (Recommended)
+
+Install locally for full access to your filesystem, accounts, and localnet:
+
+```bash
+npm install -g zetachain
+zetachain mcp install --client claude    # for Claude Code
+# or
+zetachain mcp install --client cursor    # for Cursor
+```
+
+Then restart your AI editor to activate the MCP server.
+
+**Check installation status:**
+```bash
+zetachain mcp list
+```
+
+**Remove:**
+```bash
+zetachain mcp remove --client claude
+```
+
+### Cloud Installation (Smithery)
+
+For quick setup without local installation, visit [Smithery](https://smithery.ai/server/@zeta-chain/cli) and click "One-Click Install".
+
+⚠️ **Note**: The cloud version runs on remote servers and cannot access your local files, accounts, or localnet.
+
 ## 🧭 CLI Reference
 
 For full command documentation:

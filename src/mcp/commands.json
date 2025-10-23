@@ -1,0 +1,1980 @@
+[
+  {
+    "description": "New",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "verbose": {
+          "type": "boolean"
+        },
+        "output": {
+          "type": "string"
+        },
+        "project": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "name": "new",
+    "title": "New"
+  },
+  {
+    "description": "Create a new account",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "evm",
+            "solana",
+            "sui",
+            "bitcoin",
+            "ton"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        }
+      },
+      "type": "object"
+    },
+    "name": "accounts_create",
+    "title": "Accounts Create"
+  },
+  {
+    "description": "Delete an existing account",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "evm",
+            "solana",
+            "sui",
+            "bitcoin",
+            "ton"
+          ]
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "name"
+      ]
+    },
+    "name": "accounts_delete",
+    "title": "Accounts Delete"
+  },
+  {
+    "description": "Accounts Import",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "evm",
+            "solana",
+            "sui",
+            "bitcoin",
+            "ton"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "privateKey": {
+          "type": "string"
+        },
+        "mnemonic": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "name": "accounts_import",
+    "title": "Accounts Import"
+  },
+  {
+    "description": "List all available accounts",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "json": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "name": "accounts_list",
+    "title": "Accounts List"
+  },
+  {
+    "description": "Show details of an existing account",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "evm",
+            "solana",
+            "sui",
+            "bitcoin",
+            "ton"
+          ]
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "name"
+      ]
+    },
+    "name": "accounts_show",
+    "title": "Accounts Show"
+  },
+  {
+    "description": "Fetch native and ZETA token balances",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "evm": {
+          "type": "string"
+        },
+        "solana": {
+          "type": "string"
+        },
+        "bitcoin": {
+          "type": "string"
+        },
+        "sui": {
+          "type": "string"
+        },
+        "ton": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "network": {
+          "type": "string",
+          "enum": [
+            "mainnet",
+            "testnet"
+          ],
+          "default": "testnet"
+        },
+        "json": {
+          "type": "boolean"
+        },
+        "showZero": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "type": "object"
+    },
+    "name": "query_balances",
+    "title": "Query Balances"
+  },
+  {
+    "description": "Query Cctx",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "hash": {
+          "type": "string"
+        },
+        "rpc": {
+          "type": "string",
+          "default": "https://zetachain-athens.blockpi.network/lcd/v1/public"
+        },
+        "delay": {
+          "type": "string",
+          "default": "2000"
+        },
+        "timeout": {
+          "type": "string",
+          "default": "0"
+        }
+      },
+      "type": "object",
+      "required": [
+        "hash"
+      ]
+    },
+    "name": "query_cctx",
+    "title": "Query Cctx"
+  },
+  {
+    "description": "Query Fees",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "api": {
+          "type": "string",
+          "default": "https://zetachain-athens.blockpi.network/lcd/v1/public"
+        },
+        "rpc": {
+          "type": "string",
+          "default": "https://zetachain-athens-evm.blockpi.network/v1/rpc/public"
+        },
+        "gasLimit": {
+          "type": "string"
+        },
+        "json": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "name": "query_fees",
+    "title": "Query Fees"
+  },
+  {
+    "description": "Query Tokens List",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "api": {
+          "type": "string",
+          "default": "https://zetachain-athens.blockpi.network/lcd/v1/public"
+        },
+        "json": {
+          "type": "boolean"
+        },
+        "columns": {
+          "type": "string",
+          "enum": [
+            "asset",
+            "type",
+            "decimals"
+          ],
+          "default": []
+        }
+      },
+      "type": "object"
+    },
+    "name": "query_tokens_list",
+    "title": "Query Tokens List"
+  },
+  {
+    "description": "Query Tokens Show",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "api": {
+          "type": "string",
+          "default": "https://zetachain-athens.blockpi.network/lcd/v1/public"
+        },
+        "symbol": {
+          "type": "string"
+        },
+        "field": {
+          "type": "string"
+        },
+        "json": {
+          "type": "boolean"
+        }
+      },
+      "type": "object",
+      "required": [
+        "symbol"
+      ]
+    },
+    "name": "query_tokens_show",
+    "title": "Query Tokens Show"
+  },
+  {
+    "description": "Query Chains List",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "api": {
+          "type": "string",
+          "default": "https://zetachain-athens.blockpi.network/lcd/v1/public"
+        },
+        "json": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "name": "query_chains_list",
+    "title": "Query Chains List"
+  },
+  {
+    "description": "Query Chains Show",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "apiTestnet": {
+          "type": "string",
+          "default": "https://zetachain-athens.blockpi.network/lcd/v1/public"
+        },
+        "apiMainnet": {
+          "type": "string",
+          "default": "https://zetachain.blockpi.network/lcd/v1/public"
+        },
+        "chainName": {
+          "type": "string"
+        },
+        "chainId": {
+          "type": "string"
+        },
+        "field": {
+          "type": "string"
+        },
+        "json": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "name": "query_chains_show",
+    "title": "Query Chains Show"
+  },
+  {
+    "description": "Faucet",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        }
+      },
+      "type": "object"
+    },
+    "name": "faucet",
+    "title": "Faucet"
+  },
+  {
+    "description": "Call a contract on a connected chain from ZetaChain",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "zrc20": {
+          "type": "string"
+        },
+        "receiver": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "chainId": {
+          "type": "string"
+        },
+        "privateKey": {
+          "type": "string"
+        },
+        "rpc": {
+          "type": "string"
+        },
+        "gateway": {
+          "type": "string"
+        },
+        "revertAddress": {
+          "type": "string",
+          "default": "0x0000000000000000000000000000000000000000"
+        },
+        "abortAddress": {
+          "type": "string",
+          "default": "0x0000000000000000000000000000000000000000"
+        },
+        "callOnRevert": {
+          "type": "boolean",
+          "default": false
+        },
+        "onRevertGasLimit": {
+          "type": "string",
+          "default": "1000000"
+        },
+        "revertMessage": {
+          "type": "string",
+          "default": "0x"
+        },
+        "txOptionsGasLimit": {
+          "type": "string",
+          "default": "1000000"
+        },
+        "txOptionsGasPrice": {
+          "type": "string",
+          "default": "10000000000"
+        },
+        "callOptionsGasLimit": {
+          "type": "string",
+          "default": "1000000"
+        },
+        "callOptionsIsArbitraryCall": {
+          "type": "boolean",
+          "default": false
+        },
+        "yes": {
+          "type": "boolean",
+          "default": false
+        },
+        "function": {
+          "type": "string"
+        },
+        "types": {
+          "type": "string"
+        },
+        "values": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "zrc20",
+        "receiver"
+      ]
+    },
+    "name": "zetachain_call",
+    "title": "Zetachain Call"
+  },
+  {
+    "description": "Withdraw tokens from ZetaChain to a connected chain",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "zrc20": {
+          "type": "string"
+        },
+        "receiver": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "chainId": {
+          "type": "string"
+        },
+        "privateKey": {
+          "type": "string"
+        },
+        "rpc": {
+          "type": "string"
+        },
+        "gateway": {
+          "type": "string"
+        },
+        "revertAddress": {
+          "type": "string",
+          "default": "0x0000000000000000000000000000000000000000"
+        },
+        "abortAddress": {
+          "type": "string",
+          "default": "0x0000000000000000000000000000000000000000"
+        },
+        "callOnRevert": {
+          "type": "boolean",
+          "default": false
+        },
+        "onRevertGasLimit": {
+          "type": "string",
+          "default": "1000000"
+        },
+        "revertMessage": {
+          "type": "string",
+          "default": "0x"
+        },
+        "txOptionsGasLimit": {
+          "type": "string",
+          "default": "1000000"
+        },
+        "txOptionsGasPrice": {
+          "type": "string",
+          "default": "10000000000"
+        },
+        "callOptionsGasLimit": {
+          "type": "string",
+          "default": "1000000"
+        },
+        "callOptionsIsArbitraryCall": {
+          "type": "boolean",
+          "default": false
+        },
+        "yes": {
+          "type": "boolean",
+          "default": false
+        },
+        "amount": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "zrc20",
+        "receiver",
+        "amount"
+      ]
+    },
+    "name": "zetachain_withdraw",
+    "title": "Zetachain Withdraw"
+  },
+  {
+    "description": "Withdraw tokens from ZetaChain and call a contract on a connected chain",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "zrc20": {
+          "type": "string"
+        },
+        "receiver": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "chainId": {
+          "type": "string"
+        },
+        "privateKey": {
+          "type": "string"
+        },
+        "rpc": {
+          "type": "string"
+        },
+        "gateway": {
+          "type": "string"
+        },
+        "revertAddress": {
+          "type": "string",
+          "default": "0x0000000000000000000000000000000000000000"
+        },
+        "abortAddress": {
+          "type": "string",
+          "default": "0x0000000000000000000000000000000000000000"
+        },
+        "callOnRevert": {
+          "type": "boolean",
+          "default": false
+        },
+        "onRevertGasLimit": {
+          "type": "string",
+          "default": "1000000"
+        },
+        "revertMessage": {
+          "type": "string",
+          "default": "0x"
+        },
+        "txOptionsGasLimit": {
+          "type": "string",
+          "default": "1000000"
+        },
+        "txOptionsGasPrice": {
+          "type": "string",
+          "default": "10000000000"
+        },
+        "callOptionsGasLimit": {
+          "type": "string",
+          "default": "1000000"
+        },
+        "callOptionsIsArbitraryCall": {
+          "type": "boolean",
+          "default": false
+        },
+        "yes": {
+          "type": "boolean",
+          "default": false
+        },
+        "amount": {
+          "type": "string"
+        },
+        "function": {
+          "type": "string"
+        },
+        "types": {
+          "type": "string"
+        },
+        "values": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "zrc20",
+        "receiver",
+        "amount"
+      ]
+    },
+    "name": "zetachain_withdraw-and-call",
+    "title": "Zetachain Withdraw-and-call"
+  },
+  {
+    "description": "Call a contract on ZetaChain from an EVM-compatible chain",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "chainId": {
+          "type": "string"
+        },
+        "receiver": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "privateKey": {
+          "type": "string"
+        },
+        "rpc": {
+          "type": "string"
+        },
+        "gateway": {
+          "type": "string"
+        },
+        "revertAddress": {
+          "type": "string"
+        },
+        "abortAddress": {
+          "type": "string",
+          "default": "0x0000000000000000000000000000000000000000"
+        },
+        "callOnRevert": {
+          "type": "boolean",
+          "default": false
+        },
+        "onRevertGasLimit": {
+          "type": "string",
+          "default": "200000"
+        },
+        "revertMessage": {
+          "type": "string",
+          "default": ""
+        },
+        "gasLimit": {
+          "type": "string"
+        },
+        "gasPrice": {
+          "type": "string"
+        },
+        "yes": {
+          "type": "boolean",
+          "default": false
+        },
+        "types": {
+          "type": "string"
+        },
+        "values": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "receiver",
+        "types",
+        "values"
+      ]
+    },
+    "name": "evm_call",
+    "title": "Evm Call"
+  },
+  {
+    "description": "Deposit tokens and call a contract on ZetaChain from an EVM-compatible chain",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "chainId": {
+          "type": "string"
+        },
+        "receiver": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "privateKey": {
+          "type": "string"
+        },
+        "rpc": {
+          "type": "string"
+        },
+        "gateway": {
+          "type": "string"
+        },
+        "revertAddress": {
+          "type": "string"
+        },
+        "abortAddress": {
+          "type": "string",
+          "default": "0x0000000000000000000000000000000000000000"
+        },
+        "callOnRevert": {
+          "type": "boolean",
+          "default": false
+        },
+        "onRevertGasLimit": {
+          "type": "string",
+          "default": "200000"
+        },
+        "revertMessage": {
+          "type": "string",
+          "default": ""
+        },
+        "gasLimit": {
+          "type": "string"
+        },
+        "gasPrice": {
+          "type": "string"
+        },
+        "yes": {
+          "type": "boolean",
+          "default": false
+        },
+        "amount": {
+          "type": "string"
+        },
+        "erc20": {
+          "type": "string"
+        },
+        "types": {
+          "type": "string"
+        },
+        "values": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "receiver",
+        "amount",
+        "types",
+        "values"
+      ]
+    },
+    "name": "evm_deposit-and-call",
+    "title": "Evm Deposit-and-call"
+  },
+  {
+    "description": "Deposit tokens to ZetaChain from an EVM-compatible chain",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "chainId": {
+          "type": "string"
+        },
+        "receiver": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "privateKey": {
+          "type": "string"
+        },
+        "rpc": {
+          "type": "string"
+        },
+        "gateway": {
+          "type": "string"
+        },
+        "revertAddress": {
+          "type": "string"
+        },
+        "abortAddress": {
+          "type": "string",
+          "default": "0x0000000000000000000000000000000000000000"
+        },
+        "callOnRevert": {
+          "type": "boolean",
+          "default": false
+        },
+        "onRevertGasLimit": {
+          "type": "string",
+          "default": "200000"
+        },
+        "revertMessage": {
+          "type": "string",
+          "default": ""
+        },
+        "gasLimit": {
+          "type": "string"
+        },
+        "gasPrice": {
+          "type": "string"
+        },
+        "yes": {
+          "type": "boolean",
+          "default": false
+        },
+        "amount": {
+          "type": "string"
+        },
+        "erc20": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "receiver",
+        "amount"
+      ]
+    },
+    "name": "evm_deposit",
+    "title": "Evm Deposit"
+  },
+  {
+    "description": "Solana Call",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "recipient": {
+          "type": "string"
+        },
+        "mnemonic": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "privateKey": {
+          "type": "string"
+        },
+        "chainId": {
+          "type": "string"
+        },
+        "revertAddress": {
+          "type": "string"
+        },
+        "abortAddress": {
+          "type": "string",
+          "default": "0x0000000000000000000000000000000000000000"
+        },
+        "callOnRevert": {
+          "type": "boolean",
+          "default": false
+        },
+        "revertMessage": {
+          "type": "string",
+          "default": ""
+        },
+        "onRevertGasLimit": {
+          "type": "string",
+          "default": "0"
+        },
+        "types": {
+          "type": "string"
+        },
+        "values": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "recipient",
+        "chainId",
+        "types",
+        "values"
+      ]
+    },
+    "name": "solana_call",
+    "title": "Solana Call"
+  },
+  {
+    "description": "Solana Deposit-and-call",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "recipient": {
+          "type": "string"
+        },
+        "mnemonic": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "privateKey": {
+          "type": "string"
+        },
+        "chainId": {
+          "type": "string"
+        },
+        "revertAddress": {
+          "type": "string"
+        },
+        "abortAddress": {
+          "type": "string",
+          "default": "0x0000000000000000000000000000000000000000"
+        },
+        "callOnRevert": {
+          "type": "boolean",
+          "default": false
+        },
+        "revertMessage": {
+          "type": "string",
+          "default": ""
+        },
+        "onRevertGasLimit": {
+          "type": "string",
+          "default": "0"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "tokenProgram": {
+          "type": "string",
+          "default": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        "types": {
+          "type": "string"
+        },
+        "values": {
+          "type": "string"
+        },
+        "mint": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "recipient",
+        "chainId",
+        "amount",
+        "types",
+        "values"
+      ]
+    },
+    "name": "solana_deposit-and-call",
+    "title": "Solana Deposit-and-call"
+  },
+  {
+    "description": "Deposit tokens from Solana",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "recipient": {
+          "type": "string"
+        },
+        "mnemonic": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "privateKey": {
+          "type": "string"
+        },
+        "chainId": {
+          "type": "string"
+        },
+        "revertAddress": {
+          "type": "string"
+        },
+        "abortAddress": {
+          "type": "string",
+          "default": "0x0000000000000000000000000000000000000000"
+        },
+        "callOnRevert": {
+          "type": "boolean",
+          "default": false
+        },
+        "revertMessage": {
+          "type": "string",
+          "default": ""
+        },
+        "onRevertGasLimit": {
+          "type": "string",
+          "default": "0"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "tokenProgram": {
+          "type": "string",
+          "default": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        "mint": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "recipient",
+        "chainId",
+        "amount"
+      ]
+    },
+    "name": "solana_deposit",
+    "title": "Solana Deposit"
+  },
+  {
+    "description": "Encode payload data for Solana",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "connected": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string"
+        },
+        "gateway": {
+          "type": "string"
+        },
+        "mint": {
+          "type": "string"
+        },
+        "accounts": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "connected",
+        "data",
+        "gateway"
+      ]
+    },
+    "name": "solana_encode",
+    "title": "Solana Encode"
+  },
+  {
+    "description": "Deposit tokens from Sui and call a contract on ZetaChain",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "mnemonic": {
+          "type": "string"
+        },
+        "privateKey": {
+          "type": "string"
+        },
+        "gatewayObject": {
+          "type": "string"
+        },
+        "gatewayPackage": {
+          "type": "string"
+        },
+        "receiver": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "chainId": {
+          "type": "string"
+        },
+        "coinType": {
+          "type": "string",
+          "default": "0x2::sui::SUI"
+        },
+        "gasBudget": {
+          "type": "string",
+          "default": "10000000"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "decimals": {
+          "type": "string",
+          "default": "9"
+        },
+        "values": {
+          "type": "string"
+        },
+        "types": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "receiver",
+        "amount",
+        "chainId"
+      ]
+    },
+    "name": "sui_deposit-and-call",
+    "title": "Sui Deposit-and-call"
+  },
+  {
+    "description": "Deposit tokens from Sui",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "mnemonic": {
+          "type": "string"
+        },
+        "privateKey": {
+          "type": "string"
+        },
+        "gatewayObject": {
+          "type": "string"
+        },
+        "gatewayPackage": {
+          "type": "string"
+        },
+        "receiver": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "chainId": {
+          "type": "string"
+        },
+        "coinType": {
+          "type": "string",
+          "default": "0x2::sui::SUI"
+        },
+        "gasBudget": {
+          "type": "string",
+          "default": "10000000"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "decimals": {
+          "type": "string",
+          "default": "9"
+        }
+      },
+      "type": "object",
+      "required": [
+        "receiver",
+        "amount",
+        "chainId"
+      ]
+    },
+    "name": "sui_deposit",
+    "title": "Sui Deposit"
+  },
+  {
+    "description": "Encode payload data for SUI",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "type": "string"
+        },
+        "typeArguments": {
+          "type": "string"
+        },
+        "objects": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "data"
+      ]
+    },
+    "name": "sui_encode",
+    "title": "Sui Encode"
+  },
+  {
+    "description": "Ton Deposit-and-call",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "mnemonic": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "gateway": {
+          "type": "string"
+        },
+        "receiver": {
+          "type": "string"
+        },
+        "rpc": {
+          "type": "string",
+          "default": "https://testnet.toncenter.com/api/v2/jsonRPC"
+        },
+        "apiKey": {
+          "type": "string"
+        },
+        "chainId": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "types": {
+          "type": "string"
+        },
+        "values": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "receiver",
+        "chainId",
+        "amount"
+      ]
+    },
+    "name": "ton_deposit-and-call",
+    "title": "Ton Deposit-and-call"
+  },
+  {
+    "description": "Ton Deposit",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "mnemonic": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "gateway": {
+          "type": "string"
+        },
+        "receiver": {
+          "type": "string"
+        },
+        "rpc": {
+          "type": "string",
+          "default": "https://testnet.toncenter.com/api/v2/jsonRPC"
+        },
+        "apiKey": {
+          "type": "string"
+        },
+        "chainId": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "receiver",
+        "chainId",
+        "amount"
+      ]
+    },
+    "name": "ton_deposit",
+    "title": "Ton Deposit"
+  },
+  {
+    "description": "Call a contract on ZetaChain",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "yes": {
+          "type": "boolean",
+          "default": false
+        },
+        "receiver": {
+          "type": "string"
+        },
+        "commitFee": {
+          "type": "string",
+          "default": "15000"
+        },
+        "gateway": {
+          "type": "string",
+          "default": "tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur"
+        },
+        "privateKey": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "revertAddress": {
+          "type": "string"
+        },
+        "network": {
+          "type": "string",
+          "enum": [
+            "signet",
+            "mainnet"
+          ],
+          "default": "signet"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "ABI",
+            "CompactLong",
+            "CompactShort"
+          ],
+          "default": "ABI"
+        },
+        "data": {
+          "type": "string"
+        },
+        "bitcoinApi": {
+          "type": "string",
+          "default": "https://mempool.space/signet/api"
+        },
+        "gasPriceApi": {
+          "type": "string",
+          "default": "https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/crosschain/gasPrice/18333"
+        },
+        "types": {
+          "type": "string"
+        },
+        "values": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "gateway"
+      ]
+    },
+    "name": "bitcoin_inscription_call",
+    "title": "Bitcoin Inscription Call"
+  },
+  {
+    "description": "Deposit BTC and call a contract on ZetaChain",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "yes": {
+          "type": "boolean",
+          "default": false
+        },
+        "receiver": {
+          "type": "string"
+        },
+        "commitFee": {
+          "type": "string",
+          "default": "15000"
+        },
+        "gateway": {
+          "type": "string",
+          "default": "tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur"
+        },
+        "privateKey": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "revertAddress": {
+          "type": "string"
+        },
+        "network": {
+          "type": "string",
+          "enum": [
+            "signet",
+            "mainnet"
+          ],
+          "default": "signet"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "ABI",
+            "CompactLong",
+            "CompactShort"
+          ],
+          "default": "ABI"
+        },
+        "data": {
+          "type": "string"
+        },
+        "bitcoinApi": {
+          "type": "string",
+          "default": "https://mempool.space/signet/api"
+        },
+        "gasPriceApi": {
+          "type": "string",
+          "default": "https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/crosschain/gasPrice/18333"
+        },
+        "types": {
+          "type": "string"
+        },
+        "values": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "gateway",
+        "amount"
+      ]
+    },
+    "name": "bitcoin_inscription_deposit-and-call",
+    "title": "Bitcoin Inscription Deposit-and-call"
+  },
+  {
+    "description": "Deposit BTC to ZetaChain",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "yes": {
+          "type": "boolean",
+          "default": false
+        },
+        "receiver": {
+          "type": "string"
+        },
+        "commitFee": {
+          "type": "string",
+          "default": "15000"
+        },
+        "gateway": {
+          "type": "string",
+          "default": "tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur"
+        },
+        "privateKey": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "revertAddress": {
+          "type": "string"
+        },
+        "network": {
+          "type": "string",
+          "enum": [
+            "signet",
+            "mainnet"
+          ],
+          "default": "signet"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "ABI",
+            "CompactLong",
+            "CompactShort"
+          ],
+          "default": "ABI"
+        },
+        "data": {
+          "type": "string"
+        },
+        "bitcoinApi": {
+          "type": "string",
+          "default": "https://mempool.space/signet/api"
+        },
+        "gasPriceApi": {
+          "type": "string",
+          "default": "https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/crosschain/gasPrice/18333"
+        },
+        "amount": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "gateway",
+        "amount"
+      ]
+    },
+    "name": "bitcoin_inscription_deposit",
+    "title": "Bitcoin Inscription Deposit"
+  },
+  {
+    "description": "Encode data for Bitcoin transactions using ABI encoding",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "receiver": {
+          "type": "string"
+        },
+        "types": {
+          "type": "string",
+          "default": []
+        },
+        "values": {
+          "type": "string",
+          "default": []
+        },
+        "revertAddress": {
+          "type": "string"
+        },
+        "opCode": {
+          "type": "string",
+          "enum": [
+            "Call",
+            "Deposit",
+            "DepositAndCall",
+            "Invalid"
+          ],
+          "default": "DepositAndCall"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "ABI",
+            "CompactLong",
+            "CompactShort"
+          ],
+          "default": "ABI"
+        }
+      },
+      "type": "object",
+      "required": [
+        "receiver",
+        "revertAddress"
+      ]
+    },
+    "name": "bitcoin_inscription_encode",
+    "title": "Bitcoin Inscription Encode"
+  },
+  {
+    "description": "Call a contract on ZetaChain",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "yes": {
+          "type": "boolean",
+          "default": false
+        },
+        "receiver": {
+          "type": "string"
+        },
+        "commitFee": {
+          "type": "string",
+          "default": "15000"
+        },
+        "gateway": {
+          "type": "string",
+          "default": "tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur"
+        },
+        "privateKey": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "data": {
+          "type": "string"
+        },
+        "networkFee": {
+          "type": "string",
+          "default": "1750"
+        },
+        "network": {
+          "type": "string",
+          "enum": [
+            "signet",
+            "mainnet"
+          ],
+          "default": "signet"
+        },
+        "bitcoinApi": {
+          "type": "string",
+          "default": "https://mempool.space/signet/api"
+        },
+        "gasPriceApi": {
+          "type": "string",
+          "default": "https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/crosschain/gasPrice/18333"
+        }
+      },
+      "type": "object",
+      "required": [
+        "gateway"
+      ]
+    },
+    "name": "bitcoin_memo_call",
+    "title": "Bitcoin Memo Call"
+  },
+  {
+    "description": "Deposit BTC and call a contract on ZetaChain",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "yes": {
+          "type": "boolean",
+          "default": false
+        },
+        "receiver": {
+          "type": "string"
+        },
+        "commitFee": {
+          "type": "string",
+          "default": "15000"
+        },
+        "gateway": {
+          "type": "string",
+          "default": "tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur"
+        },
+        "privateKey": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "data": {
+          "type": "string"
+        },
+        "networkFee": {
+          "type": "string",
+          "default": "1750"
+        },
+        "network": {
+          "type": "string",
+          "enum": [
+            "signet",
+            "mainnet"
+          ],
+          "default": "signet"
+        },
+        "bitcoinApi": {
+          "type": "string",
+          "default": "https://mempool.space/signet/api"
+        },
+        "gasPriceApi": {
+          "type": "string",
+          "default": "https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/crosschain/gasPrice/18333"
+        },
+        "amount": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "gateway",
+        "amount"
+      ]
+    },
+    "name": "bitcoin_memo_deposit-and-call",
+    "title": "Bitcoin Memo Deposit-and-call"
+  },
+  {
+    "description": "Deposit BTC to ZetaChain",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "yes": {
+          "type": "boolean",
+          "default": false
+        },
+        "receiver": {
+          "type": "string"
+        },
+        "commitFee": {
+          "type": "string",
+          "default": "15000"
+        },
+        "gateway": {
+          "type": "string",
+          "default": "tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur"
+        },
+        "privateKey": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "default": "default"
+        },
+        "data": {
+          "type": "string"
+        },
+        "networkFee": {
+          "type": "string",
+          "default": "1750"
+        },
+        "network": {
+          "type": "string",
+          "enum": [
+            "signet",
+            "mainnet"
+          ],
+          "default": "signet"
+        },
+        "bitcoinApi": {
+          "type": "string",
+          "default": "https://mempool.space/signet/api"
+        },
+        "gasPriceApi": {
+          "type": "string",
+          "default": "https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/crosschain/gasPrice/18333"
+        },
+        "amount": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "gateway",
+        "amount"
+      ]
+    },
+    "name": "bitcoin_memo_deposit",
+    "title": "Bitcoin Memo Deposit"
+  },
+  {
+    "description": "Localnet Start",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "port": {
+          "type": "string",
+          "default": "8545"
+        },
+        "anvil": {
+          "type": "string",
+          "default": "-q"
+        },
+        "forceKill": {
+          "type": "boolean",
+          "default": false
+        },
+        "stopAfterInit": {
+          "type": "boolean",
+          "default": false
+        },
+        "exitOnError": {
+          "type": "boolean",
+          "default": false
+        },
+        "verbosity": {
+          "type": "string",
+          "enum": [
+            "emerg",
+            "alert",
+            "crit",
+            "error",
+            "warning",
+            "notice",
+            "info",
+            "debug"
+          ],
+          "default": "info"
+        },
+        "chains": {
+          "type": "string",
+          "enum": [
+            "ton",
+            "solana",
+            "sui"
+          ],
+          "default": []
+        }
+      },
+      "type": "object"
+    },
+    "name": "localnet_start",
+    "title": "Localnet Start"
+  },
+  {
+    "description": "Localnet Stop",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "name": "localnet_stop",
+    "title": "Localnet Stop"
+  },
+  {
+    "description": "Localnet Check",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "delay": {
+          "type": "string",
+          "default": "3"
+        }
+      },
+      "type": "object"
+    },
+    "name": "localnet_check",
+    "title": "Localnet Check"
+  },
+  {
+    "description": "Localnet Ton Balance",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "address": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "address"
+      ]
+    },
+    "name": "localnet_ton_balance",
+    "title": "Localnet Ton Balance"
+  },
+  {
+    "description": "Localnet Ton Faucet",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string",
+          "default": "100"
+        }
+      },
+      "type": "object",
+      "required": [
+        "address"
+      ]
+    },
+    "name": "localnet_ton_faucet",
+    "title": "Localnet Ton Faucet"
+  },
+  {
+    "description": "Localnet Ton Wallet",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "type": "string",
+          "default": "100"
+        }
+      },
+      "type": "object"
+    },
+    "name": "localnet_ton_wallet",
+    "title": "Localnet Ton Wallet"
+  },
+  {
+    "description": "Localnet Ton Withdraw",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string",
+          "default": "1"
+        },
+        "privateKey": {
+          "type": "string"
+        },
+        "gateway": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "port": {
+          "type": "string",
+          "default": "8545"
+        }
+      },
+      "type": "object",
+      "required": [
+        "address",
+        "privateKey",
+        "gateway",
+        "token"
+      ]
+    },
+    "name": "localnet_ton_withdraw",
+    "title": "Localnet Ton Withdraw"
+  },
+  {
+    "description": "Mcp Install",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "client": {
+          "type": "string",
+          "enum": [
+            "claude",
+            "cursor"
+          ]
+        }
+      },
+      "type": "object",
+      "required": [
+        "client"
+      ]
+    },
+    "name": "mcp_install",
+    "title": "Mcp Install"
+  },
+  {
+    "description": "Mcp Remove",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "client": {
+          "type": "string",
+          "enum": [
+            "claude",
+            "cursor"
+          ]
+        }
+      },
+      "type": "object",
+      "required": [
+        "client"
+      ]
+    },
+    "name": "mcp_remove",
+    "title": "Mcp Remove"
+  },
+  {
+    "description": "Mcp List",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "name": "mcp_list",
+    "title": "Mcp List"
+  },
+  {
+    "description": "Docs",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "json": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "name": "docs",
+    "title": "Docs"
+  }
+]

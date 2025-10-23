@@ -4,7 +4,7 @@ import fs from "fs";
 import { EventMessage, PostHog } from "posthog-node";
 import { v4 as uuid } from "uuid";
 
-import { getFullCommandPath } from "./commands/docs";
+import { getFullCommandPath } from "./commands/docs/outputJSON";
 import {
   POSTHOG_API_KEY,
   POSTHOG_ENDPOINT,

@@ -16,6 +16,7 @@ import { Command } from "commander";
 import { setupAnalytics } from "./analytics";
 import { askCommand } from "./commands/ask";
 import { docsCommand } from "./commands/docs";
+import { mcpCommand } from "./commands/mcp";
 import { newCommand } from "./commands/new";
 import config from "./config.json";
 
@@ -39,6 +40,7 @@ program.addCommand(suiCommand);
 program.addCommand(tonCommand);
 program.addCommand(bitcoinCommand);
 program.addCommand(localnetCommand);
+program.addCommand(mcpCommand);
 program.addCommand(docsCommand);
 program.addCommand(askCommand);
 

@@ -1,4 +1,4 @@
-name: Generate docs
+name: Generate docs and JSON for MCP
 
 on:
   pull_request:
@@ -20,9 +20,9 @@ jobs:
 
       - name: Check for changes
         run: |
-          if git diff --exit-code --ignore-space-change --ignore-all-space --ignore-cr-at-eol -- docs/index.md; then
-            echo "Docs are up-to-date."
+          if git diff --exit-code --ignore-space-change --ignore-all-space --ignore-cr-at-eol -- docs/index.md src/mcp/commands.json; then
+            echo "Docs and commands.json are up-to-date."
           else
-            echo "::error::Docs are not up-to-date. Please run 'yarn docs' locally and commit any changes."
+            echo "::error::Docs or commands.json are not up-to-date. Please run 'yarn docs' locally and commit any changes."
             exit 1
           fi
