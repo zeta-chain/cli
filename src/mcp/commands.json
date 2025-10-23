@@ -5,13 +5,16 @@
       "additionalProperties": false,
       "properties": {
         "verbose": {
-          "type": "boolean"
+          "type": "boolean",
+          "summary": "Enable verbose logging"
         },
         "output": {
-          "type": "string"
+          "type": "string",
+          "summary": "Specify custom output directory or name"
         },
         "project": {
-          "type": "string"
+          "type": "string",
+          "summary": "Specify the example project to use and skip the prompt"
         }
       },
       "type": "object"
@@ -32,10 +35,12 @@
             "sui",
             "bitcoin",
             "ton"
-          ]
+          ],
+          "summary": "Account type"
         },
         "name": {
           "type": "string",
+          "summary": "Account name",
           "default": "default"
         }
       },
@@ -57,10 +62,12 @@
             "sui",
             "bitcoin",
             "ton"
-          ]
+          ],
+          "summary": "Account type"
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "summary": "Account name"
         }
       },
       "type": "object",
@@ -84,17 +91,21 @@
             "sui",
             "bitcoin",
             "ton"
-          ]
+          ],
+          "summary": "Account type"
         },
         "name": {
           "type": "string",
+          "summary": "Account name",
           "default": "default"
         },
         "privateKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "Private key in hex format"
         },
         "mnemonic": {
-          "type": "string"
+          "type": "string",
+          "summary": "Mnemonic phrase"
         }
       },
       "type": "object"
@@ -108,7 +119,8 @@
       "additionalProperties": false,
       "properties": {
         "json": {
-          "type": "boolean"
+          "type": "boolean",
+          "summary": "Output in JSON format"
         }
       },
       "type": "object"
@@ -129,10 +141,12 @@
             "sui",
             "bitcoin",
             "ton"
-          ]
+          ],
+          "summary": "Account type"
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "summary": "Account name"
         }
       },
       "type": "object",
@@ -149,22 +163,28 @@
       "additionalProperties": false,
       "properties": {
         "evm": {
-          "type": "string"
+          "type": "string",
+          "summary": "Fetch balances for a specific EVM address"
         },
         "solana": {
-          "type": "string"
+          "type": "string",
+          "summary": "Fetch balances for a specific Solana address"
         },
         "bitcoin": {
-          "type": "string"
+          "type": "string",
+          "summary": "Fetch balances for a specific Bitcoin address"
         },
         "sui": {
-          "type": "string"
+          "type": "string",
+          "summary": "Fetch balances for a specific Sui address"
         },
         "ton": {
-          "type": "string"
+          "type": "string",
+          "summary": "Fetch balances for a specific TON address"
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "summary": "Account name"
         },
         "network": {
           "type": "string",
@@ -172,13 +192,16 @@
             "mainnet",
             "testnet"
           ],
+          "summary": "Network to use",
           "default": "testnet"
         },
         "json": {
-          "type": "boolean"
+          "type": "boolean",
+          "summary": "Output balances as JSON"
         },
         "showZero": {
           "type": "boolean",
+          "summary": "Include zero balances",
           "default": false
         }
       },
@@ -193,18 +216,22 @@
       "additionalProperties": false,
       "properties": {
         "hash": {
-          "type": "string"
+          "type": "string",
+          "summary": "Inbound transaction hash"
         },
         "rpc": {
           "type": "string",
+          "summary": "RPC endpoint",
           "default": "https://zetachain-athens.blockpi.network/lcd/v1/public"
         },
         "delay": {
           "type": "string",
+          "summary": "Delay between polling rounds in milliseconds",
           "default": "2000"
         },
         "timeout": {
           "type": "string",
+          "summary": "Timeout duration in milliseconds (default: indefinite)",
           "default": "0"
         }
       },
@@ -223,17 +250,21 @@
       "properties": {
         "api": {
           "type": "string",
+          "summary": "API endpoint URL",
           "default": "https://zetachain-athens.blockpi.network/lcd/v1/public"
         },
         "rpc": {
           "type": "string",
+          "summary": "RPC endpoint URL",
           "default": "https://zetachain-athens-evm.blockpi.network/v1/rpc/public"
         },
         "gasLimit": {
-          "type": "string"
+          "type": "string",
+          "summary": "Gas limit for withdraw and call"
         },
         "json": {
-          "type": "boolean"
+          "type": "boolean",
+          "summary": "Output results in JSON format"
         }
       },
       "type": "object"
@@ -248,18 +279,24 @@
       "properties": {
         "api": {
           "type": "string",
+          "summary": "API endpoint URL",
           "default": "https://zetachain-athens.blockpi.network/lcd/v1/public"
         },
         "json": {
-          "type": "boolean"
+          "type": "boolean",
+          "summary": "Output tokens as JSON"
         },
         "columns": {
-          "type": "string",
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
           "enum": [
             "asset",
             "type",
             "decimals"
           ],
+          "summary": "Additional columns to show (variadic: pass as space-separated values, not JSON array)",
           "default": []
         }
       },
@@ -275,16 +312,20 @@
       "properties": {
         "api": {
           "type": "string",
+          "summary": "API endpoint URL",
           "default": "https://zetachain-athens.blockpi.network/lcd/v1/public"
         },
         "symbol": {
-          "type": "string"
+          "type": "string",
+          "summary": "Token symbol (e.g., POL.AMOY, USDC.BSC)"
         },
         "field": {
-          "type": "string"
+          "type": "string",
+          "summary": "Return specific field value (for scripting). Use 'zrc20' as shorthand for 'zrc20_contract_address'"
         },
         "json": {
-          "type": "boolean"
+          "type": "boolean",
+          "summary": "Output token as JSON"
         }
       },
       "type": "object",
@@ -302,10 +343,12 @@
       "properties": {
         "api": {
           "type": "string",
+          "summary": "API endpoint URL",
           "default": "https://zetachain-athens.blockpi.network/lcd/v1/public"
         },
         "json": {
-          "type": "boolean"
+          "type": "boolean",
+          "summary": "Output chains as JSON"
         }
       },
       "type": "object"
@@ -320,23 +363,29 @@
       "properties": {
         "apiTestnet": {
           "type": "string",
+          "summary": "Testnet API endpoint URL",
           "default": "https://zetachain-athens.blockpi.network/lcd/v1/public"
         },
         "apiMainnet": {
           "type": "string",
+          "summary": "Mainnet API endpoint URL",
           "default": "https://zetachain.blockpi.network/lcd/v1/public"
         },
         "chainName": {
-          "type": "string"
+          "type": "string",
+          "summary": "Chain name"
         },
         "chainId": {
-          "type": "string"
+          "type": "string",
+          "summary": "Chain ID"
         },
         "field": {
-          "type": "string"
+          "type": "string",
+          "summary": "Return specific field value (for scripting)"
         },
         "json": {
-          "type": "boolean"
+          "type": "boolean",
+          "summary": "Output chain as JSON"
         }
       },
       "type": "object"
@@ -350,10 +399,12 @@
       "additionalProperties": false,
       "properties": {
         "address": {
-          "type": "string"
+          "type": "string",
+          "summary": "Recipient address."
         },
         "name": {
           "type": "string",
+          "summary": "Account name to use if address not provided",
           "default": "default"
         }
       },
@@ -368,78 +419,105 @@
       "additionalProperties": false,
       "properties": {
         "zrc20": {
-          "type": "string"
+          "type": "string",
+          "summary": "The address of ZRC-20 to pay fees"
         },
         "receiver": {
-          "type": "string"
+          "type": "string",
+          "summary": "The address of the receiver contract on a connected chain. Non-hex strings will be automatically encoded to hex."
         },
         "name": {
           "type": "string",
+          "summary": "Account name",
           "default": "default"
         },
         "chainId": {
-          "type": "string"
+          "type": "string",
+          "summary": "Chain ID of the network"
         },
         "privateKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "Private key for signing transactions"
         },
         "rpc": {
-          "type": "string"
+          "type": "string",
+          "summary": "RPC URL of the network"
         },
         "gateway": {
-          "type": "string"
+          "type": "string",
+          "summary": "Gateway contract address on ZetaChain"
         },
         "revertAddress": {
           "type": "string",
+          "summary": "Revert address",
           "default": "0x0000000000000000000000000000000000000000"
         },
         "abortAddress": {
           "type": "string",
+          "summary": "Abort address",
           "default": "0x0000000000000000000000000000000000000000"
         },
         "callOnRevert": {
           "type": "boolean",
+          "summary": "Whether to call on revert",
           "default": false
         },
         "onRevertGasLimit": {
           "type": "string",
+          "summary": "Gas limit for the revert transaction",
           "default": "1000000"
         },
         "revertMessage": {
           "type": "string",
+          "summary": "Revert message",
           "default": "0x"
         },
         "txOptionsGasLimit": {
           "type": "string",
+          "summary": "Gas limit for the transaction",
           "default": "1000000"
         },
         "txOptionsGasPrice": {
           "type": "string",
+          "summary": "Gas price for the transaction",
           "default": "10000000000"
         },
         "callOptionsGasLimit": {
           "type": "string",
+          "summary": "Gas limit for the call",
           "default": "1000000"
         },
         "callOptionsIsArbitraryCall": {
           "type": "boolean",
+          "summary": "Call any function",
           "default": false
         },
         "yes": {
           "type": "boolean",
+          "summary": "Skip confirmation prompt",
           "default": false
         },
         "function": {
-          "type": "string"
+          "type": "string",
+          "summary": "Function to call (example: \"hello(string)\")"
         },
         "types": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "List of parameter types (e.g. uint256 address) (variadic: pass as space-separated values, not JSON array)"
         },
         "values": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "Parameter values for the function call (variadic: pass as space-separated values, not JSON array)"
         },
         "data": {
-          "type": "string"
+          "type": "string",
+          "summary": "Raw data for non-EVM chains like Solana"
         }
       },
       "type": "object",
@@ -457,69 +535,87 @@
       "additionalProperties": false,
       "properties": {
         "zrc20": {
-          "type": "string"
+          "type": "string",
+          "summary": "The address of ZRC-20 to pay fees"
         },
         "receiver": {
-          "type": "string"
+          "type": "string",
+          "summary": "The address of the receiver contract on a connected chain. Non-hex strings will be automatically encoded to hex."
         },
         "name": {
           "type": "string",
+          "summary": "Account name",
           "default": "default"
         },
         "chainId": {
-          "type": "string"
+          "type": "string",
+          "summary": "Chain ID of the network"
         },
         "privateKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "Private key for signing transactions"
         },
         "rpc": {
-          "type": "string"
+          "type": "string",
+          "summary": "RPC URL of the network"
         },
         "gateway": {
-          "type": "string"
+          "type": "string",
+          "summary": "Gateway contract address on ZetaChain"
         },
         "revertAddress": {
           "type": "string",
+          "summary": "Revert address",
           "default": "0x0000000000000000000000000000000000000000"
         },
         "abortAddress": {
           "type": "string",
+          "summary": "Abort address",
           "default": "0x0000000000000000000000000000000000000000"
         },
         "callOnRevert": {
           "type": "boolean",
+          "summary": "Whether to call on revert",
           "default": false
         },
         "onRevertGasLimit": {
           "type": "string",
+          "summary": "Gas limit for the revert transaction",
           "default": "1000000"
         },
         "revertMessage": {
           "type": "string",
+          "summary": "Revert message",
           "default": "0x"
         },
         "txOptionsGasLimit": {
           "type": "string",
+          "summary": "Gas limit for the transaction",
           "default": "1000000"
         },
         "txOptionsGasPrice": {
           "type": "string",
+          "summary": "Gas price for the transaction",
           "default": "10000000000"
         },
         "callOptionsGasLimit": {
           "type": "string",
+          "summary": "Gas limit for the call",
           "default": "1000000"
         },
         "callOptionsIsArbitraryCall": {
           "type": "boolean",
+          "summary": "Call any function",
           "default": false
         },
         "yes": {
           "type": "boolean",
+          "summary": "Skip confirmation prompt",
           "default": false
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "summary": "The amount of tokens to withdraw"
         }
       },
       "type": "object",
@@ -538,81 +634,109 @@
       "additionalProperties": false,
       "properties": {
         "zrc20": {
-          "type": "string"
+          "type": "string",
+          "summary": "The address of ZRC-20 to pay fees"
         },
         "receiver": {
-          "type": "string"
+          "type": "string",
+          "summary": "The address of the receiver contract on a connected chain. Non-hex strings will be automatically encoded to hex."
         },
         "name": {
           "type": "string",
+          "summary": "Account name",
           "default": "default"
         },
         "chainId": {
-          "type": "string"
+          "type": "string",
+          "summary": "Chain ID of the network"
         },
         "privateKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "Private key for signing transactions"
         },
         "rpc": {
-          "type": "string"
+          "type": "string",
+          "summary": "RPC URL of the network"
         },
         "gateway": {
-          "type": "string"
+          "type": "string",
+          "summary": "Gateway contract address on ZetaChain"
         },
         "revertAddress": {
           "type": "string",
+          "summary": "Revert address",
           "default": "0x0000000000000000000000000000000000000000"
         },
         "abortAddress": {
           "type": "string",
+          "summary": "Abort address",
           "default": "0x0000000000000000000000000000000000000000"
         },
         "callOnRevert": {
           "type": "boolean",
+          "summary": "Whether to call on revert",
           "default": false
         },
         "onRevertGasLimit": {
           "type": "string",
+          "summary": "Gas limit for the revert transaction",
           "default": "1000000"
         },
         "revertMessage": {
           "type": "string",
+          "summary": "Revert message",
           "default": "0x"
         },
         "txOptionsGasLimit": {
           "type": "string",
+          "summary": "Gas limit for the transaction",
           "default": "1000000"
         },
         "txOptionsGasPrice": {
           "type": "string",
+          "summary": "Gas price for the transaction",
           "default": "10000000000"
         },
         "callOptionsGasLimit": {
           "type": "string",
+          "summary": "Gas limit for the call",
           "default": "1000000"
         },
         "callOptionsIsArbitraryCall": {
           "type": "boolean",
+          "summary": "Call any function",
           "default": false
         },
         "yes": {
           "type": "boolean",
+          "summary": "Skip confirmation prompt",
           "default": false
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "summary": "The amount of tokens to withdraw"
         },
         "function": {
-          "type": "string"
+          "type": "string",
+          "summary": "Function to call (example: \"hello(string)\")"
         },
         "types": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "List of parameter types (e.g. uint256 address) (variadic: pass as space-separated values, not JSON array)"
         },
         "values": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "Parameter values for the function call (variadic: pass as space-separated values, not JSON array)"
         },
         "data": {
-          "type": "string"
+          "type": "string",
+          "summary": "Raw data for non-EVM chains like Solana"
         }
       },
       "type": "object",
@@ -631,58 +755,80 @@
       "additionalProperties": false,
       "properties": {
         "chainId": {
-          "type": "string"
+          "type": "string",
+          "summary": "Chain ID of the network"
         },
         "receiver": {
-          "type": "string"
+          "type": "string",
+          "summary": "Receiver address on ZetaChain"
         },
         "name": {
           "type": "string",
+          "summary": "Account name",
           "default": "default"
         },
         "privateKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "Private key for signing transactions"
         },
         "rpc": {
-          "type": "string"
+          "type": "string",
+          "summary": "RPC URL for the source chain"
         },
         "gateway": {
-          "type": "string"
+          "type": "string",
+          "summary": "EVM Gateway address"
         },
         "revertAddress": {
-          "type": "string"
+          "type": "string",
+          "summary": "Address to revert to in case of failure (default: signer address)"
         },
         "abortAddress": {
           "type": "string",
+          "summary": "Address to receive funds if aborted",
           "default": "0x0000000000000000000000000000000000000000"
         },
         "callOnRevert": {
           "type": "boolean",
+          "summary": "Whether to call revert address on failure",
           "default": false
         },
         "onRevertGasLimit": {
           "type": "string",
+          "summary": "Gas limit for revert operation",
           "default": "200000"
         },
         "revertMessage": {
           "type": "string",
+          "summary": "Message to include in revert",
           "default": ""
         },
         "gasLimit": {
-          "type": "string"
+          "type": "string",
+          "summary": "Gas limit for the transaction"
         },
         "gasPrice": {
-          "type": "string"
+          "type": "string",
+          "summary": "Gas price for the transaction"
         },
         "yes": {
           "type": "boolean",
+          "summary": "Skip confirmation prompt",
           "default": false
         },
         "types": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "List of parameter types (e.g. uint256 address) (variadic: pass as space-separated values, not JSON array)"
         },
         "values": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "Parameter values for the function call (variadic: pass as space-separated values, not JSON array)"
         }
       },
       "type": "object",
@@ -701,64 +847,88 @@
       "additionalProperties": false,
       "properties": {
         "chainId": {
-          "type": "string"
+          "type": "string",
+          "summary": "Chain ID of the network"
         },
         "receiver": {
-          "type": "string"
+          "type": "string",
+          "summary": "Receiver address on ZetaChain"
         },
         "name": {
           "type": "string",
+          "summary": "Account name",
           "default": "default"
         },
         "privateKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "Private key for signing transactions"
         },
         "rpc": {
-          "type": "string"
+          "type": "string",
+          "summary": "RPC URL for the source chain"
         },
         "gateway": {
-          "type": "string"
+          "type": "string",
+          "summary": "EVM Gateway address"
         },
         "revertAddress": {
-          "type": "string"
+          "type": "string",
+          "summary": "Address to revert to in case of failure (default: signer address)"
         },
         "abortAddress": {
           "type": "string",
+          "summary": "Address to receive funds if aborted",
           "default": "0x0000000000000000000000000000000000000000"
         },
         "callOnRevert": {
           "type": "boolean",
+          "summary": "Whether to call revert address on failure",
           "default": false
         },
         "onRevertGasLimit": {
           "type": "string",
+          "summary": "Gas limit for revert operation",
           "default": "200000"
         },
         "revertMessage": {
           "type": "string",
+          "summary": "Message to include in revert",
           "default": ""
         },
         "gasLimit": {
-          "type": "string"
+          "type": "string",
+          "summary": "Gas limit for the transaction"
         },
         "gasPrice": {
-          "type": "string"
+          "type": "string",
+          "summary": "Gas price for the transaction"
         },
         "yes": {
           "type": "boolean",
+          "summary": "Skip confirmation prompt",
           "default": false
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "summary": "Amount of tokens to deposit"
         },
         "erc20": {
-          "type": "string"
+          "type": "string",
+          "summary": "ERC20 token address (optional for native token deposits)"
         },
         "types": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "List of parameter types (e.g. uint256 address) (variadic: pass as space-separated values, not JSON array)"
         },
         "values": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "Parameter values for the function call (variadic: pass as space-separated values, not JSON array)"
         }
       },
       "type": "object",
@@ -778,58 +948,74 @@
       "additionalProperties": false,
       "properties": {
         "chainId": {
-          "type": "string"
+          "type": "string",
+          "summary": "Chain ID of the network"
         },
         "receiver": {
-          "type": "string"
+          "type": "string",
+          "summary": "Receiver address on ZetaChain"
         },
         "name": {
           "type": "string",
+          "summary": "Account name",
           "default": "default"
         },
         "privateKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "Private key for signing transactions"
         },
         "rpc": {
-          "type": "string"
+          "type": "string",
+          "summary": "RPC URL for the source chain"
         },
         "gateway": {
-          "type": "string"
+          "type": "string",
+          "summary": "EVM Gateway address"
         },
         "revertAddress": {
-          "type": "string"
+          "type": "string",
+          "summary": "Address to revert to in case of failure (default: signer address)"
         },
         "abortAddress": {
           "type": "string",
+          "summary": "Address to receive funds if aborted",
           "default": "0x0000000000000000000000000000000000000000"
         },
         "callOnRevert": {
           "type": "boolean",
+          "summary": "Whether to call revert address on failure",
           "default": false
         },
         "onRevertGasLimit": {
           "type": "string",
+          "summary": "Gas limit for revert operation",
           "default": "200000"
         },
         "revertMessage": {
           "type": "string",
+          "summary": "Message to include in revert",
           "default": ""
         },
         "gasLimit": {
-          "type": "string"
+          "type": "string",
+          "summary": "Gas limit for the transaction"
         },
         "gasPrice": {
-          "type": "string"
+          "type": "string",
+          "summary": "Gas price for the transaction"
         },
         "yes": {
           "type": "boolean",
+          "summary": "Skip confirmation prompt",
           "default": false
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "summary": "Amount of tokens to deposit"
         },
         "erc20": {
-          "type": "string"
+          "type": "string",
+          "summary": "ERC20 token address (optional for native token deposits)"
         }
       },
       "type": "object",
@@ -847,45 +1033,63 @@
       "additionalProperties": false,
       "properties": {
         "recipient": {
-          "type": "string"
+          "type": "string",
+          "summary": "EOA or contract address on ZetaChain"
         },
         "mnemonic": {
-          "type": "string"
+          "type": "string",
+          "summary": "Mnemonic"
         },
         "name": {
           "type": "string",
+          "summary": "Name of the wallet",
           "default": "default"
         },
         "privateKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "Private key in base58 or hex format (with optional 0x prefix)"
         },
         "chainId": {
-          "type": "string"
+          "type": "string",
+          "summary": "Chain ID of the network"
         },
         "revertAddress": {
-          "type": "string"
+          "type": "string",
+          "summary": "Revert address"
         },
         "abortAddress": {
           "type": "string",
+          "summary": "Abort address",
           "default": "0x0000000000000000000000000000000000000000"
         },
         "callOnRevert": {
           "type": "boolean",
+          "summary": "Call on revert",
           "default": false
         },
         "revertMessage": {
           "type": "string",
+          "summary": "Revert message",
           "default": ""
         },
         "onRevertGasLimit": {
           "type": "string",
+          "summary": "On revert gas limit",
           "default": "0"
         },
         "types": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "List of parameter types (e.g. uint256 address) (variadic: pass as space-separated values, not JSON array)"
         },
         "values": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "Parameter values for the function call (variadic: pass as space-separated values, not JSON array)"
         }
       },
       "type": "object",
@@ -905,55 +1109,76 @@
       "additionalProperties": false,
       "properties": {
         "recipient": {
-          "type": "string"
+          "type": "string",
+          "summary": "EOA or contract address on ZetaChain"
         },
         "mnemonic": {
-          "type": "string"
+          "type": "string",
+          "summary": "Mnemonic"
         },
         "name": {
           "type": "string",
+          "summary": "Name of the wallet",
           "default": "default"
         },
         "privateKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "Private key in base58 or hex format (with optional 0x prefix)"
         },
         "chainId": {
-          "type": "string"
+          "type": "string",
+          "summary": "Chain ID of the network"
         },
         "revertAddress": {
-          "type": "string"
+          "type": "string",
+          "summary": "Revert address"
         },
         "abortAddress": {
           "type": "string",
+          "summary": "Abort address",
           "default": "0x0000000000000000000000000000000000000000"
         },
         "callOnRevert": {
           "type": "boolean",
+          "summary": "Call on revert",
           "default": false
         },
         "revertMessage": {
           "type": "string",
+          "summary": "Revert message",
           "default": ""
         },
         "onRevertGasLimit": {
           "type": "string",
+          "summary": "On revert gas limit",
           "default": "0"
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "summary": "Amount of tokens to deposit"
         },
         "tokenProgram": {
           "type": "string",
+          "summary": "Token program",
           "default": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         "types": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "List of parameter types (e.g. uint256 address) (variadic: pass as space-separated values, not JSON array)"
         },
         "values": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "Parameter values for the function call (variadic: pass as space-separated values, not JSON array)"
         },
         "mint": {
-          "type": "string"
+          "type": "string",
+          "summary": "SPL token mint address"
         }
       },
       "type": "object",
@@ -974,49 +1199,62 @@
       "additionalProperties": false,
       "properties": {
         "recipient": {
-          "type": "string"
+          "type": "string",
+          "summary": "EOA or contract address on ZetaChain"
         },
         "mnemonic": {
-          "type": "string"
+          "type": "string",
+          "summary": "Mnemonic"
         },
         "name": {
           "type": "string",
+          "summary": "Name of the wallet",
           "default": "default"
         },
         "privateKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "Private key in base58 or hex format (with optional 0x prefix)"
         },
         "chainId": {
-          "type": "string"
+          "type": "string",
+          "summary": "Chain ID of the network"
         },
         "revertAddress": {
-          "type": "string"
+          "type": "string",
+          "summary": "Revert address"
         },
         "abortAddress": {
           "type": "string",
+          "summary": "Abort address",
           "default": "0x0000000000000000000000000000000000000000"
         },
         "callOnRevert": {
           "type": "boolean",
+          "summary": "Call on revert",
           "default": false
         },
         "revertMessage": {
           "type": "string",
+          "summary": "Revert message",
           "default": ""
         },
         "onRevertGasLimit": {
           "type": "string",
+          "summary": "On revert gas limit",
           "default": "0"
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "summary": "Amount of tokens to deposit"
         },
         "tokenProgram": {
           "type": "string",
+          "summary": "Token program",
           "default": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         "mint": {
-          "type": "string"
+          "type": "string",
+          "summary": "SPL token mint address"
         }
       },
       "type": "object",
@@ -1035,19 +1273,27 @@
       "additionalProperties": false,
       "properties": {
         "connected": {
-          "type": "string"
+          "type": "string",
+          "summary": "Connected PDA account address"
         },
         "data": {
-          "type": "string"
+          "type": "string",
+          "summary": "Data to encode"
         },
         "gateway": {
-          "type": "string"
+          "type": "string",
+          "summary": "Gateway program address"
         },
         "mint": {
-          "type": "string"
+          "type": "string",
+          "summary": "Mint address for SPL token operations"
         },
         "accounts": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "Additional accounts in format 'address:isWritable' (variadic: pass as space-separated values, not JSON array)"
         }
       },
       "type": "object",
@@ -1066,47 +1312,66 @@
       "additionalProperties": false,
       "properties": {
         "mnemonic": {
-          "type": "string"
+          "type": "string",
+          "summary": "Mnemonic for the account"
         },
         "privateKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "Private key for the account"
         },
         "gatewayObject": {
-          "type": "string"
+          "type": "string",
+          "summary": "Gateway object ID"
         },
         "gatewayPackage": {
-          "type": "string"
+          "type": "string",
+          "summary": "Gateway package ID"
         },
         "receiver": {
-          "type": "string"
+          "type": "string",
+          "summary": "Receiver address on ZetaChain"
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "summary": "Amount to deposit in decimal format"
         },
         "chainId": {
-          "type": "string"
+          "type": "string",
+          "summary": "Chain ID"
         },
         "coinType": {
           "type": "string",
+          "summary": "Coin type to deposit",
           "default": "0x2::sui::SUI"
         },
         "gasBudget": {
           "type": "string",
+          "summary": "Gas budget in MIST",
           "default": "10000000"
         },
         "name": {
           "type": "string",
+          "summary": "Account name",
           "default": "default"
         },
         "decimals": {
           "type": "string",
+          "summary": "Number of decimals for the coin type",
           "default": "9"
         },
         "values": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "Parameter values for the function call (variadic: pass as space-separated values, not JSON array)"
         },
         "types": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "List of parameter types (e.g. uint256 address) (variadic: pass as space-separated values, not JSON array)"
         }
       },
       "type": "object",
@@ -1125,40 +1390,51 @@
       "additionalProperties": false,
       "properties": {
         "mnemonic": {
-          "type": "string"
+          "type": "string",
+          "summary": "Mnemonic for the account"
         },
         "privateKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "Private key for the account"
         },
         "gatewayObject": {
-          "type": "string"
+          "type": "string",
+          "summary": "Gateway object ID"
         },
         "gatewayPackage": {
-          "type": "string"
+          "type": "string",
+          "summary": "Gateway package ID"
         },
         "receiver": {
-          "type": "string"
+          "type": "string",
+          "summary": "Receiver address on ZetaChain"
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "summary": "Amount to deposit in decimal format"
         },
         "chainId": {
-          "type": "string"
+          "type": "string",
+          "summary": "Chain ID"
         },
         "coinType": {
           "type": "string",
+          "summary": "Coin type to deposit",
           "default": "0x2::sui::SUI"
         },
         "gasBudget": {
           "type": "string",
+          "summary": "Gas budget in MIST",
           "default": "10000000"
         },
         "name": {
           "type": "string",
+          "summary": "Account name",
           "default": "default"
         },
         "decimals": {
           "type": "string",
+          "summary": "Number of decimals for the coin type",
           "default": "9"
         }
       },
@@ -1178,13 +1454,22 @@
       "additionalProperties": false,
       "properties": {
         "data": {
-          "type": "string"
+          "type": "string",
+          "summary": "Data to encode"
         },
         "typeArguments": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "Type arguments for the encoding (variadic: pass as space-separated values, not JSON array)"
         },
         "objects": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "Objects to include in the encoding (comma-separated) (variadic: pass as space-separated values, not JSON array)"
         }
       },
       "type": "object",
@@ -1201,39 +1486,56 @@
       "additionalProperties": false,
       "properties": {
         "mnemonic": {
-          "type": "string"
+          "type": "string",
+          "summary": "Mnemonic for the account"
         },
         "name": {
           "type": "string",
+          "summary": "Name of the account",
           "default": "default"
         },
         "gateway": {
-          "type": "string"
+          "type": "string",
+          "summary": "Gateway contract address (default: testnet)"
         },
         "receiver": {
-          "type": "string"
+          "type": "string",
+          "summary": "Receiver address"
         },
         "rpc": {
           "type": "string",
+          "summary": "RPC endpoint (default: testnet)",
           "default": "https://testnet.toncenter.com/api/v2/jsonRPC"
         },
         "apiKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "API key"
         },
         "chainId": {
-          "type": "string"
+          "type": "string",
+          "summary": "Chain ID"
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "summary": "Amount in TON"
         },
         "types": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "ABI types (variadic: pass as space-separated values, not JSON array)"
         },
         "values": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "Values corresponding to types (variadic: pass as space-separated values, not JSON array)"
         },
         "data": {
-          "type": "string"
+          "type": "string",
+          "summary": "Data to call the contract with"
         }
       },
       "type": "object",
@@ -1252,30 +1554,38 @@
       "additionalProperties": false,
       "properties": {
         "mnemonic": {
-          "type": "string"
+          "type": "string",
+          "summary": "Mnemonic for the account"
         },
         "name": {
           "type": "string",
+          "summary": "Name of the account",
           "default": "default"
         },
         "gateway": {
-          "type": "string"
+          "type": "string",
+          "summary": "Gateway contract address (default: testnet)"
         },
         "receiver": {
-          "type": "string"
+          "type": "string",
+          "summary": "Receiver address"
         },
         "rpc": {
           "type": "string",
+          "summary": "RPC endpoint (default: testnet)",
           "default": "https://testnet.toncenter.com/api/v2/jsonRPC"
         },
         "apiKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "API key"
         },
         "chainId": {
-          "type": "string"
+          "type": "string",
+          "summary": "Chain ID"
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "summary": "Amount in TON"
         }
       },
       "type": "object",
@@ -1295,28 +1605,35 @@
       "properties": {
         "yes": {
           "type": "boolean",
+          "summary": "Skip confirmation prompt",
           "default": false
         },
         "receiver": {
-          "type": "string"
+          "type": "string",
+          "summary": "ZetaChain receiver address"
         },
         "commitFee": {
           "type": "string",
+          "summary": "Commit fee (in sats)",
           "default": "15000"
         },
         "gateway": {
           "type": "string",
+          "summary": "Bitcoin gateway (TSS) address",
           "default": "tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur"
         },
         "privateKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "Bitcoin private key"
         },
         "name": {
           "type": "string",
+          "summary": "Account name",
           "default": "default"
         },
         "revertAddress": {
-          "type": "string"
+          "type": "string",
+          "summary": "Revert address"
         },
         "network": {
           "type": "string",
@@ -1324,6 +1641,7 @@
             "signet",
             "mainnet"
           ],
+          "summary": "Network",
           "default": "signet"
         },
         "format": {
@@ -1333,24 +1651,36 @@
             "CompactLong",
             "CompactShort"
           ],
+          "summary": "Encoding format",
           "default": "ABI"
         },
         "data": {
-          "type": "string"
+          "type": "string",
+          "summary": "Pass raw data"
         },
         "bitcoinApi": {
           "type": "string",
+          "summary": "Bitcoin API",
           "default": "https://mempool.space/signet/api"
         },
         "gasPriceApi": {
           "type": "string",
+          "summary": "ZetaChain API",
           "default": "https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/crosschain/gasPrice/18333"
         },
         "types": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "ABI types (variadic: pass as space-separated values, not JSON array)"
         },
         "values": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "Values corresponding to types (variadic: pass as space-separated values, not JSON array)"
         }
       },
       "type": "object",
@@ -1368,28 +1698,35 @@
       "properties": {
         "yes": {
           "type": "boolean",
+          "summary": "Skip confirmation prompt",
           "default": false
         },
         "receiver": {
-          "type": "string"
+          "type": "string",
+          "summary": "ZetaChain receiver address"
         },
         "commitFee": {
           "type": "string",
+          "summary": "Commit fee (in sats)",
           "default": "15000"
         },
         "gateway": {
           "type": "string",
+          "summary": "Bitcoin gateway (TSS) address",
           "default": "tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur"
         },
         "privateKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "Bitcoin private key"
         },
         "name": {
           "type": "string",
+          "summary": "Account name",
           "default": "default"
         },
         "revertAddress": {
-          "type": "string"
+          "type": "string",
+          "summary": "Revert address"
         },
         "network": {
           "type": "string",
@@ -1397,6 +1734,7 @@
             "signet",
             "mainnet"
           ],
+          "summary": "Network",
           "default": "signet"
         },
         "format": {
@@ -1406,27 +1744,40 @@
             "CompactLong",
             "CompactShort"
           ],
+          "summary": "Encoding format",
           "default": "ABI"
         },
         "data": {
-          "type": "string"
+          "type": "string",
+          "summary": "Pass raw data"
         },
         "bitcoinApi": {
           "type": "string",
+          "summary": "Bitcoin API",
           "default": "https://mempool.space/signet/api"
         },
         "gasPriceApi": {
           "type": "string",
+          "summary": "ZetaChain API",
           "default": "https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/crosschain/gasPrice/18333"
         },
         "types": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "ABI types (variadic: pass as space-separated values, not JSON array)"
         },
         "values": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "Values corresponding to types (variadic: pass as space-separated values, not JSON array)"
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "summary": "BTC amount to send (in BTC)"
         }
       },
       "type": "object",
@@ -1445,28 +1796,35 @@
       "properties": {
         "yes": {
           "type": "boolean",
+          "summary": "Skip confirmation prompt",
           "default": false
         },
         "receiver": {
-          "type": "string"
+          "type": "string",
+          "summary": "ZetaChain receiver address"
         },
         "commitFee": {
           "type": "string",
+          "summary": "Commit fee (in sats)",
           "default": "15000"
         },
         "gateway": {
           "type": "string",
+          "summary": "Bitcoin gateway (TSS) address",
           "default": "tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur"
         },
         "privateKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "Bitcoin private key"
         },
         "name": {
           "type": "string",
+          "summary": "Account name",
           "default": "default"
         },
         "revertAddress": {
-          "type": "string"
+          "type": "string",
+          "summary": "Revert address"
         },
         "network": {
           "type": "string",
@@ -1474,6 +1832,7 @@
             "signet",
             "mainnet"
           ],
+          "summary": "Network",
           "default": "signet"
         },
         "format": {
@@ -1483,21 +1842,26 @@
             "CompactLong",
             "CompactShort"
           ],
+          "summary": "Encoding format",
           "default": "ABI"
         },
         "data": {
-          "type": "string"
+          "type": "string",
+          "summary": "Pass raw data"
         },
         "bitcoinApi": {
           "type": "string",
+          "summary": "Bitcoin API",
           "default": "https://mempool.space/signet/api"
         },
         "gasPriceApi": {
           "type": "string",
+          "summary": "ZetaChain API",
           "default": "https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/crosschain/gasPrice/18333"
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "summary": "BTC amount to send (in BTC)"
         }
       },
       "type": "object",
@@ -1515,18 +1879,28 @@
       "additionalProperties": false,
       "properties": {
         "receiver": {
-          "type": "string"
+          "type": "string",
+          "summary": "Receiver address"
         },
         "types": {
-          "type": "string",
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "ABI types (e.g. string uint256) (variadic: pass as space-separated values, not JSON array)",
           "default": []
         },
         "values": {
-          "type": "string",
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "summary": "Values corresponding to types (variadic: pass as space-separated values, not JSON array)",
           "default": []
         },
         "revertAddress": {
-          "type": "string"
+          "type": "string",
+          "summary": "Bitcoin revert address"
         },
         "opCode": {
           "type": "string",
@@ -1536,6 +1910,7 @@
             "DepositAndCall",
             "Invalid"
           ],
+          "summary": "Operation code",
           "default": "DepositAndCall"
         },
         "format": {
@@ -1545,6 +1920,7 @@
             "CompactLong",
             "CompactShort"
           ],
+          "summary": "Encoding format",
           "default": "ABI"
         }
       },
@@ -1564,31 +1940,39 @@
       "properties": {
         "yes": {
           "type": "boolean",
+          "summary": "Skip confirmation prompt",
           "default": false
         },
         "receiver": {
-          "type": "string"
+          "type": "string",
+          "summary": "ZetaChain receiver address"
         },
         "commitFee": {
           "type": "string",
+          "summary": "Commit fee (in sats)",
           "default": "15000"
         },
         "gateway": {
           "type": "string",
+          "summary": "Bitcoin gateway (TSS) address",
           "default": "tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur"
         },
         "privateKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "Bitcoin private key"
         },
         "name": {
           "type": "string",
+          "summary": "Account name",
           "default": "default"
         },
         "data": {
-          "type": "string"
+          "type": "string",
+          "summary": "Pass raw data"
         },
         "networkFee": {
           "type": "string",
+          "summary": "Network fee (in sats)",
           "default": "1750"
         },
         "network": {
@@ -1597,14 +1981,17 @@
             "signet",
             "mainnet"
           ],
+          "summary": "Network",
           "default": "signet"
         },
         "bitcoinApi": {
           "type": "string",
+          "summary": "Bitcoin API",
           "default": "https://mempool.space/signet/api"
         },
         "gasPriceApi": {
           "type": "string",
+          "summary": "ZetaChain API",
           "default": "https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/crosschain/gasPrice/18333"
         }
       },
@@ -1623,31 +2010,39 @@
       "properties": {
         "yes": {
           "type": "boolean",
+          "summary": "Skip confirmation prompt",
           "default": false
         },
         "receiver": {
-          "type": "string"
+          "type": "string",
+          "summary": "ZetaChain receiver address"
         },
         "commitFee": {
           "type": "string",
+          "summary": "Commit fee (in sats)",
           "default": "15000"
         },
         "gateway": {
           "type": "string",
+          "summary": "Bitcoin gateway (TSS) address",
           "default": "tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur"
         },
         "privateKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "Bitcoin private key"
         },
         "name": {
           "type": "string",
+          "summary": "Account name",
           "default": "default"
         },
         "data": {
-          "type": "string"
+          "type": "string",
+          "summary": "Pass raw data"
         },
         "networkFee": {
           "type": "string",
+          "summary": "Network fee (in sats)",
           "default": "1750"
         },
         "network": {
@@ -1656,18 +2051,22 @@
             "signet",
             "mainnet"
           ],
+          "summary": "Network",
           "default": "signet"
         },
         "bitcoinApi": {
           "type": "string",
+          "summary": "Bitcoin API",
           "default": "https://mempool.space/signet/api"
         },
         "gasPriceApi": {
           "type": "string",
+          "summary": "ZetaChain API",
           "default": "https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/crosschain/gasPrice/18333"
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "summary": "BTC amount to send (in BTC)"
         }
       },
       "type": "object",
@@ -1686,31 +2085,39 @@
       "properties": {
         "yes": {
           "type": "boolean",
+          "summary": "Skip confirmation prompt",
           "default": false
         },
         "receiver": {
-          "type": "string"
+          "type": "string",
+          "summary": "ZetaChain receiver address"
         },
         "commitFee": {
           "type": "string",
+          "summary": "Commit fee (in sats)",
           "default": "15000"
         },
         "gateway": {
           "type": "string",
+          "summary": "Bitcoin gateway (TSS) address",
           "default": "tb1qy9pqmk2pd9sv63g27jt8r657wy0d9ueeh0nqur"
         },
         "privateKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "Bitcoin private key"
         },
         "name": {
           "type": "string",
+          "summary": "Account name",
           "default": "default"
         },
         "data": {
-          "type": "string"
+          "type": "string",
+          "summary": "Pass raw data"
         },
         "networkFee": {
           "type": "string",
+          "summary": "Network fee (in sats)",
           "default": "1750"
         },
         "network": {
@@ -1719,18 +2126,22 @@
             "signet",
             "mainnet"
           ],
+          "summary": "Network",
           "default": "signet"
         },
         "bitcoinApi": {
           "type": "string",
+          "summary": "Bitcoin API",
           "default": "https://mempool.space/signet/api"
         },
         "gasPriceApi": {
           "type": "string",
+          "summary": "ZetaChain API",
           "default": "https://zetachain-athens.blockpi.network/lcd/v1/public/zeta-chain/crosschain/gasPrice/18333"
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "summary": "BTC amount to send (in BTC)"
         }
       },
       "type": "object",
@@ -1749,22 +2160,27 @@
       "properties": {
         "port": {
           "type": "string",
+          "summary": "Port to run anvil on",
           "default": "8545"
         },
         "anvil": {
           "type": "string",
+          "summary": "Additional arguments to pass to anvil",
           "default": "-q"
         },
         "forceKill": {
           "type": "boolean",
+          "summary": "Force kill any process on the port without prompting",
           "default": false
         },
         "stopAfterInit": {
           "type": "boolean",
+          "summary": "Stop the localnet after successful initialization",
           "default": false
         },
         "exitOnError": {
           "type": "boolean",
+          "summary": "Exit with an error if a call is reverted",
           "default": false
         },
         "verbosity": {
@@ -1779,15 +2195,20 @@
             "info",
             "debug"
           ],
+          "summary": "Logger verbosity level",
           "default": "info"
         },
         "chains": {
-          "type": "string",
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
           "enum": [
             "ton",
             "solana",
             "sui"
           ],
+          "summary": "Chains to launch when starting localnet (variadic: pass as space-separated values, not JSON array)",
           "default": []
         }
       },
@@ -1813,6 +2234,7 @@
       "properties": {
         "delay": {
           "type": "string",
+          "summary": "Seconds to wait before checking localnet",
           "default": "3"
         }
       },
@@ -1827,7 +2249,8 @@
       "additionalProperties": false,
       "properties": {
         "address": {
-          "type": "string"
+          "type": "string",
+          "summary": "Address"
         }
       },
       "type": "object",
@@ -1844,10 +2267,12 @@
       "additionalProperties": false,
       "properties": {
         "address": {
-          "type": "string"
+          "type": "string",
+          "summary": "Address"
         },
         "amount": {
           "type": "string",
+          "summary": "Amount in TON",
           "default": "100"
         }
       },
@@ -1866,6 +2291,7 @@
       "properties": {
         "amount": {
           "type": "string",
+          "summary": "Amount to topup in TON",
           "default": "100"
         }
       },
@@ -1880,23 +2306,29 @@
       "additionalProperties": false,
       "properties": {
         "address": {
-          "type": "string"
+          "type": "string",
+          "summary": "Recipient"
         },
         "amount": {
           "type": "string",
+          "summary": "Amount in TON",
           "default": "1"
         },
         "privateKey": {
-          "type": "string"
+          "type": "string",
+          "summary": "Sender's private key on Zeta"
         },
         "gateway": {
-          "type": "string"
+          "type": "string",
+          "summary": "Gateway address on ZEVM"
         },
         "token": {
-          "type": "string"
+          "type": "string",
+          "summary": "TON.TON token address on ZEVM"
         },
         "port": {
           "type": "string",
+          "summary": "Anvil port",
           "default": "8545"
         }
       },
@@ -1921,7 +2353,8 @@
           "enum": [
             "claude",
             "cursor"
-          ]
+          ],
+          "summary": "AI client to install for"
         }
       },
       "type": "object",
@@ -1942,7 +2375,8 @@
           "enum": [
             "claude",
             "cursor"
-          ]
+          ],
+          "summary": "AI client to remove from"
         }
       },
       "type": "object",
@@ -1969,7 +2403,8 @@
       "additionalProperties": false,
       "properties": {
         "json": {
-          "type": "boolean"
+          "type": "boolean",
+          "summary": "Output documentation as JSON (tools schema)"
         }
       },
       "type": "object"

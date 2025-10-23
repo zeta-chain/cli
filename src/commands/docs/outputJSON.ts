@@ -36,16 +36,16 @@ const toSnakeCase = (text: string): string => {
 };
 
 const argumentToSchema = (
-  arg: Argument
+  arg: Argument,
 ): { isRequired: boolean; schema: JSONSchema } => {
   const isVariadic: boolean = Boolean(
-    (arg as unknown as { variadic?: boolean })?.variadic
+    (arg as unknown as { variadic?: boolean })?.variadic,
   );
   const isRequired: boolean = Boolean(
-    (arg as unknown as { required?: boolean })?.required
+    (arg as unknown as { required?: boolean })?.required,
   );
   const description: string = String(
-    (arg as unknown as { summary?: string })?.summary || ""
+    (arg as unknown as { summary?: string })?.summary || "",
   );
 
   const schema: JSONSchema = isVariadic
@@ -58,7 +58,7 @@ const argumentToSchema = (
 };
 
 const optionToSchema = (
-  opt: Option
+  opt: Option,
 ): { isMandatory: boolean; name: string; schema: JSONSchema } => {
   const name: string =
     typeof opt.attributeName === "function"
@@ -66,18 +66,21 @@ const optionToSchema = (
       : String(
           (opt as unknown as { long?: string; short?: string })?.long ||
             (opt as unknown as { long?: string; short?: string })?.short ||
-            ""
+            "",
         ).replace(/^--?/, "");
   const description: string = String(
-    (opt as unknown as { summary?: string })?.summary || ""
+    (opt as unknown as { description?: string })?.description || "",
   );
   const isBoolean: boolean =
     typeof opt.isBoolean === "function" ? opt.isBoolean() : false;
   const isMandatory: boolean = Boolean(
-    (opt as unknown as { mandatory?: boolean })?.mandatory
+    (opt as unknown as { mandatory?: boolean })?.mandatory,
+  );
+  const isVariadic: boolean = Boolean(
+    (opt as unknown as { variadic?: boolean })?.variadic,
   );
   const choices: string[] | undefined = Array.isArray(
-    (opt as unknown as { argChoices?: string[] })?.argChoices
+    (opt as unknown as { argChoices?: string[] })?.argChoices,
   )
     ? (opt as unknown as { argChoices?: string[] })?.argChoices
     : undefined;
@@ -86,10 +89,17 @@ const optionToSchema = (
 
   const schema: JSONSchema = isBoolean
     ? { type: "boolean" }
-    : { type: "string" };
+    : isVariadic
+      ? { items: { type: "string" }, type: "array" }
+      : { type: "string" };
   if (choices && choices.length > 0)
     (schema as { enum?: string[] }).enum = choices;
-  if (description) (schema as { summary?: string }).summary = description;
+  if (description) {
+    const enhancedDescription = isVariadic
+      ? `${description} (variadic: pass as space-separated values, not JSON array)`
+      : description;
+    (schema as { summary?: string }).summary = enhancedDescription;
+  }
   if (defaultValue !== undefined)
     (schema as { default?: unknown }).default = defaultValue;
 
