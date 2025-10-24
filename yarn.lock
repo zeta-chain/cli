@@ -2959,7 +2959,7 @@
   dependencies:
     "@wallet-standard/base" "^1.1.0"
 
-"@zetachain/localnet@^13.1.1":
+"@zetachain/localnet@13.1.1":
   version "13.1.1"
   resolved "https://registry.npmjs.org/@zetachain/localnet/-/localnet-13.1.1.tgz#947e292efe4892bb19de25188f132f51886f7a21"
   integrity sha512-Irjrdh0wfGPUKkosVVlLrMP9+U/Iocs/uLcIaQxfdrhSby67BCs8xsFmmWtlt4+gbANcj0UxGLKdm26AOzAstA==
