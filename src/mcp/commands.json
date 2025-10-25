@@ -36,7 +36,7 @@
             "bitcoin",
             "ton"
           ],
-          "summary": "Account type"
+          "summary": "Chain type"
         },
         "name": {
           "type": "string",
@@ -63,7 +63,7 @@
             "bitcoin",
             "ton"
           ],
-          "summary": "Account type"
+          "summary": "Chain type"
         },
         "name": {
           "type": "string",
@@ -79,7 +79,7 @@
     "title": "Accounts Delete"
   },
   {
-    "description": "Accounts Import",
+    "description": "Import an existing account",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -92,7 +92,7 @@
             "bitcoin",
             "ton"
           ],
-          "summary": "Account type"
+          "summary": "Chain type"
         },
         "name": {
           "type": "string",
@@ -114,7 +114,7 @@
     "title": "Accounts Import"
   },
   {
-    "description": "List all available accounts",
+    "description": "List all stored accounts",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -129,7 +129,7 @@
     "title": "Accounts List"
   },
   {
-    "description": "Show details of an existing account",
+    "description": "View details of a specific account",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -142,7 +142,7 @@
             "bitcoin",
             "ton"
           ],
-          "summary": "Account type"
+          "summary": "Chain type"
         },
         "name": {
           "type": "string",
@@ -158,29 +158,29 @@
     "title": "Accounts Show"
   },
   {
-    "description": "Fetch native and ZETA token balances",
+    "description": "Fetch native and ZRC-20 token balances",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
         "evm": {
           "type": "string",
-          "summary": "Fetch balances for a specific EVM address"
+          "summary": "Address on EVM chains"
         },
         "solana": {
           "type": "string",
-          "summary": "Fetch balances for a specific Solana address"
+          "summary": "Address on Solana"
         },
         "bitcoin": {
           "type": "string",
-          "summary": "Fetch balances for a specific Bitcoin address"
+          "summary": "Address on Bitcoin"
         },
         "sui": {
           "type": "string",
-          "summary": "Fetch balances for a specific Sui address"
+          "summary": "Address on Sui"
         },
         "ton": {
           "type": "string",
-          "summary": "Fetch balances for a specific TON address"
+          "summary": "Address on TON"
         },
         "name": {
           "type": "string",
@@ -201,7 +201,7 @@
         },
         "showZero": {
           "type": "boolean",
-          "summary": "Include zero balances",
+          "summary": "Include zero balances in output",
           "default": false
         }
       },
@@ -211,7 +211,7 @@
     "title": "Query Balances"
   },
   {
-    "description": "Query Cctx",
+    "description": "Track the status of a cross-chain transaction.",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -244,7 +244,70 @@
     "title": "Query Cctx"
   },
   {
-    "description": "Query Fees",
+    "description": "List protocol contracts on all connected chains",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "rpc": {
+          "type": "string",
+          "summary": "Custom RPC URL",
+          "default": "https://zetachain-athens-evm.blockpi.network/v1/rpc/public"
+        },
+        "json": {
+          "type": "boolean",
+          "summary": "Output contracts as JSON"
+        },
+        "columns": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "enum": [
+            "type",
+            "address"
+          ],
+          "summary": "Additional columns to show (variadic: pass as space-separated values, not JSON array)",
+          "default": [
+            "type",
+            "address"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "name": "query_contracts_list",
+    "title": "Query Contracts List"
+  },
+  {
+    "description": "Show a protocol contract address on a specific chain",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "rpc": {
+          "type": "string",
+          "summary": "Custom RPC URL",
+          "default": "https://zetachain-athens-evm.blockpi.network/v1/rpc/public"
+        },
+        "chainId": {
+          "type": "string",
+          "summary": "Chain ID"
+        },
+        "type": {
+          "type": "string",
+          "summary": "Contract type"
+        }
+      },
+      "type": "object",
+      "required": [
+        "chainId",
+        "type"
+      ]
+    },
+    "name": "query_contracts_show",
+    "title": "Query Contracts Show"
+  },
+  {
+    "description": "List withdraw gas fees",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -260,7 +323,57 @@
         },
         "gasLimit": {
           "type": "string",
-          "summary": "Gas limit for withdraw and call"
+          "summary": "Gas limit for withdraw and call transactions"
+        },
+        "json": {
+          "type": "boolean",
+          "summary": "Output in JSON format"
+        }
+      },
+      "type": "object"
+    },
+    "name": "query_fees_list",
+    "title": "Query Fees List"
+  },
+  {
+    "description": "Query Fees Show",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "target": {
+          "type": "string",
+          "summary": "Target ZRC-20 token address"
+        },
+        "gasLimit": {
+          "type": "string",
+          "summary": "Optional gas limit to compute withdraw fee with"
+        },
+        "targetChain": {
+          "type": "string",
+          "summary": "Target chain ID to auto-resolve gas token ZRC-20"
+        },
+        "source": {
+          "type": "string",
+          "summary": "Source ZRC-20 token address"
+        },
+        "sourceChain": {
+          "type": "string",
+          "summary": "Source chain ID to auto-resolve source ZRC-20"
+        },
+        "rpc": {
+          "type": "string",
+          "summary": "RPC endpoint URL",
+          "default": "https://zetachain-athens-evm.blockpi.network/v1/rpc/public"
+        },
+        "router": {
+          "type": "string",
+          "summary": "UniswapV2 router address",
+          "default": "0x2ca7d64A7EFE2D62A725E2B35Cf7230D6677FfEe"
+        },
+        "api": {
+          "type": "string",
+          "summary": "API endpoint URL",
+          "default": "https://zetachain-athens.blockpi.network/lcd/v1/public"
         },
         "json": {
           "type": "boolean",
@@ -269,11 +382,11 @@
       },
       "type": "object"
     },
-    "name": "query_fees",
-    "title": "Query Fees"
+    "name": "query_fees_show",
+    "title": "Query Fees Show"
   },
   {
-    "description": "Query Tokens List",
+    "description": "List all ZRC-20 tokens",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -284,7 +397,7 @@
         },
         "json": {
           "type": "boolean",
-          "summary": "Output tokens as JSON"
+          "summary": "Output in JSON format"
         },
         "columns": {
           "items": {
@@ -296,7 +409,7 @@
             "type",
             "decimals"
           ],
-          "summary": "Additional columns to show (variadic: pass as space-separated values, not JSON array)",
+          "summary": "Additional columns to display (variadic: pass as space-separated values, not JSON array)",
           "default": []
         }
       },
@@ -306,7 +419,7 @@
     "title": "Query Tokens List"
   },
   {
-    "description": "Query Tokens Show",
+    "description": "Show details for a ZRC-20 token",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -321,11 +434,11 @@
         },
         "field": {
           "type": "string",
-          "summary": "Return specific field value (for scripting). Use 'zrc20' as shorthand for 'zrc20_contract_address'"
+          "summary": "Return only a specific field value. Use 'zrc20' as shorthand for 'zrc20_contract_address'"
         },
         "json": {
           "type": "boolean",
-          "summary": "Output token as JSON"
+          "summary": "Output in JSON format"
         }
       },
       "type": "object",
@@ -337,7 +450,7 @@
     "title": "Query Tokens Show"
   },
   {
-    "description": "Query Chains List",
+    "description": "List all connected chains",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -348,7 +461,7 @@
         },
         "json": {
           "type": "boolean",
-          "summary": "Output chains as JSON"
+          "summary": "Output in JSON format"
         }
       },
       "type": "object"
@@ -357,7 +470,7 @@
     "title": "Query Chains List"
   },
   {
-    "description": "Query Chains Show",
+    "description": "Show details for a connected chain",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -381,11 +494,11 @@
         },
         "field": {
           "type": "string",
-          "summary": "Return specific field value (for scripting)"
+          "summary": "Return only a specific field value"
         },
         "json": {
           "type": "boolean",
-          "summary": "Output chain as JSON"
+          "summary": "Output in JSON format"
         }
       },
       "type": "object"
@@ -394,7 +507,7 @@
     "title": "Query Chains Show"
   },
   {
-    "description": "Faucet",
+    "description": "Request testnet ZETA tokens from the faucet",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -420,11 +533,11 @@
       "properties": {
         "zrc20": {
           "type": "string",
-          "summary": "The address of ZRC-20 to pay fees"
+          "summary": "ZRC-20 token address to pay cross-chain fees"
         },
         "receiver": {
           "type": "string",
-          "summary": "The address of the receiver contract on a connected chain. Non-hex strings will be automatically encoded to hex."
+          "summary": "Receiver contract address on the connected chain (non-hex strings will be encoded)"
         },
         "name": {
           "type": "string",
@@ -433,7 +546,7 @@
         },
         "chainId": {
           "type": "string",
-          "summary": "Chain ID of the network"
+          "summary": "Chain ID of the destination network"
         },
         "privateKey": {
           "type": "string",
@@ -441,7 +554,7 @@
         },
         "rpc": {
           "type": "string",
-          "summary": "RPC URL of the network"
+          "summary": "ZetaChain RPC URL"
         },
         "gateway": {
           "type": "string",
@@ -449,17 +562,17 @@
         },
         "revertAddress": {
           "type": "string",
-          "summary": "Revert address",
+          "summary": "Address to receive tokens if the transaction reverts",
           "default": "0x0000000000000000000000000000000000000000"
         },
         "abortAddress": {
           "type": "string",
-          "summary": "Abort address",
+          "summary": "Address to receive tokens if transaction is aborted",
           "default": "0x0000000000000000000000000000000000000000"
         },
         "callOnRevert": {
           "type": "boolean",
-          "summary": "Whether to call on revert",
+          "summary": "Call onRevert handler if the transaction fails",
           "default": false
         },
         "onRevertGasLimit": {
@@ -469,7 +582,7 @@
         },
         "revertMessage": {
           "type": "string",
-          "summary": "Revert message",
+          "summary": "Message to include in the revert call ",
           "default": "0x"
         },
         "txOptionsGasLimit": {
@@ -484,12 +597,12 @@
         },
         "callOptionsGasLimit": {
           "type": "string",
-          "summary": "Gas limit for the call",
+          "summary": "Gas limit for the contract call on the connected chain",
           "default": "1000000"
         },
         "callOptionsIsArbitraryCall": {
           "type": "boolean",
-          "summary": "Call any function",
+          "summary": "Call any function (--function is required)",
           "default": false
         },
         "yes": {
@@ -499,7 +612,7 @@
         },
         "function": {
           "type": "string",
-          "summary": "Function to call (example: \"hello(string)\")"
+          "summary": "Function signature to call (example: \"hello(string)\")"
         },
         "types": {
           "items": {
@@ -517,7 +630,7 @@
         },
         "data": {
           "type": "string",
-          "summary": "Raw data for non-EVM chains like Solana"
+          "summary": "Raw data"
         }
       },
       "type": "object",
@@ -536,11 +649,11 @@
       "properties": {
         "zrc20": {
           "type": "string",
-          "summary": "The address of ZRC-20 to pay fees"
+          "summary": "ZRC-20 token address to pay cross-chain fees"
         },
         "receiver": {
           "type": "string",
-          "summary": "The address of the receiver contract on a connected chain. Non-hex strings will be automatically encoded to hex."
+          "summary": "Receiver contract address on the connected chain (non-hex strings will be encoded)"
         },
         "name": {
           "type": "string",
@@ -549,7 +662,7 @@
         },
         "chainId": {
           "type": "string",
-          "summary": "Chain ID of the network"
+          "summary": "Chain ID of the destination network"
         },
         "privateKey": {
           "type": "string",
@@ -557,7 +670,7 @@
         },
         "rpc": {
           "type": "string",
-          "summary": "RPC URL of the network"
+          "summary": "ZetaChain RPC URL"
         },
         "gateway": {
           "type": "string",
@@ -565,17 +678,17 @@
         },
         "revertAddress": {
           "type": "string",
-          "summary": "Revert address",
+          "summary": "Address to receive tokens if the transaction reverts",
           "default": "0x0000000000000000000000000000000000000000"
         },
         "abortAddress": {
           "type": "string",
-          "summary": "Abort address",
+          "summary": "Address to receive tokens if transaction is aborted",
           "default": "0x0000000000000000000000000000000000000000"
         },
         "callOnRevert": {
           "type": "boolean",
-          "summary": "Whether to call on revert",
+          "summary": "Call onRevert handler if the transaction fails",
           "default": false
         },
         "onRevertGasLimit": {
@@ -585,7 +698,7 @@
         },
         "revertMessage": {
           "type": "string",
-          "summary": "Revert message",
+          "summary": "Message to include in the revert call ",
           "default": "0x"
         },
         "txOptionsGasLimit": {
@@ -600,12 +713,12 @@
         },
         "callOptionsGasLimit": {
           "type": "string",
-          "summary": "Gas limit for the call",
+          "summary": "Gas limit for the contract call on the connected chain",
           "default": "1000000"
         },
         "callOptionsIsArbitraryCall": {
           "type": "boolean",
-          "summary": "Call any function",
+          "summary": "Call any function (--function is required)",
           "default": false
         },
         "yes": {
@@ -629,17 +742,17 @@
     "title": "Zetachain Withdraw"
   },
   {
-    "description": "Withdraw tokens from ZetaChain and call a contract on a connected chain",
+    "description": "Withdraw tokens and call a contract on a connected chain",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
         "zrc20": {
           "type": "string",
-          "summary": "The address of ZRC-20 to pay fees"
+          "summary": "ZRC-20 token address to pay cross-chain fees"
         },
         "receiver": {
           "type": "string",
-          "summary": "The address of the receiver contract on a connected chain. Non-hex strings will be automatically encoded to hex."
+          "summary": "Receiver contract address on the connected chain (non-hex strings will be encoded)"
         },
         "name": {
           "type": "string",
@@ -648,7 +761,7 @@
         },
         "chainId": {
           "type": "string",
-          "summary": "Chain ID of the network"
+          "summary": "Chain ID of the destination network"
         },
         "privateKey": {
           "type": "string",
@@ -656,7 +769,7 @@
         },
         "rpc": {
           "type": "string",
-          "summary": "RPC URL of the network"
+          "summary": "ZetaChain RPC URL"
         },
         "gateway": {
           "type": "string",
@@ -664,17 +777,17 @@
         },
         "revertAddress": {
           "type": "string",
-          "summary": "Revert address",
+          "summary": "Address to receive tokens if the transaction reverts",
           "default": "0x0000000000000000000000000000000000000000"
         },
         "abortAddress": {
           "type": "string",
-          "summary": "Abort address",
+          "summary": "Address to receive tokens if transaction is aborted",
           "default": "0x0000000000000000000000000000000000000000"
         },
         "callOnRevert": {
           "type": "boolean",
-          "summary": "Whether to call on revert",
+          "summary": "Call onRevert handler if the transaction fails",
           "default": false
         },
         "onRevertGasLimit": {
@@ -684,7 +797,7 @@
         },
         "revertMessage": {
           "type": "string",
-          "summary": "Revert message",
+          "summary": "Message to include in the revert call ",
           "default": "0x"
         },
         "txOptionsGasLimit": {
@@ -699,12 +812,12 @@
         },
         "callOptionsGasLimit": {
           "type": "string",
-          "summary": "Gas limit for the call",
+          "summary": "Gas limit for the contract call on the connected chain",
           "default": "1000000"
         },
         "callOptionsIsArbitraryCall": {
           "type": "boolean",
-          "summary": "Call any function",
+          "summary": "Call any function (--function is required)",
           "default": false
         },
         "yes": {
@@ -718,7 +831,7 @@
         },
         "function": {
           "type": "string",
-          "summary": "Function to call (example: \"hello(string)\")"
+          "summary": "Function signature to call (example: \"hello(string)\")"
         },
         "types": {
           "items": {
@@ -1028,11 +1141,11 @@
     "title": "Evm Deposit"
   },
   {
-    "description": "Solana Call",
+    "description": "Call a contract on ZetaChain from Solana",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
-        "recipient": {
+        "receiver": {
           "type": "string",
           "summary": "EOA or contract address on ZetaChain"
         },
@@ -1094,7 +1207,7 @@
       },
       "type": "object",
       "required": [
-        "recipient",
+        "receiver",
         "chainId",
         "types",
         "values"
@@ -1104,11 +1217,11 @@
     "title": "Solana Call"
   },
   {
-    "description": "Solana Deposit-and-call",
+    "description": "Deposit tokens from Solana and call a contract on ZetaChain",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
-        "recipient": {
+        "receiver": {
           "type": "string",
           "summary": "EOA or contract address on ZetaChain"
         },
@@ -1183,7 +1296,7 @@
       },
       "type": "object",
       "required": [
-        "recipient",
+        "receiver",
         "chainId",
         "amount",
         "types",
@@ -1198,7 +1311,7 @@
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
-        "recipient": {
+        "receiver": {
           "type": "string",
           "summary": "EOA or contract address on ZetaChain"
         },
@@ -1259,7 +1372,7 @@
       },
       "type": "object",
       "required": [
-        "recipient",
+        "receiver",
         "chainId",
         "amount"
       ]
@@ -1481,7 +1594,7 @@
     "title": "Sui Encode"
   },
   {
-    "description": "Ton Deposit-and-call",
+    "description": "Deposit TON and call a contract on ZetaChain",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -1549,7 +1662,7 @@
     "title": "Ton Deposit-and-call"
   },
   {
-    "description": "Ton Deposit",
+    "description": "Deposit tokens from TON",
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
@@ -1634,6 +1747,14 @@
         "revertAddress": {
           "type": "string",
           "summary": "Revert address"
+        },
+        "abortAddress": {
+          "type": "string",
+          "summary": "Abort address"
+        },
+        "revertMessage": {
+          "type": "string",
+          "summary": "Revert message"
         },
         "network": {
           "type": "string",
@@ -1727,6 +1848,14 @@
         "revertAddress": {
           "type": "string",
           "summary": "Revert address"
+        },
+        "abortAddress": {
+          "type": "string",
+          "summary": "Abort address"
+        },
+        "revertMessage": {
+          "type": "string",
+          "summary": "Revert message"
         },
         "network": {
           "type": "string",
@@ -1825,6 +1954,14 @@
         "revertAddress": {
           "type": "string",
           "summary": "Revert address"
+        },
+        "abortAddress": {
+          "type": "string",
+          "summary": "Abort address"
+        },
+        "revertMessage": {
+          "type": "string",
+          "summary": "Revert message"
         },
         "network": {
           "type": "string",
