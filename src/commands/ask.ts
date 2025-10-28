@@ -7,13 +7,20 @@ import { streamChatResponse } from "./ask/streaming";
 import { createChatSpinner } from "./ask/ui";
 import { validateAndSanitizePrompt } from "./ask/validation";
 
-const main = async (promptParts: string[]): Promise<void> => {
+const main = async (
+  promptParts: string[],
+  options?: { nonInteractive?: boolean },
+): Promise<void> => {
+  const nonInteractive = Boolean(options?.nonInteractive);
   let conversationId: string = uuidv4();
   const messages: { content: string; role: "assistant" | "user" }[] = [];
   let nextPrompt = promptParts.join(" ").trim();
   while (true) {
     let prompt = nextPrompt;
     if (!prompt) {
+      if (nonInteractive) {
+        return;
+      }
       try {
         const { input } = await inquirer.prompt([
           { message: "Ask ZetaChain", name: "input", type: "input" },
@@ -66,6 +73,9 @@ const main = async (promptParts: string[]): Promise<void> => {
       if (assistantBuffer.trim()) {
         messages.push({ content: assistantBuffer, role: "assistant" });
       }
+      if (nonInteractive) {
+        return;
+      }
     } catch (securityError) {
       const message =
         securityError instanceof Error
@@ -81,4 +91,5 @@ const main = async (promptParts: string[]): Promise<void> => {
 export const askCommand = new Command("ask")
   .description("Chat with ZetaChain Docs AI")
   .argument("[prompt...]", "Prompt to send to AI")
+  .option("--non-interactive", "Run in non-interactive mode")
   .action(main);
