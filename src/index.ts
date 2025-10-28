@@ -10,6 +10,7 @@ import {
   suiCommand,
   tonCommand,
   zetachainCommand,
+  utilsCommand,
 } from "@zetachain/toolkit/commands";
 import { Command } from "commander";
 
@@ -41,8 +42,9 @@ program.addCommand(tonCommand);
 program.addCommand(bitcoinCommand);
 program.addCommand(localnetCommand);
 program.addCommand(mcpCommand);
-program.addCommand(docsCommand);
 program.addCommand(askCommand);
+program.addCommand(utilsCommand);
+program.addCommand(docsCommand);
 
 setupAnalytics(program);
 
