@@ -1387,7 +1387,7 @@
       "properties": {
         "connected": {
           "type": "string",
-          "summary": "Connected PDA account address"
+          "summary": "Connected program address"
         },
         "data": {
           "type": "string",

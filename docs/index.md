@@ -914,7 +914,7 @@ Options:
 Usage: zetachain solana encode [options]
 
 Options:
-  --connected <address>     Connected PDA account address
+  --connected <address>     Connected program address
   --data <data>             Data to encode
   --gateway <address>       Gateway program address
   --mint <address>          Mint address for SPL token operations
