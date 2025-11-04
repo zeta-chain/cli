@@ -3139,10 +3139,10 @@
   resolved "https://registry.npmjs.org/@zetachain/standard-contracts/-/standard-contracts-2.0.1.tgz#aefd28bb81f1f05b183bd73dc62bd68e456a6ebf"
   integrity sha512-SHV9a1bSgy8litI/LRZ4VIus7Gsjy0wj3n9bZeIsEydn0C5NNZxYO4XW+P06dlEyDQjtcVJQHoQOyHkodBoVsQ==
 
-"@zetachain/toolkit@16.2.2":
-  version "16.2.2"
-  resolved "https://registry.yarnpkg.com/@zetachain/toolkit/-/toolkit-16.2.2.tgz#b17ad2a00d40c05ea6281d193325a8bf98cecbb3"
-  integrity sha512-PCrGlNdnO5PO/o5UdEKo0ruXiCSIAWzOCQDdShEY3aMfhishZ7j1sIQtif/dsr/oGvfFztA0X89MYR8xYQ+vRA==
+"@zetachain/toolkit@^16.3.0":
+  version "16.3.0"
+  resolved "https://registry.npmjs.org/@zetachain/toolkit/-/toolkit-16.3.0.tgz#ab35c451fd4f3a7e08a750a547a164ef418ffa48"
+  integrity sha512-pAvUgSM3K/LfGwPOoNIWOrXZj+ApyagCq0bidknlN5AEURzeL6qzJyiDfFGD0DmIcNb8YItl1BTwpQaHDwBe7g==
   dependencies:
     "@bitcoinerlab/secp256k1" "^1.2.0"
     "@coral-xyz/anchor" "^0.30.1"
